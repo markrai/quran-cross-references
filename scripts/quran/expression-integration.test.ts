@@ -34,6 +34,11 @@ describe('exact Arabic expressions against the pinned 6,236-ayah corpus', () => 
       evidence.expressions.length,
     );
     expect(validateExactExpressionEvidence(evidence, text.arabic, source)).toBe(evidence);
+    const bytes = JSON.stringify(evidence) + '\n';
+    expect(Buffer.byteLength(bytes, 'utf8')).toBe(1772921);
+    expect(createHash('sha256').update(bytes).digest('hex')).toBe(
+      '3c8f6e602abdfcf8c71713fef2c62183458928d6f5ad08c365612dac0bc55923',
+    );
     expect(evidence.expressions.every((item) => item.occurrences.length >= 2)).toBe(true);
     expect(
       evidence.expressions.every(
