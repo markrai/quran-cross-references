@@ -6,6 +6,10 @@ import {
   QuranRelationshipEvidenceIndex,
 } from '../../src/core/quran/relationship-evidence.ts';
 import { QuranRelationshipIndex } from '../../src/core/quran/relationship-index.ts';
+import {
+  createExactExpressionEvidence,
+  validateExactExpressionEvidence,
+} from './expression-evidence.ts';
 import { importMutashabihat, importQuranText } from './datasets.ts';
 import { verifyPinnedQuranSource } from './pinned-source.ts';
 
@@ -95,6 +99,11 @@ writeDataset('text.json', { ...text, tanzilNotice });
 
 writeDataset('relationships.json', links);
 writeDataset('evidence.json', evidence);
+const arabicPin = pins.find((pin) => pin.id === 'tanzil-uthmani');
+if (!arabicPin) throw new Error('Missing pinned Arabic source.');
+const expressions = createExactExpressionEvidence(text.arabic, arabicPin);
+validateExactExpressionEvidence(expressions, text.arabic, arabicPin);
+writeDataset('expressions.json', { ...expressions, tanzilNotice });
 writeDataset('manifest.json', {
   format: 'quran-foundation-manifest',
   schemaVersion: 1,

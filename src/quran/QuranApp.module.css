@@ -748,3 +748,139 @@
     grid-column: 1 / -1;
   }
 }
+
+.expressionsReaderLayout {
+  display: block;
+}
+
+.expressionCard {
+  margin-bottom: 1.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.expressionColumns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+
+.expressionColumn {
+  min-width: 0;
+}
+
+.expressionColumn h3 {
+  margin: 0 0 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.expressionButtons,
+.expressionLocations {
+  display: grid;
+  gap: 0.45rem;
+  max-height: 27rem;
+  overflow-y: auto;
+}
+
+.expressionButton {
+  display: grid;
+  gap: 0.3rem;
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  text-align: start;
+  border: 1px solid var(--color-border);
+  border-radius: 0.55rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.expressionButton[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.expressionArabic,
+.expressionSelected {
+  font-family: 'Amiri', 'Noto Naskh Arabic', 'Traditional Arabic', 'Scheherazade New', serif;
+  font-size: 1.4rem;
+  line-height: 1.85;
+  text-align: right;
+  unicode-bidi: isolate;
+}
+
+.expressionButton small,
+.expressionOccurrence small {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.expressionSelected {
+  margin: 0.35rem 0;
+  font-size: 1.8rem;
+}
+
+.expressionStats {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.expressionLocations {
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  max-height: 16rem;
+}
+
+.expressionOccurrence {
+  display: grid;
+  gap: 0.2rem;
+  min-height: 44px;
+  padding: 0.55rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: center;
+}
+
+.expressionOccurrence[aria-current='location'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.expressionButton:hover,
+.expressionOccurrence:hover {
+  border-color: var(--color-accent);
+}
+
+.expressionMore {
+  margin: 0.6rem 0;
+  color: var(--color-text-muted);
+  font-size: 0.83rem;
+}
+
+.expressionMore summary {
+  padding: 0.5rem 0;
+  cursor: pointer;
+}
+
+.expressionMore > .expressionButtons,
+.expressionMore > .expressionLocations {
+  margin-top: 0.65rem;
+}
+
+.expressionAnchor {
+  fill: #f3c37b;
+  stroke: var(--color-surface);
+  stroke-width: 2;
+}
+
+@media (max-width: 62rem) {
+  .expressionColumns {
+    grid-template-columns: 1fr;
+  }
+}

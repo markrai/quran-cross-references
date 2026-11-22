@@ -73,6 +73,12 @@ expressions are yet shipped to the PWA or rendered as curated arcs.
 Run `npm run bench:expressions` to regenerate and profile the corpus.
 See [Phase 2B.2 algorithm, provenance and corpus budgets](docs/QURAN_PHASE_2B2.md).
 
+## On-demand exact Arabic exploration (Phase 2B.3)
+
+Choose **Evidence type → Computed exact Arabic phrases** to inspect the 5,084 computed verbatim phrases and navigate their 16,924 recorded word spans. A phrase-specific graph displays at most 32 distinct target ayahs per page, with all targets accessible through pagination. Computed matches are not curated links, root matches or interpretations.
+
+The versioned `data/quran/expressions.json` artifact is SHA-256-pinned in the publication manifest, verified before it is indexed, and loaded only when the computed mode is selected. It is not part of the default offline PWA precache. Deep links use `evidence=exact&expression=exact:v1:...`; legacy curated `link=N` selections remain separate. See [Phase 2B.3](docs/QURAN_PHASE_2B3.md).
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).

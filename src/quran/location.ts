@@ -4,6 +4,7 @@ import type { QuranRelationshipScope } from '../core/quran/relationship-filter.t
 
 export type QuranView = 'arcs' | 'threads';
 export type QuranDirection = 'outgoing' | 'incoming' | 'both';
+export type QuranEvidenceMode = 'curated' | 'exact';
 
 export interface QuranLocation {
   readonly view: QuranView;
@@ -12,6 +13,8 @@ export interface QuranLocation {
   readonly reference: AyahRef;
   readonly rangeEnd: AyahRef | null;
   readonly selectedLink: number | null;
+  readonly evidence: QuranEvidenceMode;
+  readonly selectedExpression: string | null;
 }
 
 export const DEFAULT_QURAN_LOCATION: QuranLocation = {
@@ -21,6 +24,8 @@ export const DEFAULT_QURAN_LOCATION: QuranLocation = {
   reference: { surah: 2, ayah: 1 },
   rangeEnd: null,
   selectedLink: null,
+  evidence: 'curated',
+  selectedExpression: null,
 };
 
 function parseSelectedLink(raw: string | null): number | null {
@@ -45,10 +50,17 @@ export function parseQuranLocation(url: URL): QuranLocation {
   const view = params.get('view');
   const direction = params.get('direction');
   const scope = params.get('scope');
+  const evidence: QuranEvidenceMode = params.get('evidence') === 'exact' ? 'exact' : 'curated';
+  const expression = params.get('expression');
   return {
     reference,
     rangeEnd,
-    selectedLink: parseSelectedLink(params.get('link')),
+    selectedLink: evidence === 'curated' ? parseSelectedLink(params.get('link')) : null,
+    evidence,
+    selectedExpression:
+      evidence === 'exact' && expression !== null && /^exact:v1:[a-f0-9]{64}$/.test(expression)
+        ? expression
+        : null,
     view: view === 'threads' ? 'threads' : 'arcs',
     direction: direction === 'incoming' || direction === 'outgoing' ? direction : 'both',
     scope: scope === 'same-surah' || scope === 'cross-surah' ? scope : 'all',
@@ -59,7 +71,13 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
   const params = new URLSearchParams();
   params.set('ref', formatAyahId(location.reference));
   if (location.rangeEnd !== null) params.set('end', formatAyahId(location.rangeEnd));
-  if (location.selectedLink !== null) params.set('link', String(location.selectedLink));
+  if (location.evidence === 'curated' && location.selectedLink !== null) {
+    params.set('link', String(location.selectedLink));
+  }
+  if (location.evidence === 'exact') {
+    params.set('evidence', 'exact');
+    if (location.selectedExpression !== null) params.set('expression', location.selectedExpression);
+  }
   if (location.view !== 'arcs') params.set('view', location.view);
   if (location.direction !== 'both') params.set('direction', location.direction);
   if (location.scope !== 'all') params.set('scope', location.scope);
