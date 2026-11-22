@@ -73,20 +73,24 @@ describe('published Quran analytics validation', () => {
   it('requires all 114 canonical rows, valid per-100 denominators and traceable ayah positions', () => {
     expect(() => parseQuranAnalytics({ ...valid, surahs: valid.surahs.slice(1) }, hashes, 1)).toThrow('114');
     const rows = [...valid.surahs];
-    rows[0] = { ...rows[0]!, curatedPer100Ayahs: 777 };
+    const first = rows[0];
+    if (!first) throw new Error('Missing surah fixture.');
+    rows[0] = { ...first, curatedPer100Ayahs: 777 };
     expect(() => parseQuranAnalytics({ ...valid, surahs: rows }, hashes, 1)).toThrow('denominator');
-    rows[0] = { ...valid.surahs[0]!, firstCuratedAyah: 293 };
+    rows[0] = { ...first, firstCuratedAyah: 293 };
     expect(() => parseQuranAnalytics({ ...valid, surahs: rows }, hashes, 1)).toThrow('outside');
-    rows[0] = { ...valid.surahs[0]!, exactSpans: 9 };
+    rows[0] = { ...first, exactSpans: 9 };
     expect(() => parseQuranAnalytics({ ...valid, surahs: rows }, hashes, 1)).toThrow();
   });
 
   it('rejects fabricated exact phrases and oversized ranked projections', () => {
     const top = [...valid.topExpressions];
-    top[0] = { ...top[0]!, id: 'made-up' };
+    const entry = top[0];
+    if (!entry) throw new Error('Missing expression fixture.');
+    top[0] = { ...entry, id: 'made-up' };
     expect(() => parseQuranAnalytics({ ...valid, topExpressions: top }, hashes, 1)).toThrow('ranking');
     expect(() => parseQuranAnalytics({ ...valid, topExpressions: Array.from({ length: 33 }, () => valid.topExpressions[0]) }, hashes, 1)).toThrow('budget');
-    top[0] = { ...valid.topExpressions[0]!, spanCount: 1 };
+    top[0] = { ...entry, spanCount: 1 };
     expect(() => parseQuranAnalytics({ ...valid, topExpressions: top }, hashes, 1)).toThrow('ranking');
   });
 });

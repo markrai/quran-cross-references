@@ -217,6 +217,17 @@ under `BASE_PATH=/`, open `/quran/`.
 
 See [Phase 2B.3](QURAN_PHASE_2B3.md). The separate real-device and rights release gates still apply.
 
+### Phase 2C.1: Corpus analytics foundation
+
+- Build a deterministic summary artifact from pinned curated relationships and exact Arabic phrase evidence.
+- Count each curated relationship once globally and once per surah it touches; count each computed word-span occurrence once, preserving multiple occurrences within an ayah.
+- Separate within-surah and cross-surah evidence classes and provide both raw counts and length-normalized per-100-ayah measures.
+- Show an interactive, searchable 114-surah distribution and 32 ranked verbatim Arabic phrases with links to original ayah contexts.
+- Pin and verify the small analytics JSON artifact, precache it for offline PWA availability, and keep the full 2B.3 expression corpus opt-in.
+- Retain the original text, relationship IDs and the noindex release gates.
+
+See [Phase 2C.1](QURAN_PHASE_2C1.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

@@ -509,3 +509,81 @@ test.describe('Quran Phase 2B.3 computed expression exploration', () => {
     ).toBeVisible();
   });
 });
+
+
+test.describe('Quran Phase 2C.1 reproducible analytics', () => {
+  test('loads a pinned analytics projection on demand without loading full exact-expression evidence', async ({
+    page,
+    request,
+  }) => {
+    const downloads: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().endsWith('/data/quran/analytics.json') ||
+          request.url().endsWith('/data/quran/expressions.json')) {
+        downloads.push(request.url());
+      }
+    });
+    await page.goto('./?ref=2%3A255');
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
+    expect(downloads).toEqual([]);
+    await page.getByRole('button', { name: 'Analytics' }).click();
+    await expect(page).toHaveURL(/view=analytics/);
+    await expect(page.getByRole('heading', { name: 'Explore the Quran through its connections' })).toBeVisible();
+    await expect(page.getByLabel('Corpus summary')).toContainText('2,445');
+    await expect(page.getByLabel('Corpus summary')).toContainText('5,084');
+    expect(downloads.filter((url) => url.endsWith('/analytics.json'))).toHaveLength(1);
+    expect(downloads.filter((url) => url.endsWith('/expressions.json'))).toHaveLength(0);
+
+    const response = await request.get('data/quran/analytics.json');
+    expect(response.ok()).toBe(true);
+    const report = (await response.json()) as {
+      format: string;
+      surahs: unknown[];
+      totals: { curatedLinks: number; exactExpressions: number; exactSpans: number };
+      tanzilNotice: string;
+    };
+    expect(report.format).toBe('quran-analytics');
+    expect(report.surahs).toHaveLength(114);
+    expect(report.totals).toMatchObject({ curatedLinks: 2445, exactExpressions: 5084, exactSpans: 16924 });
+    expect(report.tanzilNotice).toContain('Copyright (C) 2007-2021 Tanzil Project');
+
+    await page.getByRole('combobox', { name: 'Analytics evidence metric' }).selectOption('computed');
+    await page.getByRole('combobox', { name: 'Analytics measure' }).selectOption('count');
+    await page.getByRole('searchbox', { name: 'Filter analytics by surah' }).fill('Al-Fatihah');
+    await expect(page.getByText(/1 surahs · Computed word spans/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Explore Al-Fatihah computed evidence' })).toBeVisible();
+    await page.getByRole('button', { name: 'Explore Al-Fatihah computed evidence' }).click();
+    await expect(page).toHaveURL(/evidence=exact/);
+    await expect(page.getByRole('heading', { name: 'Verbatim Arabic repetitions' })).toBeVisible();
+    await page.goBack();
+    await expect(page.getByRole('heading', { name: 'Explore the Quran through its connections' })).toBeVisible();
+  });
+
+  test('opens ranked exact Arabic evidence through stable expression links', async ({ page }) => {
+    await page.goto('./?ref=55%3A13&view=analytics');
+    await expect(page.getByRole('heading', { name: 'Most repeated exact phrases' })).toBeVisible();
+    await page.getByRole('button', { name: 'Explore ranked Arabic phrase 1' }).click();
+    await expect(page).toHaveURL(/evidence=exact&expression=exact%3Av1%3A/);
+    await expect(page.getByRole('heading', { name: 'Verbatim Arabic repetitions' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Exact expression occurrences along the 6,236-ayah Quran' })).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/view=analytics/);
+    await expect(page.getByRole('heading', { name: 'Explore the Quran through its connections' })).toBeVisible();
+  });
+
+  test('includes the compact analytics report in the offline PWA shell', async ({ page }) => {
+    await page.goto('./?view=analytics');
+    await expect(page.getByRole('heading', { name: 'Explore the Quran through its connections' })).toBeVisible();
+    const cached = await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready;
+      const names = await caches.keys();
+      const name = names.find((candidate) => candidate.startsWith('quran-cross-references-shell-'));
+      if (!name) return { analytics: false, expressions: false };
+      const cache = await caches.open(name);
+      const analytics = await cache.match(new URL('data/quran/analytics.json', registration.scope));
+      const expressions = await cache.match(new URL('data/quran/expressions.json', registration.scope));
+      return { analytics: analytics !== undefined, expressions: expressions !== undefined };
+    });
+    expect(cached).toEqual({ analytics: true, expressions: false });
+  });
+});

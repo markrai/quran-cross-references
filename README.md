@@ -79,6 +79,14 @@ Choose **Evidence type → Computed exact Arabic phrases** to inspect the 5,084 
 
 The versioned `data/quran/expressions.json` artifact is SHA-256-pinned in the publication manifest, verified before it is indexed, and loaded only when the computed mode is selected. It is not part of the default offline PWA precache. Deep links use `evidence=exact&expression=exact:v1:...`; legacy curated `link=N` selections remain separate. See [Phase 2B.3](docs/QURAN_PHASE_2B3.md).
 
+## Analytics (Phase 2C.1)
+
+The **Analytics** tab provides a reproducible, navigable view of the Quran's 114 surahs. Compare raw curated-link incidences and exact computed word-span occurrences, or use per-100-ayah rates to normalize for surah length. Search and sort the surah bars, inspect within-surah and cross-surah evidence breakdowns, or open one of the 32 most repeated exact Arabic phrases in its source ayahs.
+
+The separate `data/quran/analytics.json` report is generated exclusively from verified pinned Quran sources and published with a SHA-256 digest in the Quran foundation manifest. The small derived report is cached for offline use, while the much larger complete expressions dataset remains opt-in. Values are descriptive corpus statistics, not theological rankings or semantic similarity scores.
+
+See [Phase 2C.1 acceptance and counting rules](docs/QURAN_PHASE_2C1.md).
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).
