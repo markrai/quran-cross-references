@@ -84,11 +84,16 @@ test.describe('Quran production readiness', () => {
     expect(manifest.icons.some((icon) => icon.purpose === 'maskable')).toBe(true);
     const previewUrl = await page.locator('meta[property="og:image"]').getAttribute('content');
     expect(previewUrl).toMatch(/social-preview\.png$/);
-    const preview = await request.get(previewUrl ?? '');
+    const localPreview = new URL(new URL(previewUrl ?? '').pathname, page.url()).href;
+    const preview = await request.get(localPreview);
     expect(preview.ok()).toBe(true);
     const previewBytes = await preview.body();
     expect(previewBytes.readUInt32BE(16)).toBe(1200);
     expect(previewBytes.readUInt32BE(20)).toBe(630);
+    const scripture = await request.get('data/quran/text.json');
+    expect(scripture.ok()).toBe(true);
+    const publishedText = (await scripture.json()) as { tanzilNotice: string };
+    expect(publishedText.tanzilNotice).toContain('Copyright (C) 2007-2021 Tanzil Project');
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
@@ -152,8 +157,7 @@ test.describe('Quran production readiness', () => {
     await page.goto('./?ref=2%3A255');
     await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
     await page.getByRole('button', { name: 'Share ayah' }).click();
-    await expect(page.getByRole('status', { name: '' }).filter({ hasText: 'Ayah link copied' }))
-      .toBeVisible();
+    await expect(page.getByText('Ayah link copied')).toBeVisible();
     const copied = await page.evaluate(
       () => (window as Window & { copiedAyahLink?: string }).copiedAyahLink,
     );
