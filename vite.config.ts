@@ -30,9 +30,12 @@ export default defineConfig(({ command, isPreview = false }) => ({
     // Three.js alone is ~550 kB minified (~140 kB gzipped); only the WebGL pages load it.
     chunkSizeWarningLimit: 600,
     rolldownOptions: {
-      input: Object.fromEntries(
-        Object.entries(PAGES).map(([name, { entry }]) => [name, resolve(ROOT_DIR, entry)]),
-      ),
+      input: {
+        ...Object.fromEntries(
+          Object.entries(PAGES).map(([name, { entry }]) => [name, resolve(ROOT_DIR, entry)]),
+        ),
+        quran: resolve(ROOT_DIR, 'quran/index.html'),
+      },
       output: {
         // Named vendor chunks: cacheable across pages and readable in the build report.
         codeSplitting: {

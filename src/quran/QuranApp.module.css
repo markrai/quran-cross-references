@@ -1,0 +1,535 @@
+.shell {
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem max(1.25rem, calc((100vw - 84rem) / 2));
+  border-bottom: 1px solid var(--color-border);
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.brandLink {
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.previewLabel {
+  font-size: 0.73rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.legacyLink {
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.main {
+  max-width: 86rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.viewTabs {
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.25rem;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+
+.tab,
+.activeTab {
+  border: 0;
+  border-radius: 0.55rem;
+  padding: 0.7rem 0.9rem;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.activeTab {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 1px 5px #0003;
+}
+
+.toolbarFields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.65rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.field input,
+.field select {
+  max-width: min(100%, 19rem);
+  min-height: 2.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.5rem 0.65rem;
+  font-size: 0.91rem;
+}
+
+.referenceForm {
+  display: flex;
+  align-items: end;
+  gap: 0.35rem;
+}
+
+.goButton {
+  min-height: 2.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.goButton:hover,
+.tab:hover,
+.ayahButton:hover,
+.connectionButton:hover {
+  border-color: var(--color-accent);
+}
+
+.searchError {
+  width: 100%;
+  margin: 0;
+  color: var(--color-danger);
+}
+
+.loading {
+  padding: 5rem 1rem;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.focusCard,
+.graphCard,
+.reader,
+.threadPanel,
+.linkDetail {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+}
+
+.focusCard {
+  padding: clamp(1rem, 2.5vw, 2.25rem);
+  margin-bottom: 1.2rem;
+}
+
+.focusHeading,
+.graphIntro {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.focusHeading h1 {
+  font: 500 clamp(1.3rem, 2.5vw, 2rem) / 1.25 var(--font-serif);
+  margin: 0;
+}
+
+.eyebrow {
+  color: var(--color-accent);
+  font-size: 0.73rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 0.35rem;
+}
+
+.stepper {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.stepper button {
+  min-width: 2.5rem;
+  min-height: 2.4rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  border-radius: 0.4rem;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 1.35rem;
+}
+
+.stepper button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.focusArabic {
+  font-family: 'Amiri', 'Noto Naskh Arabic', 'Traditional Arabic', 'Scheherazade New', serif;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 2.1;
+  text-align: right;
+  margin: 1rem 0;
+  unicode-bidi: isolate;
+}
+
+.focusEnglish {
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 1.7vw, 1.23rem);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.graphCard {
+  overflow: hidden;
+}
+
+.graphIntro {
+  padding: 1.35rem 1.4rem 0;
+}
+
+.graphIntro h2,
+.panelHeading h2,
+.linkDetail h2 {
+  margin: 0;
+  font: 500 1.3rem var(--font-serif);
+}
+
+.graphIntro p,
+.panelHeading p,
+.linkDetail p {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.graphIntro strong {
+  color: #6dd5bf;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.graphScroll {
+  overflow-x: auto;
+  padding: 0.5rem 1rem;
+}
+
+.graph {
+  display: block;
+  width: 100%;
+  min-width: 650px;
+  max-height: 450px;
+  overflow: visible;
+}
+
+.activeSurah {
+  fill: #b58c4a22;
+  stroke: #bd9c59bb;
+  stroke-width: 1;
+}
+
+.arc,
+.arcActive {
+  cursor: pointer;
+  outline: none;
+}
+
+.arcStroke {
+  fill: none;
+  stroke: #5ebda9;
+  stroke-width: 1.45;
+  opacity: 0.65;
+}
+
+.arcHit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 12;
+  pointer-events: stroke;
+}
+
+.arcActive .arcStroke,
+.arc:focus-visible .arcStroke,
+.arc:hover .arcStroke {
+  stroke: #f3c37b;
+  stroke-width: 3;
+  opacity: 1;
+}
+
+.axis {
+  stroke: var(--color-text-muted);
+  stroke-width: 1;
+}
+
+.axisText,
+.threadMapLabel {
+  fill: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.graphNote {
+  margin: 0;
+  padding: 0 1.4rem 1.35rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.linkDetail {
+  padding: 1.3rem;
+  margin-top: 1rem;
+}
+
+.linkPair {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.9rem 0;
+}
+
+.linkPair button {
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.8rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.threadsLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.reader,
+.threadPanel {
+  overflow: hidden;
+}
+
+.panelHeading {
+  padding: 1.15rem 1.3rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.panelHeading h2 span {
+  font-family: 'Traditional Arabic', serif;
+  margin-inline-start: 0.35rem;
+}
+
+.panelHeading p {
+  margin: 0.35rem 0 0;
+}
+
+.ayahList,
+.connectionList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ayah,
+.selectedAyah {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.selectedAyah {
+  background: var(--color-accent-soft);
+  box-shadow: inset 3px 0 var(--color-accent);
+}
+
+.ayahButton {
+  width: 100%;
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.2rem;
+  border: 0;
+  border-left: 3px solid transparent;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: start;
+}
+
+.ayahNumber {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.arabic {
+  display: block;
+  font-family: 'Amiri', 'Noto Naskh Arabic', 'Traditional Arabic', 'Scheherazade New', serif;
+  font-size: 1.75rem;
+  line-height: 2.05;
+  text-align: right;
+  unicode-bidi: isolate;
+}
+
+.english {
+  display: block;
+  line-height: 1.65;
+  font-family: var(--font-serif);
+  font-size: 1.02rem;
+}
+
+.threadMap {
+  display: block;
+  width: 100%;
+  max-height: 260px;
+  padding: 1rem;
+}
+
+.connectionList li {
+  border-top: 1px solid var(--color-border);
+}
+
+.connectionButton {
+  display: grid;
+  gap: 0.55rem;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 1rem 1.25rem;
+  color: var(--color-text);
+  text-align: start;
+  cursor: pointer;
+}
+
+.connectionHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--color-accent);
+  font-size: 0.8rem;
+}
+
+.connectionPreview {
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  font-family: var(--font-serif);
+}
+
+.connectionButton small {
+  color: var(--color-text-muted);
+}
+
+.empty {
+  color: var(--color-text-muted);
+  padding: 1.25rem;
+  margin: 0;
+}
+
+.footer {
+  max-width: 86rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.79rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 62rem) {
+  .threadsLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .threadPanel {
+    order: -1;
+  }
+}
+
+@media (max-width: 40rem) {
+  .header {
+    align-items: start;
+    padding: 1rem;
+  }
+
+  .brandLink {
+    font-size: 1.12rem;
+  }
+
+  .main {
+    padding: 1rem 0.65rem 2rem;
+  }
+
+  .toolbarFields,
+  .toolbar,
+  .field {
+    width: 100%;
+  }
+
+  .toolbarFields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+  }
+
+  .referenceForm {
+    grid-column: 1 / -1;
+  }
+
+  .referenceForm .field {
+    flex: 1;
+  }
+
+  .focusArabic {
+    line-height: 1.85;
+  }
+
+  .graphScroll {
+    padding: 0.5rem;
+  }
+
+  .footer {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell * {
+    scroll-behavior: auto;
+  }
+}

@@ -480,3 +480,17 @@ UI icons are from [Lucide](https://lucide.dev/) (ISC License), plus the touch-ge
 Arcs is inspired by Chris Harrison and Christoph Römhild's
 [Bible Cross-References](https://www.chrisharrison.net/index.php/Visualizations/BibleViz), and the
 genre colors by Drawing with Data's [Bible Fascinator](https://designs.drawingwithdata.com/fascinator).
+
+## Quran reader preview (Phase 1C)
+
+A standalone, unlisted Quran reader lives at `quran/`, separate from the default Bible
+application. It uses pinned Tanzil Uthmani Arabic, Pickthall English and curated
+Mutashabihat relationships, with Arabic RTL, English LTR, an interactive arc overview,
+and a per-surah Threads reader. This is an early preview, not a product cutover.
+
+With Node 24, run `npm ci`, `npm run build` and `npm run preview`. Then open
+`/bible-cross-references/quran/?ref=2:255` at the preview origin, or `/quran/` with
+`BASE_PATH=/`. The Quran dataset build is also available as `npm run data:quran`.
+
+See [`docs/QURAN_PHASES.md`](docs/QURAN_PHASES.md) for the separation boundaries,
+source attribution and remaining Phase 1D acceptance gates.
