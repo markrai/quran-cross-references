@@ -228,6 +228,18 @@ See [Phase 2B.3](QURAN_PHASE_2B3.md). The separate real-device and rights releas
 
 See [Phase 2C.1](QURAN_PHASE_2C1.md).
 
+### Phase 2C.2: Directed graph topology and bounded navigation
+
+- Precompute canonical curated surah source-to-target pair counts, incident and directed degree statistics and the top 32 highest-link-incidence ayahs.
+- Retain every original curated relationship ID for each directed surah-pair aggregate, including cross-boundary source or target ranges.
+- Validate a pinned topology artifact against the source index in the browser before interactive display.
+- Render a paged 12-partner surah network with arrow direction, count-based stroke weight, minimum-count filtering and all edge evidence available through 12-ID evidence pages.
+- Expand the reader's selected ayah through up to 12 first-hop relationships per page, optionally showing up to 24 distinct second-hop link incidences. Every visible link opens the original curated relationship.
+- Keep computed exact-expression occurrence evidence segregated; no all-to-all phrase connections and no misleading theological rankings.
+- Include the compact report in the existing PWA precache, without changing the optional full-expression download or release gates.
+
+See [Phase 2C.2](QURAN_PHASE_2C2.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

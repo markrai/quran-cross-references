@@ -24,6 +24,8 @@ describe('Quran-first canonical route', () => {
       selectedLink: null,
       evidence: 'curated',
       selectedExpression: null,
+      networkMode: 'surah',
+      networkDepth: 1,
     });
     const named = new URL('https://example.test/?ref=Al-Baqarah+255');
     expect(parseQuranLocation(named).reference).toEqual({ surah: 2, ayah: 255 });
@@ -95,6 +97,37 @@ describe('Quran-first canonical route', () => {
       expect(location.selectedLink).toBeNull();
     }
   });
+  it('round-trips bounded neighborhood state and preserves selected ayah', () => {
+    const location = {
+      ...DEFAULT_QURAN_LOCATION,
+      reference: { surah: 2, ayah: 255 },
+      view: 'network' as const,
+      networkMode: 'ayah' as const,
+      networkDepth: 2 as const,
+      direction: 'incoming' as const,
+    };
+    const href = quranLocationUrl(location, '/quran-cross-references/');
+    expect(href).toContain('view=network');
+    expect(href).toContain('network=ayah');
+    expect(href).toContain('depth=2');
+    expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(location);
+  });
+
+  it('defaults malformed graph settings and never mixes exact-expression links with curated topology', () => {
+    const wrong = new URL(
+      'https://example.test/?view=network&evidence=exact&expression=exact:v1:' +
+        'a'.repeat(64) +
+        '&network=other&depth=999&link=7',
+    );
+    expect(parseQuranLocation(wrong)).toEqual({
+      ...DEFAULT_QURAN_LOCATION,
+      view: 'network',
+      selectedLink: 7,
+    });
+    const stale = new URL('https://example.test/?view=arcs&network=ayah&depth=2');
+    expect(parseQuranLocation(stale)).toEqual(DEFAULT_QURAN_LOCATION);
+  });
+
   it('round-trips computed evidence and its stable SHA expression deep link', () => {
     const expression = 'exact:v1:' + 'a'.repeat(64);
     const location = {

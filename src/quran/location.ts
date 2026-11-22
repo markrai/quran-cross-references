@@ -2,7 +2,8 @@ import { formatAyahId, type AyahRef } from '../core/quran/ayah-ref.ts';
 import { parseReference } from '../core/quran/reference.ts';
 import type { QuranRelationshipScope } from '../core/quran/relationship-filter.ts';
 
-export type QuranView = 'arcs' | 'threads' | 'analytics';
+export type QuranView = 'arcs' | 'threads' | 'analytics' | 'network';
+export type QuranNetworkMode = 'surah' | 'ayah';
 export type QuranDirection = 'outgoing' | 'incoming' | 'both';
 export type QuranEvidenceMode = 'curated' | 'exact';
 
@@ -15,6 +16,8 @@ export interface QuranLocation {
   readonly selectedLink: number | null;
   readonly evidence: QuranEvidenceMode;
   readonly selectedExpression: string | null;
+  readonly networkMode: QuranNetworkMode;
+  readonly networkDepth: 1 | 2;
 }
 
 export const DEFAULT_QURAN_LOCATION: QuranLocation = {
@@ -26,6 +29,8 @@ export const DEFAULT_QURAN_LOCATION: QuranLocation = {
   selectedLink: null,
   evidence: 'curated',
   selectedExpression: null,
+  networkMode: 'surah',
+  networkDepth: 1,
 };
 
 function parseSelectedLink(raw: string | null): number | null {
@@ -47,10 +52,13 @@ export function parseQuranLocation(url: URL): QuranLocation {
     parsedEnd.reference.ayah > reference.ayah
       ? parsedEnd.reference
       : null;
-  const view = params.get('view');
+  const rawView = params.get('view');
+  const view: QuranView =
+    rawView === 'threads' || rawView === 'analytics' || rawView === 'network' ? rawView : 'arcs';
   const direction = params.get('direction');
   const scope = params.get('scope');
-  const evidence: QuranEvidenceMode = params.get('evidence') === 'exact' ? 'exact' : 'curated';
+  const evidence: QuranEvidenceMode =
+    view !== 'network' && params.get('evidence') === 'exact' ? 'exact' : 'curated';
   const expression = params.get('expression');
   return {
     reference,
@@ -61,7 +69,10 @@ export function parseQuranLocation(url: URL): QuranLocation {
       evidence === 'exact' && expression !== null && /^exact:v1:[a-f0-9]{64}$/.test(expression)
         ? expression
         : null,
-    view: view === 'threads' || view === 'analytics' ? view : 'arcs',
+    view,
+    networkMode: view === 'network' && params.get('network') === 'ayah' ? 'ayah' : 'surah',
+    networkDepth:
+      view === 'network' && params.get('network') === 'ayah' && params.get('depth') === '2' ? 2 : 1,
     direction: direction === 'incoming' || direction === 'outgoing' ? direction : 'both',
     scope: scope === 'same-surah' || scope === 'cross-surah' ? scope : 'all',
   };
@@ -79,6 +90,10 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
     if (location.selectedExpression !== null) params.set('expression', location.selectedExpression);
   }
   if (location.view !== 'arcs') params.set('view', location.view);
+  if (location.view === 'network' && location.networkMode === 'ayah') {
+    params.set('network', 'ayah');
+    if (location.networkDepth === 2) params.set('depth', '2');
+  }
   if (location.direction !== 'both') params.set('direction', location.direction);
   if (location.scope !== 'all') params.set('scope', location.scope);
   return base + '?' + params.toString();

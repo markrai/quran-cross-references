@@ -608,3 +608,133 @@ test.describe('Quran Phase 2C.1 reproducible analytics', () => {
     expect(cached).toEqual({ analytics: true, expressions: false });
   });
 });
+
+test.describe('Quran Phase 2C.2 curated graph network', () => {
+  test('publishes verified directed topology and loads it only on Network, without fetching exact expressions', async ({
+    page,
+    request,
+  }) => {
+    const downloads: string[] = [];
+    page.on('request', (event) => {
+      if (
+        event.url().endsWith('/data/quran/topology.json') ||
+        event.url().endsWith('/data/quran/expressions.json')
+      )
+        downloads.push(event.url());
+    });
+    await page.goto('./?ref=2%3A1');
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeVisible();
+    expect(downloads).toEqual([]);
+
+    await page.getByRole('button', { name: 'Network', exact: true }).click();
+    await expect(page).toHaveURL(/view=network/);
+    await expect(
+      page.getByRole('heading', { name: "Explore the Quran's relationship network" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('group', { name: 'Interactive surah connectivity network' }),
+    ).toBeVisible();
+    expect(downloads.filter((url) => url.endsWith('topology.json'))).toHaveLength(1);
+    expect(downloads.filter((url) => url.endsWith('expressions.json'))).toHaveLength(0);
+
+    const response = await request.get('data/quran/topology.json');
+    expect(response.ok()).toBe(true);
+    const graph = (await response.json()) as {
+      format: string;
+      linkCount: number;
+      surahs: unknown[];
+      edges: { source: number; target: number; ids: number[] }[];
+      topAyahs: unknown[];
+    };
+    expect(graph.format).toBe('quran-curated-topology');
+    expect(graph.linkCount).toBe(2445);
+    expect(graph.surahs).toHaveLength(114);
+    expect(graph.topAyahs).toHaveLength(32);
+    expect(graph.edges.length).toBeGreaterThan(0);
+    await page.getByRole('combobox', { name: 'Network direction' }).selectOption('incoming');
+    await expect(page).toHaveURL(/direction=incoming/);
+    await page.getByRole('combobox', { name: 'Minimum surah links' }).selectOption('5');
+    await expect(page.getByLabel('Surah connections')).toBeVisible();
+    await page.goBack();
+    await expect(page.getByRole('combobox', { name: 'Network direction' })).toHaveValue('both');
+  });
+
+  test('opens a real curated source link from the directed surah network and restores graph history', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=2%3A1&view=network');
+    await expect(
+      page.getByRole('heading', { name: "Explore the Quran's relationship network" }),
+    ).toBeVisible();
+    const links = page.getByLabel('Verified surah pair links').getByRole('button');
+    await expect(links.first()).toBeVisible();
+    await links.first().click();
+    await expect(page).toHaveURL(/link=\d+/);
+    await expect(page.getByRole('heading', { name: 'Selected relationship' })).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/view=network/);
+    await expect(
+      page.getByRole('heading', { name: "Explore the Quran's relationship network" }),
+    ).toBeVisible();
+  });
+
+  test('navigates ranked ayah nodes and expands only a bounded second-hop neighborhood', async ({
+    page,
+    request,
+  }) => {
+    const response = await request.get('data/quran/topology.json');
+    expect(response.ok()).toBe(true);
+    const report = (await response.json()) as {
+      topAyahs: { ayah: number }[];
+    };
+    const first = report.topAyahs[0];
+    if (!first) throw new Error('No curated ayahs in topology.');
+    const ref = CANONICAL_QURAN.refAt(first.ayah);
+    const label = String(ref.surah) + ':' + String(ref.ayah);
+    await page.goto('./?ref=2%3A1&view=network');
+    await page.getByRole('button', { name: 'Explore ranked connected ayah ' + label }).click();
+    await expect(page).toHaveURL(/view=network&network=ayah/);
+    await expect(
+      page.getByRole('group', { name: 'Interactive bounded ayah neighborhood' }),
+    ).toBeVisible();
+    await page.getByRole('combobox', { name: 'Neighborhood depth' }).selectOption('2');
+    await expect(page).toHaveURL(/depth=2/);
+    await expect(page.getByText(/second-hop incidences/)).toBeVisible();
+    await expect(page.getByLabel('Neighborhood source links')).toBeVisible();
+    const edges = page.getByLabel('Neighborhood source links').getByRole('button');
+    expect(await edges.count()).toBeLessThanOrEqual(36);
+    expect(await edges.count()).toBeGreaterThan(0);
+    await edges.first().click();
+    await expect(page).toHaveURL(/link=\d+/);
+    await expect(page.getByRole('heading', { name: 'Selected relationship' })).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/view=network&network=ayah&depth=2/);
+  });
+
+  test('precaches the compact topology report but not all computed phrase occurrences', async ({
+    page,
+  }) => {
+    await page.goto('./?view=network');
+    await expect(
+      page.getByRole('heading', { name: "Explore the Quran's relationship network" }),
+    ).toBeVisible();
+    const cached = await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready;
+      const names = await caches.keys();
+      const name = names.find((candidate) => candidate.startsWith('quran-cross-references-shell-'));
+      if (!name) return { topology: false, expressions: false };
+      const cache = await caches.open(name);
+      const topology = await cache.match(new URL('data/quran/topology.json', registration.scope));
+      const expressions = await cache.match(
+        new URL('data/quran/expressions.json', registration.scope),
+      );
+      return { topology: topology !== undefined, expressions: expressions !== undefined };
+    });
+    expect(cached).toEqual({ topology: true, expressions: false });
+    await page
+      .getByRole('button', { name: 'Explore computed exact Arabic phrases separately' })
+      .click();
+    await expect(page).toHaveURL(/evidence=exact/);
+    await expect(page.getByRole('heading', { name: 'Verbatim Arabic repetitions' })).toBeVisible();
+  });
+});

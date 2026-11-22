@@ -12,6 +12,7 @@ import {
 } from './expression-evidence.ts';
 import { importMutashabihat, importQuranText } from './datasets.ts';
 import { buildQuranAnalytics } from './analytics.ts';
+import { buildQuranTopology } from '../../src/quran/topology-model.ts';
 import { verifyPinnedQuranSource } from './pinned-source.ts';
 
 interface SourcePin {
@@ -112,6 +113,7 @@ const analytics = buildQuranAnalytics(
   tanzilNotice,
 );
 writeDataset('analytics.json', analytics);
+writeDataset('topology.json', buildQuranTopology(relationshipIndex, curatedPin.sha256));
 writeDataset('manifest.json', {
   format: 'quran-foundation-manifest',
   schemaVersion: 1,
