@@ -257,6 +257,14 @@ export function QuranArcs({
             );
           })}
           <rect
+            x="0"
+            y="380"
+            width={GRAPH_WIDTH}
+            height="20"
+            fill="transparent"
+            data-graph-pan-surface=""
+          />
+          <rect
             x={GRAPH_AXIS_LEFT}
             y={GRAPH_AXIS_Y - 5}
             width={GRAPH_AXIS_WIDTH}
