@@ -31,7 +31,7 @@ describe('Quran graph layout and focused passages', () => {
   it('creates stable labeled paths for the selected relationship index', () => {
     expect(arcs).toHaveLength(2);
     expect(first.id).toBe(0);
-    expect(first.label).toContain('Al-Baqarah 2:1 to Al-Baqarah 2:255');
+    expect(first.label).toContain('Al-Baqarah 2:1–2 to Al-Baqarah 2:255');
     expect(first.path).toContain(' Q ');
     expect(second.left).toBeLessThan(second.right);
   });
