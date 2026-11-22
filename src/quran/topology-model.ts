@@ -1,5 +1,4 @@
-import type { QuranRelationship } from '../core/quran/relationship-index.ts';
-import { QuranRelationshipIndex } from '../core/quran/relationship-index.ts';
+import type { QuranRelationship, QuranRelationshipIndex } from '../core/quran/relationship-index.ts';
 import { CANONICAL_QURAN, type AyahIndexRange } from '../core/quran/quran-versification.ts';
 
 export const TOPOLOGY_SURAH_PAGE_SIZE = 12;
@@ -130,7 +129,7 @@ export function buildQuranTopology(
     }
     for (const source of sources) {
       for (const target of targets) {
-        const key = source + ':' + target;
+        const key = String(source) + ':' + String(target);
         const pair = pairs.get(key);
         if (pair) pair.ids.push(id);
         else pairs.set(key, { source, target, ids: [id] });
@@ -259,7 +258,7 @@ export function curatedNeighborhood(
   const second: QuranNeighborhoodEdge[] = [];
   let secondCount = 0;
   if (depth === 2) {
-    const seen = new Set(first.map((edge) => edge.id + ':' + edge.direction));
+    const seen = new Set(first.map((edge) => String(edge.id) + ':' + edge.direction));
     for (const neighbor of new Set(first.map((edge) => edge.neighbor))) {
       for (const edge of directEdges(index, neighbor, direction, 2)) {
         const key = edge.id + ':' + edge.direction;
@@ -276,5 +275,5 @@ export function curatedNeighborhood(
 export function curatedLinkLabel(link: QuranRelationship): string {
   const source = CANONICAL_QURAN.refAt(link.source.start);
   const target = CANONICAL_QURAN.refAt(link.target.start);
-  return source.surah + ':' + source.ayah + ' → ' + target.surah + ':' + target.ayah;
+  return String(source.surah) + ':' + String(source.ayah) + ' → ' + String(target.surah) + ':' + String(target.ayah);
 }

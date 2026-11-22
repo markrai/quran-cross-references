@@ -61,7 +61,7 @@ export async function loadQuranTopology(
   const expectedDigest = digest(outputs['topology.json']);
   const pins = metadata['sources'];
   if (!Array.isArray(pins)) throw new Error('Missing Quran source registry.');
-  const source = pins.find((entry: unknown) => {
+  const source: unknown = (pins as unknown[]).find((entry: unknown) => {
     if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) return false;
     return (entry as Record<string, unknown>)['id'] === 'mutashabihat';
   });
