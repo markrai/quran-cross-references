@@ -76,6 +76,21 @@ Run `npm run check`, `npm run data:quran`, `npm run build`, then
 On a preview built at its default base path, open `/bible-cross-references/quran/`;
 under `BASE_PATH=/`, open `/quran/`.
 
+### CI and Windows source integrity
+
+The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows
+checkout may have CRLF endings despite the repository's LF attributes. In that case,
+it accepts the data **only if** changing CRLF to LF reproduces the pinned bytes
+exactly. Any other byte change still fails. The pinned digests and Quran text are
+unchanged.
+
+GitHub Actions runs on pull requests and pushes to main. The CI workflow includes
+type checking, type coverage, ESLint, Prettier, unit coverage, verified Quran dataset
+generation on Linux and Windows, a deterministic Bible dataset manifest check,
+the full legacy browser suite, and dedicated Quran desktop/phone browser scenarios.
+Deployments depend on all these jobs. A fork owner may have to enable GitHub Actions
+in the repository's Actions tab or Settings before any jobs can run.
+
 ### Licensing and provenance
 
 See `data/quran/sources.json` for each exact source URL, SHA-256 digest, attribution,
