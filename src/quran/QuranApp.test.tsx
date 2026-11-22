@@ -40,7 +40,7 @@ describe('Quran Phase 1C reader', () => {
     expect(await screen.findByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeTruthy();
     expect(screen.getByLabelText('Selected ayah').querySelector('[lang="ar"]')).not.toBeNull();
     expect(screen.getByLabelText('Selected ayah').querySelector('[dir="ltr"]')).not.toBeNull();
-    expect(screen.getByRole('link', { name: 'Bible Explorer' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Bible Explorer' }).getAttribute('href')).toBe('/');
     expect(screen.getByText(/2 visible links/)).toBeTruthy();
   });
 
@@ -54,7 +54,7 @@ describe('Quran Phase 1C reader', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Read in Threads' }));
     expect(await screen.findByRole('heading', { name: 'Threads from 2:1' })).toBeTruthy();
     expect(window.location.search).toContain('view=threads');
-    expect(screen.getByText('2. Al-Baqarah')).toBeTruthy();
+    expect(screen.getByRole('combobox', { name: 'Surah' })).toHaveProperty('value', '2');
   });
 
   it('supports reference search, selection and browser back navigation', async () => {
@@ -72,7 +72,7 @@ describe('Quran Phase 1C reader', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Threads from 2:1' })).toBeTruthy();
     });
-    expect(screen.getByRole('button', { name: /2:255/ })).toBeTruthy();
+    expect(screen.getAllByRole('button', { name: /2:255/ }).length).toBeGreaterThan(0);
   });
 
   it('reports invalid references and supports filtered threads', async () => {
@@ -100,7 +100,7 @@ describe('Quran Phase 1C reader', () => {
       .mockRejectedValueOnce(new Error('Dataset unavailable'))
       .mockResolvedValue(data);
     render(<QuranApp />);
-    expect(await screen.findByRole('alert')).toHaveTextContent('Dataset unavailable');
+    expect((await screen.findByRole('alert')).textContent).toContain('Dataset unavailable');
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
     expect(await screen.findByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeTruthy();
   });
