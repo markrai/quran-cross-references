@@ -285,10 +285,12 @@ test.describe('Quran Phase 2A graph exploration', () => {
       await page.mouse.move(startX - 2, startY);
       await expect(graph).toHaveAttribute('viewBox', '0 0 1200 400');
       await page.mouse.move(startX - 120, startY, { steps: 8 });
-      await expect.poll(async () => {
-        const value = await graph.getAttribute('viewBox');
-        return Number(value?.split(' ')[2] ?? '1200');
-      }).toBeLessThan(1200);
+      await expect
+        .poll(async () => {
+          const value = await graph.getAttribute('viewBox');
+          return Number(value?.split(' ')[2] ?? '1200');
+        })
+        .toBeLessThan(1200);
       const viewBox = await graph.getAttribute('viewBox');
       const [x, , width] = (viewBox ?? '').split(' ').map(Number);
       expect(x).toBeGreaterThan(0);

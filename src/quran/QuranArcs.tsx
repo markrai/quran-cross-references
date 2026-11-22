@@ -239,8 +239,8 @@ export function QuranArcs({
       </div>
       <p id="quran-graph-help" className={styles.graphHelp}>
         Drag the handle below the graph or open space to navigate. At 1×, dragging zooms in first;
-        once zoomed, it pans. Ctrl or Cmd + wheel also zooms. Click the horizontal axis to choose
-        an ayah. Use its arrow keys to move one ayah at a time.
+        once zoomed, it pans. Ctrl or Cmd + wheel also zooms. Click the horizontal axis to choose an
+        ayah. Use its arrow keys to move one ayah at a time.
       </p>
       <div className={styles.graphScroll}>
         <svg
