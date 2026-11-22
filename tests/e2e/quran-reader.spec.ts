@@ -484,7 +484,9 @@ test.describe('Quran Phase 2B.3 computed expression exploration', () => {
         name: 'Exact expression occurrences along the 6,236-ayah Quran',
       }),
     ).toBeVisible();
-    await expect(page.getByText(expression.words.join(' '), { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('region', { name: 'Exact Arabic expressions' }).locator('p[lang="ar"]'),
+    ).toHaveText(expression.words.join(' '));
     await page.getByRole('button', { name: 'Next expression graph targets' }).click();
     await expect(page.getByText(/Showing 33–/)).toBeVisible();
     const target = expression.occurrences.find((site) => site.ayah !== first.ayah);
@@ -493,7 +495,7 @@ test.describe('Quran Phase 2B.3 computed expression exploration', () => {
     const targetLabel = String(targetRef.surah) + ':' + String(targetRef.ayah);
     await page
       .getByRole('region', { name: 'Exact Arabic expressions' })
-      .getByRole('button', { name: new RegExp('^' + targetLabel.replace(':', ':')) })
+      .getByRole('button', { name: new RegExp('^' + targetLabel) })
       .first()
       .click();
     await expect(page).toHaveURL(
@@ -503,6 +505,8 @@ test.describe('Quran Phase 2B.3 computed expression exploration', () => {
     await page.getByRole('button', { name: 'Threads & Reader' }).click();
     await expect(page.getByRole('heading', { name: 'Verbatim Arabic repetitions' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Threads from ' + targetLabel })).toHaveCount(0);
-    await expect(page.getByRole('region', { name: 'Quran text and exact expressions' })).toBeVisible();
+    await expect(
+      page.getByRole('region', { name: 'Quran text and exact expressions' }),
+    ).toBeVisible();
   });
 });
