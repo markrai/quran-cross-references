@@ -1,6 +1,10 @@
 import { elementAt } from '../lib/array.ts';
 import type { AyahIndex } from './ayah-ref.ts';
-import { CANONICAL_QURAN, type AyahIndexRange, type QuranVersification } from './quran-versification.ts';
+import {
+  CANONICAL_QURAN,
+  type AyahIndexRange,
+  type QuranVersification,
+} from './quran-versification.ts';
 
 export interface QuranRelationship {
   readonly id: number;
@@ -45,7 +49,10 @@ function parseRange(value: unknown, label: string, ayahCount: number): AyahIndex
   return Object.freeze({ start, end });
 }
 
-function parseRelationships(value: unknown, versification: QuranVersification): readonly QuranRelationship[] {
+function parseRelationships(
+  value: unknown,
+  versification: QuranVersification,
+): readonly QuranRelationship[] {
   const record = expectRecord(value, 'dataset');
   if (record['format'] !== 'quran-similar-passages' || record['schemaVersion'] !== 1) {
     throw new QuranRelationshipIntegrityError('unknown format or schema version.');
