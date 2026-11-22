@@ -1,3 +1,4 @@
+import { CANONICAL_QURAN } from '../../src/core/quran/quran-versification.ts';
 import { expect, test } from '@playwright/test';
 import { serveQuranBuild } from './serve-quran-build.ts';
 
@@ -407,5 +408,101 @@ test.describe('Quran Phase 2A graph exploration', () => {
     await expect(
       page.getByRole('group', { name: 'Relationships along the 6,236-ayah Quran' }),
     ).toBeVisible();
+  });
+});
+
+
+test.describe('Quran Phase 2B.3 computed expression exploration', () => {
+  test('loads exact evidence only on demand without adding it to the offline installation cache', async ({
+    page,
+  }) => {
+    const requested: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().endsWith('/data/quran/expressions.json')) requested.push(request.url());
+    });
+    await page.goto('./?ref=2%3A1');
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeVisible();
+    expect(requested).toEqual([]);
+
+    await page.getByRole('combobox', { name: 'Evidence type' }).selectOption('exact');
+    await expect(page.getByRole('heading', { name: 'Verbatim Arabic repetitions' })).toBeVisible();
+    expect(requested).toHaveLength(1);
+    await expect(page).toHaveURL(/evidence=exact/);
+    const expressionIsPrecached = await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready;
+      const names = await caches.keys();
+      const name = names.find((candidate) =>
+        candidate.startsWith('quran-cross-references-shell-'),
+      );
+      if (!name) throw new Error('Quran PWA cache missing.');
+      const cache = await caches.open(name);
+      return (
+        (await cache.match(new URL('data/quran/expressions.json', registration.scope))) !==
+        undefined
+      );
+    });
+    expect(expressionIsPrecached).toBe(false);
+
+    await page.getByRole('combobox', { name: 'Evidence type' }).selectOption('curated');
+    await expect(page.getByText(/visible links/)).toBeVisible();
+    await expect(page).not.toHaveURL(/evidence=exact/);
+  });
+
+  test('restores a stable expression link and navigates its bounded graph and source spans', async ({
+    page,
+    request,
+  }) => {
+    const response = await request.get('data/quran/expressions.json');
+    expect(response.ok()).toBe(true);
+    const published = (await response.json()) as {
+      format: string;
+      expressions: {
+        id: string;
+        words: string[];
+        occurrences: { ayah: number; start: number; end: number }[];
+      }[];
+    };
+    expect(published.format).toBe('quran-exact-expressions');
+    expect(published.expressions).toHaveLength(5084);
+    const expression = published.expressions.find(
+      (item) => new Set(item.occurrences.map((site) => site.ayah)).size > 32,
+    );
+    expect(expression).toBeDefined();
+    if (!expression) return;
+    const first = expression.occurrences[0];
+    if (!first) throw new Error('No source for selected expression.');
+    const source = CANONICAL_QURAN.refAt(first.ayah);
+    await page.goto(
+      './?ref=' +
+        encodeURIComponent(String(source.surah) + ':' + String(source.ayah)) +
+        '&evidence=exact&expression=' +
+        encodeURIComponent(expression.id),
+    );
+    await expect(page.getByRole('heading', { name: 'Verbatim Arabic repetitions' })).toBeVisible();
+    await expect(
+      page.getByRole('group', {
+        name: 'Exact expression occurrences along the 6,236-ayah Quran',
+      }),
+    ).toBeVisible();
+    await expect(page.getByText(expression.words.join(' '), { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Next expression graph targets' }).click();
+    await expect(page.getByText(/Showing 33–/)).toBeVisible();
+    const target = expression.occurrences.find((site) => site.ayah !== first.ayah);
+    if (!target) throw new Error('No second ayah for selected expression.');
+    const targetRef = CANONICAL_QURAN.refAt(target.ayah);
+    const targetLabel = String(targetRef.surah) + ':' + String(targetRef.ayah);
+    await page
+      .getByRole('region', { name: 'Exact Arabic expressions' })
+      .getByRole('button', { name: new RegExp('^' + targetLabel.replace(':', ':')) })
+      .first()
+      .click();
+    await expect(page).toHaveURL(
+      new RegExp('ref=' + String(targetRef.surah) + '%3A' + String(targetRef.ayah)),
+    );
+    await expect(page).toHaveURL(/expression=exact%3Av1%3A/);
+    await page.getByRole('button', { name: 'Threads & Reader' }).click();
+    await expect(page.getByRole('heading', { name: 'Verbatim Arabic repetitions' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Threads from ' + targetLabel })).toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Quran text and exact expressions' })).toBeVisible();
   });
 });
