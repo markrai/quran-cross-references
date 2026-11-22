@@ -100,6 +100,21 @@ test.describe('Quran production readiness', () => {
     expect(scripture.ok()).toBe(true);
     const publishedText = (await scripture.json()) as { tanzilNotice: string };
     expect(publishedText.tanzilNotice).toContain('Copyright (C) 2007-2021 Tanzil Project');
+    const evidenceResponse = await request.get('data/quran/evidence.json');
+    expect(evidenceResponse.ok()).toBe(true);
+    const evidence = (await evidenceResponse.json()) as {
+      format: string;
+      sources: { id: string; sha256: string }[];
+      relationships: { stableId: string; legacyId: number; type: string }[];
+    };
+    expect(evidence.format).toBe('quran-relationship-evidence');
+    expect(evidence.relationships).toHaveLength(2445);
+    expect(evidence.relationships[0]?.legacyId).toBe(0);
+    expect(evidence.relationships[0]?.stableId).toMatch(/^curated:mutashabihat:\d+-\d+:\d+-\d+$/);
+    expect(evidence.relationships[0]?.type).toBe('curated-similar-passage');
+    expect(evidence.sources[0]?.sha256).toBe(
+      '785d5efa266a19c405a449b0a01ebf34fe7dc09836d5b6ef301eae874db780f0',
+    );
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
@@ -134,6 +149,7 @@ test.describe('Quran production readiness', () => {
           'quran/index.html',
           'data/quran/text.json',
           'data/quran/relationships.json',
+          'data/quran/evidence.json',
         ];
         const responses = await Promise.all(
           required.map((path) => cache.match(new URL(path, registration.scope))),
