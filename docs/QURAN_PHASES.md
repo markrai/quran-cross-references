@@ -1,14 +1,16 @@
 # Quran Cross-References: phased adoption
 
-## Merge boundary: Quran reader preview, no default-app cutover
+## Current state: Quran-first application (Phase 1D.1)
 
-This repository is currently a fork of Bible Cross-References. The original application
-remains the working default while the Quran implementation is introduced in isolated,
-reviewable phases.
+Phases 1A through 1C established the dataset, graph adapters and bilingual Quran reader
+under a separate preview route. Phase 1D.1 makes the Quran reader the only built app
+and the default landing page at `/`.
 
-Phases 1A and 1B retain their isolation. Phase 1C introduces an independent Quran route at
-`/quran/` without changing the default Bible app shell, existing visualization routes,
-Bible datasets, or its translation picker.
+The previous Bible source and its independent unit tests are retained for the 1D.2
+cleanup. The Bible user interface, datasets, service worker, first-frame rendering,
+site-head generator and analytics are no longer part of the dev/build configuration.
+Quran SEO, PWA, icons, offline and accessibility acceptance are planned for Phase 1D.3.
+The Quran pages remain `noindex` until that acceptance is complete.
 
 ### Included in Phase 1A
 
@@ -76,6 +78,31 @@ Run `npm run check`, `npm run data:quran`, `npm run build`, then
 On a preview built at its default base path, open `/bible-cross-references/quran/`;
 under `BASE_PATH=/`, open `/quran/`.
 
+### Phase 1D.1: Quran default app and isolated build
+
+- `npm run dev` and `npm run build` now run `data:quran` only, without invoking
+  any Bible source download, translation import, or STEP Bible build.
+- `index.html` mounts the Quran app. Quran references now serialize as
+  `/?ref=2%3A255`; previously shared `/quran/?ref=2%3A255` links still load and
+  then navigate to canonical root paths on interaction.
+- Vite uses only the Quran root and compatibility HTML entries, with
+  `publicDir=public/quran-only`. This prevents **stale generated Bible files**
+  under `public/data/` from silently leaking into `dist/`.
+- The importer writes identical verified Quran JSON to
+  `data/quran/generated/` and `public/quran-only/data/quran/`. The published
+  URLs remain `/data/quran/text.json` and `/data/quran/relationships.json`
+  under the deployment base.
+- The production base defaults to `/quran-cross-references/` rather than
+  the original project's `/bible-cross-references/`. Set `BASE_PATH=/` for
+  root-domain hosting.
+- CI keeps strict unit/type/format gates and Windows source verification,
+  asserts that Bible assets are absent from the published site, and runs Quran
+  desktop/phone browser tests. It does **not** run historical Bible browser or
+  Bible offline tests against a Quran-only distribution.
+- The original Bible code and isolated unit tests are deliberately retained
+  for the explicit Phase 1D.2 removal. Quran SEO, PWA/offline, visual polish,
+  and mobile/accessibility release gates belong to Phase 1D.3.
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows
@@ -88,7 +115,7 @@ GitHub Actions runs on pull requests and pushes to main. The CI workflow include
 type checking, type coverage, ESLint, Prettier, unit coverage, verified Quran dataset
 generation on Linux and Windows, a deterministic Bible dataset manifest check,
 the full legacy browser suite, and dedicated Quran desktop/phone browser scenarios.
-Deployments depend on all these jobs. A fork owner may have to enable GitHub Actions
+Deployments depend on the active Quran release jobs. A fork owner may have to enable GitHub Actions
 in the repository's Actions tab or Settings before any jobs can run.
 
 ### Licensing and provenance
@@ -103,11 +130,15 @@ dedicated CC0 and is not a complete scholarly cross-reference set.
 
 ### Next merges
 
-1. **Phase 1D: Product cutover.** Replace metadata, link previews, PWA assets,
-   help text, and all Bible-specific UI; validate mobile, offline, accessibility
-   and end-to-end flows before replacing the default landing page.
+1. **Phase 1D.2: Legacy cleanup.** Remove the unused Bible UI, data importers,
+   datasets, obsolete browser tests, docs and dependencies after checking
+   for Quran-reusable code.
+2. **Phase 1D.3: Production readiness.** Add Quran metadata, share previews,
+   Quran-specific PWA/offline caching, mobile/accessibility acceptance and
+   complete source attribution/rights review. Remove `noindex` only then.
+3. **Phase 2: Relationship exploration.** Improve Quran arc and thread navigation,
+   relationship semantics and supported corpus breadth without fabricating rankings.
 
-Each phase must be independently mergeable with a passing build, tests and CI.
-No incomplete Quran screen should ship as the default. The original WIP
-implementation remains in commit `82ae6b54995ba059f08c84e19946e82be70d71c0`
+Each phase must remain reviewable and pass its release gates. The original
+WIP implementation remains in commit `82ae6b54995ba059f08c84e19946e82be70d71c0`
 for selectively recovering design and code during later phases.
