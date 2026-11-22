@@ -11,6 +11,7 @@ import {
   type QuranLocation,
 } from './location.ts';
 import { loadQuranReaderData, type QuranReaderData } from './model.ts';
+import { shareQuranReference } from './share.ts';
 import styles from './QuranApp.module.css';
 
 type LoadState =
@@ -51,6 +52,20 @@ export function QuranApp() {
   const [attempt, setAttempt] = useState(0);
   const [selected, setSelected] = useState<{ readonly id: number; readonly surah: number; readonly scope: string } | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
+  const [offline, setOffline] = useState(() => !navigator.onLine);
+
+  useEffect(() => {
+    const update = () => {
+      setOffline(!navigator.onLine);
+    };
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    return () => {
+      window.removeEventListener('online', update);
+      window.removeEventListener('offline', update);
+    };
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -78,6 +93,7 @@ export function QuranApp() {
 
   const focus = (reference: AyahRef) => {
     setSearchError(null);
+    setShareMessage(null);
     navigate(linkReference(location, reference));
   };
   const changeSurah = (surah: number) => {
@@ -95,13 +111,15 @@ export function QuranApp() {
 
   return (
     <div className={styles.shell}>
+      <a className={styles.skipLink} href="#quran-main">Skip to Quran content</a>
       <header className={styles.header}>
         <div className={styles.brand}>
           <a href={defaultLink} className={styles.brandLink}>Quran Cross-References</a>
         </div>
+        {offline && <span className={styles.offlineLabel} role="status">Offline</span>}
       </header>
 
-      <main className={styles.main}>
+      <main id="quran-main" className={styles.main}>
         <div className={styles.toolbar}>
           <div className={styles.viewTabs} role="group" aria-label="Visualization">
             {(['arcs', 'threads'] as const).map((view) => (
@@ -223,8 +241,31 @@ export function QuranApp() {
                   <p className={styles.eyebrow}>Selected passage</p>
                   <h1>{activeSurah.name} · {formatAyahId(location.reference)}</h1>
                 </div>
-                <div className={styles.stepper}>
-                  <button type="button" aria-label="Previous ayah" disabled={activeIndex === 0} onClick={() => {
+                <div className={styles.focusActions}>
+                  <button
+                    className={styles.shareButton}
+                    type="button"
+                    aria-label="Share ayah"
+                    onClick={() => {
+                      const url = new URL(
+                        quranLocationUrl(location, import.meta.env.BASE_URL),
+                        window.location.origin,
+                      ).href;
+                      void shareQuranReference(
+                        url,
+                        activeSurah.name + ' ' + formatAyahId(location.reference),
+                      ).then((result) => {
+                        if (result === 'cancelled') return;
+                        if (result === 'copied') setShareMessage('Ayah link copied');
+                        else if (result === 'shared') setShareMessage('Ayah link shared');
+                        else setShareMessage('Share this link: ' + url);
+                      });
+                    }}
+                  >
+                    Share ayah
+                  </button>
+                  <div className={styles.stepper}>
+                    <button type="button" aria-label="Previous ayah" disabled={activeIndex === 0} onClick={() => {
                     if (activeIndex !== undefined && activeIndex > 0) {
                       focus(data.relationships.versification.refAt(activeIndex - 1));
                     }
@@ -234,8 +275,10 @@ export function QuranApp() {
                       focus(data.relationships.versification.refAt(activeIndex + 1));
                     }
                   }}>›</button>
+                  </div>
                 </div>
               </div>
+              {shareMessage && <p className={styles.shareStatus} role="status">{shareMessage}</p>}
               {activeIndex !== undefined && (
                 <>
                   <p className={styles.focusArabic} lang="ar" dir="rtl">{data.text.arabic[activeIndex]}</p>
@@ -297,7 +340,8 @@ export function QuranApp() {
       <footer className={styles.footer}>
         <p>Arabic text © <a href="https://tanzil.net/docs/Text_License">Tanzil Project</a>, Uthmani v1.1, reproduced without modification.
           English: Marmaduke Pickthall (1930), Tanzil digital edition.
-          Curated similar passages: <a href="https://github.com/Waqar144/Quran_Mutashabihat_Data">Waqar144 Mutashabihat Data</a> (CC0).</p>
+          Curated similar passages: <a href="https://github.com/Waqar144/Quran_Mutashabihat_Data">Waqar144 Mutashabihat Data</a> (CC0).
+          <a href={import.meta.env.BASE_URL + 'data/quran/manifest.json'}> Verified dataset provenance</a>.</p>
         <p>Relationships indicate upstream textual similarities only, not verified theological interpretations.</p>
       </footer>
     </div>

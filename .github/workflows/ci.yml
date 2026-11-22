@@ -63,7 +63,15 @@ jobs:
           test -s dist/data/quran/text.json
           test -s dist/data/quran/relationships.json
           test -s dist/data/quran/manifest.json
+          test -s dist/manifest.webmanifest
+          test -s dist/icons/icon-192.png
+          test -s dist/icons/icon-512.png
+          test -s dist/icons/icon-maskable-512.png
+          test -s dist/social-preview.png
+          test -s dist/sw.js
           grep -q 'Quran Cross-References' dist/index.html
+          grep -q 'og:image' dist/index.html
+          grep -q 'quran-cross-references-shell-' dist/sw.js
           if test -e dist/data/translations || test -e dist/data/cross-references || test -e dist/data/words || test -e dist/threads; then
             echo '::error::Legacy Bible app or datasets leaked into the Quran release.'
             exit 1

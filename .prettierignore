@@ -3,7 +3,7 @@ coverage/
 test-results/
 playwright-report/
 public/data/
-public/quran-only/data/
+public/quran-only/
 data/quran/generated/
 data/raw/
 package-lock.json
