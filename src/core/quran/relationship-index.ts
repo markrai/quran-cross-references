@@ -170,13 +170,13 @@ export class QuranRelationshipIndex {
 
   #countAt(postings: PostingList, ayah: number): number {
     this.#validateAyah(ayah);
-    return postings.elementAt(offsets, ayah + 1) - postings.elementAt(offsets, ayah);
+    return elementAt(postings.offsets, ayah + 1) - elementAt(postings.offsets, ayah);
   }
 
   #atAyah(postings: PostingList, ayah: number): readonly QuranRelationship[] {
     this.#validateAyah(ayah);
-    const start = postings.elementAt(offsets, ayah);
-    const end = postings.elementAt(offsets, ayah + 1);
+    const start = elementAt(postings.offsets, ayah);
+    const end = elementAt(postings.offsets, ayah + 1);
     return Array.from(postings.ids.subarray(start, end), (id) => this.link(id));
   }
 
@@ -185,8 +185,8 @@ export class QuranRelationshipIndex {
     const seen = new Uint8Array(this.linkCount);
     const ids: number[] = [];
     for (let ayah = range.start; ayah <= range.end; ayah += 1) {
-      const start = postings.elementAt(offsets, ayah);
-      const end = postings.elementAt(offsets, ayah + 1);
+      const start = elementAt(postings.offsets, ayah);
+      const end = elementAt(postings.offsets, ayah + 1);
       for (let position = start; position < end; position += 1) {
         const id = elementAt(postings.ids, position);
         if (seen[id] === 0) {
