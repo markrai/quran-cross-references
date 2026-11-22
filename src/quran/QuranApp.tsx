@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { formatAyahId, type AyahRef } from '../core/quran/ayah-ref.ts';
 import { formatIndexRange, parseReference } from '../core/quran/reference.ts';
 import { passesQuranRelationshipFilter } from '../core/quran/relationship-filter.ts';
@@ -120,6 +120,10 @@ export function QuranApp() {
     data && location.rangeEnd
       ? (data.relationships.versification.indexOf(location.rangeEnd) ?? focusStart)
       : focusStart;
+  const focusedRange = useMemo(
+    () => ({ start: focusStart, end: focusEnd }),
+    [focusStart, focusEnd],
+  );
   const activeSurah = getSurah(location.reference.surah);
   const defaultLink = quranLocationUrl(DEFAULT_QURAN_LOCATION, import.meta.env.BASE_URL);
 
@@ -228,7 +232,7 @@ export function QuranApp() {
                 onChange={(event) => {
                   const scope = event.target.value;
                   if (scope === 'all' || scope === 'same-surah' || scope === 'cross-surah') {
-                    navigate({ ...location, scope });
+                    navigate({ ...location, scope, selectedLink: null });
                   }
                 }}
               >
@@ -332,7 +336,7 @@ export function QuranApp() {
                   index={data.relationships}
                   surah={location.reference.surah}
                   scope={location.scope}
-                  focus={{ start: focusStart, end: focusEnd }}
+                  focus={focusedRange}
                   selectedId={link?.id ?? null}
                   onSelect={(id) => {
                     navigate({ ...location, selectedLink: id });
