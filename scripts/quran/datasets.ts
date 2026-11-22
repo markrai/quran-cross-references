@@ -87,7 +87,7 @@ function parseRange(
   repeated: () => void,
 ): AyahRange {
   const values: unknown[] = typeof value === 'number' ? [value] : Array.isArray(value) ? value : [];
-  if (values.length === 0 || !values.every((member) => Number.isInteger(member))) {
+  if (values.length === 0 || !values.every((member) => typeof member === 'number' && Number.isInteger(member))) {
     throw new Error(`${where}: ayah must be an integer or a nonempty integer array.`);
   }
   const indices: number[] = [];
