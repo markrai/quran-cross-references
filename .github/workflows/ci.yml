@@ -29,6 +29,8 @@ jobs:
         run: npm run typecheck
       - name: Enforce type coverage
         run: npm run typecoverage
+      - name: Retrieve verified QAC corpus for importer tests
+        run: npm run data:qac:fetch
       - name: Enforce unit-test coverage
         run: npm run test:coverage
       - name: Archive unit coverage detail
@@ -111,7 +113,7 @@ jobs:
       - name: Generate exact-expression evidence on Windows
         run: npm run data:expressions
       - name: Test Quran source integrity, importers and graph
-        run: npx vitest run scripts/quran/pinned-source.test.ts scripts/quran/datasets.test.ts scripts/quran/graph.test.ts scripts/quran/raw-ignore.test.ts src/core/quran/relationship-evidence.test.ts
+        run: npx vitest run scripts/quran/qac.test.ts scripts/quran/pinned-source.test.ts scripts/quran/datasets.test.ts scripts/quran/graph.test.ts scripts/quran/raw-ignore.test.ts src/core/quran/relationship-evidence.test.ts
       - name: Confirm Quran datasets were published
         shell: pwsh
         run: |
