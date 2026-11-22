@@ -1,16 +1,17 @@
 # Quran Cross-References: phased adoption
 
-## Current state: Quran-first application (Phase 1D.1)
+## Current state: Quran-first application (Phase 1D.2)
 
-Phases 1A through 1C established the dataset, graph adapters and bilingual Quran reader
-under a separate preview route. Phase 1D.1 makes the Quran reader the only built app
-and the default landing page at `/`.
+Phases 1A through 1C established the verified Quran model, graph adapters and
+bilingual reader. Phase 1D.1 switched the default application and runtime to
+Quran-only. Phase 1D.2 removed the obsolete Bible application and data pipeline
+from source control, leaving a small Quran-focused codebase.
 
-The previous Bible source and its independent unit tests are retained for the 1D.2
-cleanup. The Bible user interface, datasets, service worker, first-frame rendering,
-site-head generator and analytics are no longer part of the dev/build configuration.
-Quran SEO, PWA, icons, offline and accessibility acceptance are planned for Phase 1D.3.
-The Quran pages remain `noindex` until that acceptance is complete.
+The original Bible implementation remains available in Git history. The Quran
+application retains its canonical root entry, `/quran/` compatibility entry
+and strict pinned-source verification. Quran SEO, PWA, icons, offline and
+accessibility acceptance are planned for Phase 1D.3. Both HTML entry points
+remain `noindex` until those gates are complete.
 
 ### Included in Phase 1A
 
@@ -99,9 +100,30 @@ under `BASE_PATH=/`, open `/quran/`.
   asserts that Bible assets are absent from the published site, and runs Quran
   desktop/phone browser tests. It does **not** run historical Bible browser or
   Bible offline tests against a Quran-only distribution.
-- The original Bible code and isolated unit tests are deliberately retained
-  for the explicit Phase 1D.2 removal. Quran SEO, PWA/offline, visual polish,
+- The original Bible code and isolated unit tests were retained until
+  Phase 1D.2, when they were removed. Quran SEO, PWA/offline, visual polish,
   and mobile/accessibility release gates belong to Phase 1D.3.
+
+### Phase 1D.2: Delete legacy code and retain Quran foundation
+
+- Remove all dormant Bible UI routes, six-language Bible translation registry,
+  original-words features, Bible WebGL visualizations, debugging shell, locale
+  generator and offline worker. None was imported by the Quran reader.
+- Remove the Bible raw inputs, source pins, importers, generated dataset checks,
+  original site assets, obsolete Playwright snapshots and legacy unit tests.
+- Keep `src/core/lib/array.ts` (used by Quran graph adapters) and the generic
+  runtime JSON validators and their unit tests as reusable platform helpers.
+- Remove unused direct dependencies: Three.js, React Icons, fflate, associated
+  type packages, and the browser user-event helper. Prune orphaned lockfile
+  packages rather than retaining stale dependency artifacts.
+- Remove old `tsconfig.sw.json` and the worker project reference; narrow
+  the Vitest/coverage and Playwright configuration to Quran behavior.
+  The strict core coverage thresholds remain 98% of statements, lines and
+  functions, and 88% of branches; Quran UI behavior also has desktop and
+  phone browser acceptance.
+- Retain all three pinned raw Quran sources, their SHA-256 checks and
+  license/attribution metadata unchanged. `npm run format` ignores raw
+  snapshots and generated output.
 
 ### CI and Windows source integrity
 
@@ -114,8 +136,8 @@ unchanged.
 GitHub Actions is configured to run on pull requests and pushes to main. Active release
 checks include TypeScript, type coverage, ESLint, Prettier, unit coverage, verified
 Quran generation on Linux and Windows, a Quran-only distribution check, and
-desktop/phone Quran browser scenarios. The old Bible manifest and browser suites
-remain in source but are not part of the current build and CI release gates.
+desktop/phone Quran browser scenarios. Phase 1D.2 removes the obsolete
+Bible manifest and browser suites entirely.
 GitHub Pages deployment depends on the active Quran jobs passing.
 A fork owner may have to enable GitHub Actions in the repository's Actions tab
 or Settings before jobs can run.
@@ -132,13 +154,10 @@ dedicated CC0 and is not a complete scholarly cross-reference set.
 
 ### Next merges
 
-1. **Phase 1D.2: Legacy cleanup.** Remove the unused Bible UI, data importers,
-   datasets, obsolete browser tests, docs and dependencies after checking
-   for Quran-reusable code.
-2. **Phase 1D.3: Production readiness.** Add Quran metadata, share previews,
+1. **Phase 1D.3: Production readiness.** Add Quran metadata, share previews,
    Quran-specific PWA/offline caching, mobile/accessibility acceptance and
    complete source attribution/rights review. Remove `noindex` only then.
-3. **Phase 2: Relationship exploration.** Improve Quran arc and thread navigation,
+2. **Phase 2: Relationship exploration.** Improve Quran arc and thread navigation,
    relationship semantics and supported corpus breadth without fabricating rankings.
 
 Each phase must remain reviewable and pass its release gates. The original

@@ -26,17 +26,8 @@ import ts from 'typescript';
  */
 const DEFAULT_MINIMUM = 98;
 
-/**
- * The real ratchet: how many values the checker may fail to type, in absolute terms.
- *
- * Four today, all of them irreducible — two Three.js uniforms, `event.data` on a worker message,
- * and the TypeScript API's own `readConfigFile`. The allowance is small enough that adding an
- * untyped value is a decision somebody has to make on purpose, by editing this line and saying
- * why in the commit.
- */
 const DEFAULT_MAX_UNTYPED = 6;
 
-/** The projects `tsconfig.json` references: the app, the build scripts, the worker, the e2e suite. */
 function projectPaths(): string[] {
   const root: unknown = JSON.parse(readFileSync('tsconfig.json', 'utf8'));
   const references =
