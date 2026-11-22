@@ -24,12 +24,13 @@
     "test:e2e:ci": "playwright test tests/e2e/quran-reader.spec.ts --project=desktop --project=phone --fail-on-flaky-tests",
     "test:report": "playwright show-report",
     "check": "npm run typecheck && npm run typecoverage && npm run lint && npm run format:check && npm run test:coverage",
-    "data:quran": "node scripts/quran/build.ts",
+    "data:quran": "node scripts/quran/fetch-maqam.ts && node scripts/quran/build.ts",
     "assets:quran": "node scripts/quran/build-assets.ts",
     "pwa:build": "node scripts/quran/build-pwa.ts",
     "bench:graph": "node scripts/quran/bench-graph.ts",
     "data:expressions": "node scripts/quran/build-expressions.ts",
-    "bench:expressions": "npm run data:expressions"
+    "bench:expressions": "npm run data:expressions",
+    "data:morphology:fetch": "node scripts/quran/fetch-maqam.ts"
   },
   "dependencies": {
     "react": "^19.3.0",

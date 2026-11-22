@@ -29,6 +29,16 @@
       "retrievedAt": "2026-11-01",
       "license": "CC0 1.0 Universal",
       "attribution": "Quran Mutashabihat Data, Waqar144, drawing on Qari Idrees Al Asim; https://github.com/Waqar144/Quran_Mutashabihat_Data"
+    },
+    {
+      "id": "maqam-2026",
+      "description": "MAQAM: A Richly Annotated Corpus for Quranic Arabic Morphological Analysis and Disambiguation, pinned upstream 2e52c1354a901e998a311c94f43d14c99f467f6f",
+      "url": "https://raw.githubusercontent.com/CAMeL-Lab/MAQAM-Quranic-Corpus/2e52c1354a901e998a311c94f43d14c99f467f6f/data/MAQAM%20Dataset.csv",
+      "fileName": "maqam-2026.csv",
+      "sha256": "2b14d207844f725e1fe217d158fa540e9ec6eb3a6f81549ea1a0f3d7caa318d2",
+      "retrievedAt": "2026-11-22",
+      "license": "CC BY 4.0; derived annotation of Tanzil text under the upstream attribution terms",
+      "attribution": "MAQAM © 2026 New York University Abu Dhabi (Saeed et al.), https://github.com/CAMeL-Lab/MAQAM-Quranic-Corpus, https://aclanthology.org/2026.arabicnlp-main.11/; CC BY 4.0 https://creativecommons.org/licenses/by/4.0/"
     }
   ]
 }
