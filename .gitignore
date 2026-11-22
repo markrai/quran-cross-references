@@ -3,7 +3,7 @@ dist/
 coverage/
 *.tsbuildinfo
 data/quran/generated/
-public/quran-only/data/
+public/quran-only/
 public/data/
 test-results/
 playwright-report/
