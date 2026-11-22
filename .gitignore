@@ -17,3 +17,8 @@ npm-debug.log*
 !.vscode/extensions.json
 .idea/
 .DS_Store
+
+data/raw/*
+!data/raw/quran-uthmani-1.1.txt
+!data/raw/en.pickthall.txt
+!data/raw/mutashabiha_data.json
