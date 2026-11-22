@@ -63,6 +63,14 @@ const buckwalter: Readonly<Record<string, string>> = {
   '{': 'ٱ',
 };
 
+const arabicToBw = new Map(
+  Object.entries(buckwalter).map(([symbol, arabic]) => [arabic, symbol]),
+);
+
+function arabicToBuckwalter(value: string): string {
+  return Array.from(value, (symbol) => arabicToBw.get(symbol) ?? symbol).join('');
+}
+
 export function buckwalterToArabic(value: string): string {
   return Array.from(value, (symbol) => buckwalter[symbol] ?? symbol).join('');
 }
@@ -241,6 +249,17 @@ export class QacMorphologyIndex {
   wordsAt(ayah: number): readonly QacWordAnalysis[] {
     if (!CANONICAL_QURAN.isValidIndex(ayah)) throw new RangeError('Invalid QAC ayah index.');
     return this.#ayahs[ayah] ?? [];
+  }
+
+  resolve(grouping: QacGrouping, input: string): string | null {
+    const registry = grouping === 'root' ? this.#roots : this.#lemmas;
+    const trimmed = input.trim();
+    if (registry.has(trimmed)) return trimmed;
+    const normalized = grouping === 'root'
+      ? trimmed.replaceAll('.', '').replaceAll('·', '').replaceAll(' ', '')
+      : trimmed;
+    const converted = arabicToBuckwalter(normalized);
+    return registry.has(converted) ? converted : null;
   }
 
   occurrences(grouping: QacGrouping, term: string): readonly QacOccurrence[] {
