@@ -1,8 +1,8 @@
 {
-  "name": "bible-cross-references",
+  "name": "quran-cross-references",
   "version": "0.1.0",
   "private": true,
-  "description": "A minimalist, interactive explorer of Bible cross-references.",
+  "description": "An interactive bilingual Quran cross-reference explorer.",
   "license": "MIT",
   "type": "module",
   "engines": {
