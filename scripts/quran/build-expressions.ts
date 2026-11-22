@@ -32,10 +32,10 @@ const dataset = createExactExpressionEvidence(text.arabic, source);
 validateExactExpressionEvidence(dataset, text.arabic, source);
 const output = JSON.stringify(dataset) + '\n';
 const bytes = Buffer.byteLength(output, 'utf8');
-const maxBytes = 64 * 1024 * 1024;
+const maxBytes = 4 * 1024 * 1024;
 if (bytes > maxBytes) {
   throw new Error(
-    'Exact-expression dataset exceeded 64 MiB. Review the profile before publication.',
+    'Exact-expression dataset exceeded the measured 4 MiB budget. Review the complete corpus profile.',
   );
 }
 const directory = 'data/quran/generated';
@@ -43,6 +43,9 @@ mkdirSync(directory, { recursive: true });
 writeFileSync(join(directory, 'expressions.json'), output);
 const digest = createHash('sha256').update(output).digest('hex');
 const elapsedMs = Math.round(performance.now() - begin);
+if (elapsedMs > 30_000) {
+  throw new Error('Exact-expression generation exceeded the 30-second profiling budget.');
+}
 const heapDeltaBytes = process.memoryUsage().heapUsed - before;
 const profile = {
   format: 'quran-exact-expression-profile',
