@@ -33,7 +33,7 @@ The build publishes `index.html`, a compatibility page at `quran/index.html`, an
 
 The default production base path is `/quran-cross-references/`. Set `BASE_PATH=/` to build for a domain root.
 
-The previous Bible implementation remains in the repository temporarily for the Phase 1D.2 cleanup, but it is no longer part of the application bundle or the default development/build process. Its UI and offline browser tests are retained as historical tests and are not part of the Quran release gate. Quran PWA/offline features, full metadata and accessibility acceptance are scheduled for Phase 1D.3; both entry pages remain `noindex` in the meantime.
+Phase 1D.2 removed the unused Bible application, translations, data importers, visualizations, assets and obsolete tests. The repository now contains the Quran reader, validated source pipeline, core model, and a small set of reusable generic helpers. The original Bible implementation remains available in Git history. Quran PWA/offline features, complete metadata and accessibility acceptance are scheduled for Phase 1D.3; both entry pages remain `noindex` in the meantime.
 
 ## Data provenance
 
@@ -43,6 +43,6 @@ The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pi
 - English: Marmaduke Pickthall (1930), Tanzil digital text.
 - Similar-passage relationships: [Waqar144 Quran Mutashabihat Data](https://github.com/Waqar144/Quran_Mutashabihat_Data), CC0.
 
-The Quran implementation was adapted from the open-source Bible Cross-References project by [Oleksii Trekhleb](https://github.com/trekhleb/bible-cross-references). The original code is retained under its existing MIT license.
+The Quran implementation was adapted from the open-source Bible Cross-References project by [Oleksii Trekhleb](https://github.com/trekhleb/bible-cross-references). The inherited portions remain covered by the original MIT license; removed legacy code remains accessible in Git history.
 
 See [docs/QURAN_PHASES.md](docs/QURAN_PHASES.md) for the migration roadmap and outstanding work.
