@@ -168,12 +168,15 @@ export class QuranRelationshipEvidenceIndex {
       if (byStableId.has(stableId)) {
         throw new QuranEvidenceIntegrityError(label + ' duplicates a stable ID.');
       }
+      const assertions: readonly QuranEvidenceAssertion[] = Object.freeze([
+        { kind: 'curated-reference', sourceId: expectedSource.id },
+      ]);
       const entry: QuranClassifiedRelationship = Object.freeze({
         stableId,
         legacyId,
         type: 'curated-similar-passage',
         origin: 'curated',
-        evidence: Object.freeze([{ kind: 'curated-reference', sourceId: expectedSource.id }]),
+        evidence: assertions,
       });
       byStableId.set(stableId, entry);
       return entry;
