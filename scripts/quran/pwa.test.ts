@@ -13,7 +13,6 @@ describe('Quran offline release shell', () => {
       'data/quran/evidence.json',
       'data/quran/analytics.json',
       'data/quran/manifest.json',
-      'data/quran/analytics.json',
       'data/quran/expressions.json',
       'manifest.webmanifest',
       'icons/icon-192.png',
@@ -26,6 +25,7 @@ describe('Quran offline release shell', () => {
     ];
     expect(pwaCacheFiles(files)).toEqual([
       'assets/index-abc.js',
+      'data/quran/analytics.json',
       'data/quran/evidence.json',
       'data/quran/manifest.json',
       'data/quran/relationships.json',
