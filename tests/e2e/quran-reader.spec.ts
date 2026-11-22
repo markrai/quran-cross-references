@@ -107,8 +107,9 @@ test.describe('Quran production readiness', () => {
     );
   });
 
-  test('loads Arabic, English and related passages after losing network access', async ({
+  test('loads Arabic, English and related passages when origin content is unavailable', async ({
     page,
+    context,
   }) => {
     const site = await serveQuranBuild();
     try {
@@ -146,7 +147,7 @@ test.describe('Quran production readiness', () => {
           'Failed request: ' + request.url() + ' ' + (request.failure()?.errorText ?? ''),
         );
       });
-      await site.stop();
+      site.setUnavailable();
       const probe = await page.evaluate(async () => {
         const scope = (await navigator.serviceWorker.ready).scope;
         const paths = ['', 'quran/', 'data/quran/text.json', 'data/quran/relationships.json'];
@@ -197,6 +198,15 @@ test.describe('Quran production readiness', () => {
       await page.goto(site.url + 'quran/?ref=114%3A6&view=threads');
       await expect(page.getByRole('heading', { name: /An-Nas.*114:6/ })).toBeVisible();
       await expect(page.getByRole('heading', { name: 'Threads from 114:6' })).toBeVisible();
+      if (process.platform !== 'win32') {
+        await context.setOffline(true);
+        try {
+          await page.reload();
+          await expect(page.getByRole('heading', { name: /An-Nas.*114:6/ })).toBeVisible();
+        } finally {
+          await context.setOffline(false);
+        }
+      }
     } finally {
       await site.stop();
     }
