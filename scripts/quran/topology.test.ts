@@ -33,8 +33,8 @@ describe('pinned full-corpus curated topology', () => {
         expect(id).toBeLessThan(2445);
       }
     }
-    expect(
-      createHash('sha256').update(JSON.stringify(first)).digest('hex'),
-    ).toBe(createHash('sha256').update(JSON.stringify(second)).digest('hex'));
+    expect(createHash('sha256').update(JSON.stringify(first)).digest('hex')).toBe(
+      createHash('sha256').update(JSON.stringify(second)).digest('hex'),
+    );
   });
 });

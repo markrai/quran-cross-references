@@ -97,7 +97,8 @@ export function QuranTopology({
     currentSurahPage * TOPOLOGY_SURAH_PAGE_SIZE,
     (currentSurahPage + 1) * TOPOLOGY_SURAH_PAGE_SIZE,
   );
-  const partner = neighbors.find((candidate) => candidate.surah === selectedPartner) ?? displayed[0] ?? null;
+  const partner =
+    neighbors.find((candidate) => candidate.surah === selectedPartner) ?? displayed[0] ?? null;
   const partnerPages = Math.max(
     1,
     Math.ceil((partner?.ids.length ?? 0) / TOPOLOGY_EVIDENCE_PAGE_SIZE),
@@ -118,10 +119,12 @@ export function QuranTopology({
     currentAyahPage === ayahPage
       ? neighborhood
       : curatedNeighborhood(relationships, focus, direction, depth, currentAyahPage);
-  const firstNodes = [...new Set(shownNeighborhood.first.map((edge) => edge.neighbor))].filter((node) => node !== focus);
-  const secondNodes = [
-    ...new Set(shownNeighborhood.second.map((edge) => edge.neighbor)),
-  ].filter((node) => node !== focus && !firstNodes.includes(node));
+  const firstNodes = [...new Set(shownNeighborhood.first.map((edge) => edge.neighbor))].filter(
+    (node) => node !== focus,
+  );
+  const secondNodes = [...new Set(shownNeighborhood.second.map((edge) => edge.neighbor))].filter(
+    (node) => node !== focus && !firstNodes.includes(node),
+  );
   const positions = new Map<number, Position>([[focus, CENTER]]);
   for (const [position, ayah] of firstNodes.entries()) {
     positions.set(ayah, coordinate(position, firstNodes.length, 134));
@@ -196,8 +199,7 @@ export function QuranTopology({
         <h1>Explore the Quran's relationship network</h1>
         <p>
           Every edge is backed by a curated similar-passage ID. Counts describe this dataset's
-          coverage, not religious significance, thematic importance or inferred similarity
-          scores.
+          coverage, not religious significance, thematic importance or inferred similarity scores.
         </p>
         <div className={styles.topologyIntroActions}>
           <span className={styles.topologyEvidenceLabel}>Curated evidence only</span>
@@ -285,7 +287,10 @@ export function QuranTopology({
       </div>
 
       <div className={styles.topologyColumns}>
-        <section className={styles.topologyPanel} aria-label={mode === 'surah' ? 'Surah connections' : 'Ayah connections'}>
+        <section
+          className={styles.topologyPanel}
+          aria-label={mode === 'surah' ? 'Surah connections' : 'Ayah connections'}
+        >
           <div className={styles.panelHeading}>
             <h2>
               {mode === 'surah'
@@ -294,16 +299,16 @@ export function QuranTopology({
             </h2>
             {mode === 'surah' ? (
               <p>
-                {smallNumber(focusSurahRow?.touching ?? 0)} distinct curated links touch this
-                surah. {smallNumber(focusSurahRow?.outgoing ?? 0)} source incidences,{' '}
-                {smallNumber(focusSurahRow?.incoming ?? 0)} target incidences. The diagram
-                omits within-surah edges.
+                {smallNumber(focusSurahRow?.touching ?? 0)} distinct curated links touch this surah.{' '}
+                {smallNumber(focusSurahRow?.outgoing ?? 0)} source incidences,{' '}
+                {smallNumber(focusSurahRow?.incoming ?? 0)} target incidences. The diagram omits
+                within-surah edges.
               </p>
             ) : (
               <p>
                 Up to {TOPOLOGY_FIRST_HOP_LIMIT} first-hop links per page and{' '}
-                {TOPOLOGY_SECOND_HOP_LIMIT} second-hop links per expansion. Arrows follow
-                recorded source-to-target direction.
+                {TOPOLOGY_SECOND_HOP_LIMIT} second-hop links per expansion. Arrows follow recorded
+                source-to-target direction.
               </p>
             )}
           </div>
@@ -316,7 +321,14 @@ export function QuranTopology({
                 aria-label="Interactive surah connectivity network"
               >
                 <defs>
-                  <marker id="topology-surah-arrow" markerWidth="8" markerHeight="8" refX="23" refY="4" orient="auto">
+                  <marker
+                    id="topology-surah-arrow"
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="23"
+                    refY="4"
+                    orient="auto"
+                  >
                     <path d="M0,0 L8,4 L0,8 z" className={styles.topologyArrow} />
                   </marker>
                 </defs>
@@ -345,7 +357,9 @@ export function QuranTopology({
                     )}
                     <a
                       href={surahHref(entry.surah)}
-                      aria-label={'Focus surah ' + String(entry.surah) + ' ' + getSurah(entry.surah).name}
+                      aria-label={
+                        'Focus surah ' + String(entry.surah) + ' ' + getSurah(entry.surah).name
+                      }
                       onClick={(event) => {
                         event.preventDefault();
                         setSurahPage(0);
@@ -353,40 +367,67 @@ export function QuranTopology({
                         onFocusSurah(entry.surah);
                       }}
                     >
-                      <circle cx={entry.point.x} cy={entry.point.y} r="25" className={styles.topologyNode} />
-                      <text x={entry.point.x} y={entry.point.y + 5} textAnchor="middle" className={styles.topologyNodeLabel}>
+                      <circle
+                        cx={entry.point.x}
+                        cy={entry.point.y}
+                        r="25"
+                        className={styles.topologyNode}
+                      />
+                      <text
+                        x={entry.point.x}
+                        y={entry.point.y + 5}
+                        textAnchor="middle"
+                        className={styles.topologyNodeLabel}
+                      >
                         {entry.surah}
                       </text>
                     </a>
                   </g>
                 ))}
                 <circle cx={CENTER.x} cy={CENTER.y} r="34" className={styles.topologyCenter} />
-                <text x={CENTER.x} y={CENTER.y + 5} textAnchor="middle" className={styles.topologyNodeLabel}>
+                <text
+                  x={CENTER.x}
+                  y={CENTER.y + 5}
+                  textAnchor="middle"
+                  className={styles.topologyNodeLabel}
+                >
                   {surah}
                 </text>
               </svg>
               <p className={styles.topologyCaption}>
-                Solid lines: outgoing. Dashed lines: incoming. Width follows the actual number
-                of directed source/target pair incidences, not a normalized similarity score.
-                Showing {displayed.length} of {neighbors.length} matching partner surahs.
+                Solid lines: outgoing. Dashed lines: incoming. Width follows the actual number of
+                directed source/target pair incidences, not a normalized similarity score. Showing{' '}
+                {displayed.length} of {neighbors.length} matching partner surahs.
               </p>
               <div className={styles.topologyPager}>
-                <button type="button" disabled={currentSurahPage === 0} onClick={() => {
-                  setSurahPage(currentSurahPage - 1);
-                  setSelectedPartner(null);
-                }}>
+                <button
+                  type="button"
+                  disabled={currentSurahPage === 0}
+                  onClick={() => {
+                    setSurahPage(currentSurahPage - 1);
+                    setSelectedPartner(null);
+                  }}
+                >
                   Previous surah partners
                 </button>
-                <span>Page {currentSurahPage + 1} of {surahPages}</span>
-                <button type="button" disabled={currentSurahPage + 1 >= surahPages} onClick={() => {
-                  setSurahPage(currentSurahPage + 1);
-                  setSelectedPartner(null);
-                }}>
+                <span>
+                  Page {currentSurahPage + 1} of {surahPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={currentSurahPage + 1 >= surahPages}
+                  onClick={() => {
+                    setSurahPage(currentSurahPage + 1);
+                    setSelectedPartner(null);
+                  }}
+                >
                   Next surah partners
                 </button>
               </div>
               {displayed.length === 0 && (
-                <p className={styles.empty}>No partner surahs meet this direction and minimum-link filter.</p>
+                <p className={styles.empty}>
+                  No partner surahs meet this direction and minimum-link filter.
+                </p>
               )}
               <div className={styles.topologyPartnerList} aria-label="Connected surahs">
                 {displayed.map((entry) => (
@@ -396,8 +437,12 @@ export function QuranTopology({
                     aria-pressed={partner?.surah === entry.surah}
                     onClick={() => selectPartner(entry.surah)}
                   >
-                    <strong>{entry.surah}. {getSurah(entry.surah).name}</strong>
-                    <small>{smallNumber(entry.outgoing)} out · {smallNumber(entry.incoming)} in</small>
+                    <strong>
+                      {entry.surah}. {getSurah(entry.surah).name}
+                    </strong>
+                    <small>
+                      {smallNumber(entry.outgoing)} out · {smallNumber(entry.incoming)} in
+                    </small>
                     <span>{smallNumber(entry.strength)}</span>
                   </button>
                 ))}
@@ -412,7 +457,14 @@ export function QuranTopology({
                 aria-label="Interactive bounded ayah neighborhood"
               >
                 <defs>
-                  <marker id="topology-arrow" markerWidth="8" markerHeight="8" refX="23" refY="4" orient="auto">
+                  <marker
+                    id="topology-arrow"
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="23"
+                    refY="4"
+                    orient="auto"
+                  >
                     <path d="M0,0 L8,4 L0,8 z" className={styles.topologyArrow} />
                   </marker>
                 </defs>
@@ -421,15 +473,26 @@ export function QuranTopology({
                 {secondNodes.map((ayah) => renderAyahLink(ayah, 'outer-' + ayah, true))}
                 {firstNodes.map((ayah) => renderAyahLink(ayah, 'inner-' + ayah, false))}
                 <circle cx={CENTER.x} cy={CENTER.y} r="34" className={styles.topologyCenter} />
-                <text x={CENTER.x} y={CENTER.y + 5} textAnchor="middle" className={styles.topologyNodeLabel}>
+                <text
+                  x={CENTER.x}
+                  y={CENTER.y + 5}
+                  textAnchor="middle"
+                  className={styles.topologyNodeLabel}
+                >
                   {label(focus)}
                 </text>
               </svg>
               <p className={styles.topologyCaption} role="status">
                 Showing {shownNeighborhood.first.length} of {shownNeighborhood.firstCount} first-hop
-                link incidences{depth === 2 ? ', plus ' + shownNeighborhood.second.length +
-                ' of ' + shownNeighborhood.secondCount + ' second-hop incidences' : ''}.
-                Source and target ranges are represented by their first ayah; the full spans
+                link incidences
+                {depth === 2
+                  ? ', plus ' +
+                    shownNeighborhood.second.length +
+                    ' of ' +
+                    shownNeighborhood.secondCount +
+                    ' second-hop incidences'
+                  : ''}
+                . Source and target ranges are represented by their first ayah; the full spans
                 remain available in the original relationship.
               </p>
               <div className={styles.topologyPager}>
@@ -440,7 +503,9 @@ export function QuranTopology({
                 >
                   Previous neighborhood links
                 </button>
-                <span>Page {currentAyahPage + 1} of {shownNeighborhood.pages}</span>
+                <span>
+                  Page {currentAyahPage + 1} of {shownNeighborhood.pages}
+                </span>
                 <button
                   type="button"
                   disabled={currentAyahPage + 1 >= shownNeighborhood.pages}
@@ -458,14 +523,18 @@ export function QuranTopology({
                       type="button"
                       onClick={() => onOpenLink(link.id)}
                     >
-                      <span>Hop {edge.hop} · Link #{link.id + 1}</span>
+                      <span>
+                        Hop {edge.hop} · Link #{link.id + 1}
+                      </span>
                       <strong>{curatedLinkLabel(link)}</strong>
                       <small>View original relationship and passage</small>
                     </button>
                   );
                 })}
                 {shownNeighborhood.firstCount === 0 && (
-                  <p className={styles.empty}>No curated links are incident to this ayah in the selected direction.</p>
+                  <p className={styles.empty}>
+                    No curated links are incident to this ayah in the selected direction.
+                  </p>
                 )}
               </div>
               <button type="button" className={styles.goButton} onClick={() => onReadAyah(focus)}>
@@ -483,11 +552,13 @@ export function QuranTopology({
                 <p>Select a partner surah to inspect the exact relationship IDs behind its edge.</p>
               </div>
               {partner === null ? (
-                <p className={styles.empty}>No matching edge. Lower the threshold or change direction.</p>
+                <p className={styles.empty}>
+                  No matching edge. Lower the threshold or change direction.
+                </p>
               ) : (
                 <>
                   <p className={styles.topologyCaption}>
-                    {getSurah(surah).name} ⇄ {getSurah(partner.surah).name}: {' '}
+                    {getSurah(surah).name} ⇄ {getSurah(partner.surah).name}:{' '}
                     {smallNumber(partner.ids.length)} distinct curated link IDs. An ID may
                     contribute to both directions if its source and target ranges overlap surahs.
                   </p>
@@ -501,11 +572,21 @@ export function QuranTopology({
                     ))}
                   </div>
                   <div className={styles.topologyPager}>
-                    <button type="button" disabled={currentEvidencePage === 0} onClick={() => setEvidencePage(currentEvidencePage - 1)}>
+                    <button
+                      type="button"
+                      disabled={currentEvidencePage === 0}
+                      onClick={() => setEvidencePage(currentEvidencePage - 1)}
+                    >
                       Previous evidence
                     </button>
-                    <span>{currentEvidencePage + 1} / {partnerPages}</span>
-                    <button type="button" disabled={currentEvidencePage + 1 >= partnerPages} onClick={() => setEvidencePage(currentEvidencePage + 1)}>
+                    <span>
+                      {currentEvidencePage + 1} / {partnerPages}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={currentEvidencePage + 1 >= partnerPages}
+                      onClick={() => setEvidencePage(currentEvidencePage + 1)}
+                    >
                       Next evidence
                     </button>
                   </div>
@@ -517,8 +598,8 @@ export function QuranTopology({
             <div className={styles.panelHeading}>
               <h2>Most connected ayahs</h2>
               <p>
-                Ranked by distinct curated relationship IDs incident to each ayah. This
-                measures documentation coverage, not importance.
+                Ranked by distinct curated relationship IDs incident to each ayah. This measures
+                documentation coverage, not importance.
               </p>
             </div>
             <ol className={styles.topologyRankings}>
@@ -534,7 +615,9 @@ export function QuranTopology({
                   >
                     <span>#{position + 1}</span>
                     <strong>{label(row.ayah)}</strong>
-                    <small>{smallNumber(row.uniqueLinks)} links · {row.outgoing} out · {row.incoming} in</small>
+                    <small>
+                      {smallNumber(row.uniqueLinks)} links · {row.outgoing} out · {row.incoming} in
+                    </small>
                   </button>
                 </li>
               ))}
@@ -544,8 +627,8 @@ export function QuranTopology({
       </div>
       <p className={styles.analyticsFootnote}>
         The network is directed and curated-only. Surah edges aggregate verified
-        source-surah/target-surah pairs; their totals can exceed the underlying 2,445 distinct links.
-        No all-to-all ayah or exact-phrase edges are synthesized. Neighborhood expansions are
+        source-surah/target-surah pairs; their totals can exceed the underlying 2,445 distinct
+        links. No all-to-all ayah or exact-phrase edges are synthesized. Neighborhood expansions are
         explicitly bounded and paginated.
       </p>
     </section>

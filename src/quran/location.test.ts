@@ -114,7 +114,11 @@ describe('Quran-first canonical route', () => {
   });
 
   it('defaults malformed graph settings and never mixes exact-expression links with curated topology', () => {
-    const wrong = new URL('https://example.test/?view=network&evidence=exact&expression=exact:v1:' + 'a'.repeat(64) + '&network=other&depth=999&link=7');
+    const wrong = new URL(
+      'https://example.test/?view=network&evidence=exact&expression=exact:v1:' +
+        'a'.repeat(64) +
+        '&network=other&depth=999&link=7',
+    );
     expect(parseQuranLocation(wrong)).toEqual({
       ...DEFAULT_QURAN_LOCATION,
       view: 'network',

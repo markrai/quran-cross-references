@@ -20,7 +20,7 @@ A directed **surah-pair edge** represents one or more curated links whose source
 
 The surah network displays **12 partner surahs per page** with outgoing solid lines and incoming dashed lines. Thickness reflects verified directional pair counts, not probabilistic affinity. A minimum-link filter can restrict the view. Select a partner to inspect **all underlying curated link IDs**, paginated at 12 per page, and open any source relationship.
 
-The ayah neighborhood displays **12 first-hop link incidences per page**. A second-hop expansion follows only neighbors on the *current first-hop page*, showing at most **24 additional link incidences**. The UI explicitly reports the displayed/eligible counts. Repeated ayah nodes share one plotted position. The selected ayah may be inside a source/target *range*; plotted neighbor anchors use the first ayah of the opposite range, and the original link detail exposes the full span.
+The ayah neighborhood displays **12 first-hop link incidences per page**. A second-hop expansion follows only neighbors on the _current first-hop page_, showing at most **24 additional link incidences**. The UI explicitly reports the displayed/eligible counts. Repeated ayah nodes share one plotted position. The selected ayah may be inside a source/target _range_; plotted neighbor anchors use the first ayah of the opposite range, and the original link detail exposes the full span.
 
 Network links support the canonical URL `?ref=2%3A255&view=network`. Neighborhood state is addressable as `?ref=2%3A255&view=network&network=ayah&depth=2`; direction is preserved in `direction=outgoing` or `direction=incoming`. Browser back/forward follows the same history contract as the existing reader and Analytics.
 

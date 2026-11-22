@@ -97,9 +97,15 @@ export function buildQuranTopology(
   const pairs = new Map<string, { source: number; target: number; ids: number[] }>();
   for (let id = 0; id < index.linkCount; id += 1) {
     const link = index.link(id);
-    for (let ayah = link.source.start; ayah <= link.source.end; ayah += 1) outgoing[ayah] = (outgoing[ayah] ?? 0) + 1;
-    for (let ayah = link.target.start; ayah <= link.target.end; ayah += 1) incoming[ayah] = (incoming[ayah] ?? 0) + 1;
-    for (let ayah = Math.max(link.source.start, link.target.start); ayah <= Math.min(link.source.end, link.target.end); ayah += 1) {
+    for (let ayah = link.source.start; ayah <= link.source.end; ayah += 1)
+      outgoing[ayah] = (outgoing[ayah] ?? 0) + 1;
+    for (let ayah = link.target.start; ayah <= link.target.end; ayah += 1)
+      incoming[ayah] = (incoming[ayah] ?? 0) + 1;
+    for (
+      let ayah = Math.max(link.source.start, link.target.start);
+      ayah <= Math.min(link.source.end, link.target.end);
+      ayah += 1
+    ) {
       overlap[ayah] = (overlap[ayah] ?? 0) + 1;
     }
     const sources = touchedSurahs(link.source);
@@ -170,14 +176,22 @@ export function topologyNeighbors(
   if (!Number.isInteger(minimum) || minimum < 1) {
     throw new RangeError('Invalid topology connection threshold.');
   }
-  const partners = new Map<number, { surah: number; incoming: number; outgoing: number; ids: Set<number> }>();
+  const partners = new Map<
+    number,
+    { surah: number; incoming: number; outgoing: number; ids: Set<number> }
+  >();
   for (const edge of report.edges) {
     if (edge.source === edge.target) continue;
     const outgoing = edge.source === surah && direction !== 'incoming';
     const incoming = edge.target === surah && direction !== 'outgoing';
     if (!outgoing && !incoming) continue;
     const partner = outgoing ? edge.target : edge.source;
-    const row = partners.get(partner) ?? { surah: partner, incoming: 0, outgoing: 0, ids: new Set<number>() };
+    const row = partners.get(partner) ?? {
+      surah: partner,
+      incoming: 0,
+      outgoing: 0,
+      ids: new Set<number>(),
+    };
     if (outgoing) row.outgoing += edge.ids.length;
     if (incoming) row.incoming += edge.ids.length;
     for (const id of edge.ids) row.ids.add(id);
@@ -195,16 +209,33 @@ export function topologyNeighbors(
     .sort((a, b) => b.strength - a.strength || a.surah - b.surah);
 }
 
-function directEdges(index: QuranRelationshipIndex, ayah: number, direction: TopologyDirection, hop: 1 | 2): QuranNeighborhoodEdge[] {
+function directEdges(
+  index: QuranRelationshipIndex,
+  ayah: number,
+  direction: TopologyDirection,
+  hop: 1 | 2,
+): QuranNeighborhoodEdge[] {
   const result: QuranNeighborhoodEdge[] = [];
   if (direction !== 'incoming') {
     for (const link of index.outgoing(ayah)) {
-      result.push({ id: link.id, via: ayah, neighbor: link.target.start, direction: 'outgoing', hop });
+      result.push({
+        id: link.id,
+        via: ayah,
+        neighbor: link.target.start,
+        direction: 'outgoing',
+        hop,
+      });
     }
   }
   if (direction !== 'outgoing') {
     for (const link of index.incoming(ayah)) {
-      result.push({ id: link.id, via: ayah, neighbor: link.source.start, direction: 'incoming', hop });
+      result.push({
+        id: link.id,
+        via: ayah,
+        neighbor: link.source.start,
+        direction: 'incoming',
+        hop,
+      });
     }
   }
   return result.sort((a, b) => a.id - b.id || a.direction.localeCompare(b.direction));
@@ -221,7 +252,10 @@ export function curatedNeighborhood(
   if (!Number.isInteger(page) || page < 0) throw new RangeError('Invalid neighborhood page.');
   const candidates = directEdges(index, focus, direction, 1);
   const pages = Math.max(1, Math.ceil(candidates.length / TOPOLOGY_FIRST_HOP_LIMIT));
-  const first = candidates.slice(page * TOPOLOGY_FIRST_HOP_LIMIT, (page + 1) * TOPOLOGY_FIRST_HOP_LIMIT);
+  const first = candidates.slice(
+    page * TOPOLOGY_FIRST_HOP_LIMIT,
+    (page + 1) * TOPOLOGY_FIRST_HOP_LIMIT,
+  );
   const second: QuranNeighborhoodEdge[] = [];
   let secondCount = 0;
   if (depth === 2) {

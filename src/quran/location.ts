@@ -53,10 +53,12 @@ export function parseQuranLocation(url: URL): QuranLocation {
       ? parsedEnd.reference
       : null;
   const rawView = params.get('view');
-  const view: QuranView = rawView === 'threads' || rawView === 'analytics' || rawView === 'network' ? rawView : 'arcs';
+  const view: QuranView =
+    rawView === 'threads' || rawView === 'analytics' || rawView === 'network' ? rawView : 'arcs';
   const direction = params.get('direction');
   const scope = params.get('scope');
-  const evidence: QuranEvidenceMode = view !== 'network' && params.get('evidence') === 'exact' ? 'exact' : 'curated';
+  const evidence: QuranEvidenceMode =
+    view !== 'network' && params.get('evidence') === 'exact' ? 'exact' : 'curated';
   const expression = params.get('expression');
   return {
     reference,
@@ -69,7 +71,8 @@ export function parseQuranLocation(url: URL): QuranLocation {
         : null,
     view,
     networkMode: view === 'network' && params.get('network') === 'ayah' ? 'ayah' : 'surah',
-    networkDepth: view === 'network' && params.get('network') === 'ayah' && params.get('depth') === '2' ? 2 : 1,
+    networkDepth:
+      view === 'network' && params.get('network') === 'ayah' && params.get('depth') === '2' ? 2 : 1,
     direction: direction === 'incoming' || direction === 'outgoing' ? direction : 'both',
     scope: scope === 'same-surah' || scope === 'cross-surah' ? scope : 'all',
   };

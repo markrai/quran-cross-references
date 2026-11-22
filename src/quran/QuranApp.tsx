@@ -138,7 +138,13 @@ export function QuranApp() {
   const data = loadState.status === 'ready' ? loadState.data : null;
 
   useEffect(() => {
-    if (!data || location.view === 'analytics' || location.view === 'network' || location.evidence !== 'exact') return;
+    if (
+      !data ||
+      location.view === 'analytics' ||
+      location.view === 'network' ||
+      location.evidence !== 'exact'
+    )
+      return;
     const controller = new AbortController();
     void loadQuranExpressions(data.text.arabic, controller.signal)
       .then((index) => {
@@ -289,7 +295,13 @@ export function QuranApp() {
                   });
                 }}
               >
-                {view === 'arcs' ? 'Arcs' : view === 'threads' ? 'Threads & Reader' : view === 'analytics' ? 'Analytics' : 'Network'}
+                {view === 'arcs'
+                  ? 'Arcs'
+                  : view === 'threads'
+                    ? 'Threads & Reader'
+                    : view === 'analytics'
+                      ? 'Analytics'
+                      : 'Network'}
               </button>
             ))}
           </div>
@@ -394,25 +406,27 @@ export function QuranApp() {
                 </select>
               </label>
             )}
-            {location.view !== 'analytics' && location.view !== 'network' && location.evidence === 'curated' && (
-              <label className={styles.field}>
-                <span>Relationships</span>
-                <select
-                  aria-label="Relationship scope"
-                  value={location.scope}
-                  onChange={(event) => {
-                    const scope = event.target.value;
-                    if (scope === 'all' || scope === 'same-surah' || scope === 'cross-surah') {
-                      navigate({ ...location, scope, selectedLink: null });
-                    }
-                  }}
-                >
-                  <option value="all">All curated links</option>
-                  <option value="same-surah">Within one surah</option>
-                  <option value="cross-surah">Across surahs</option>
-                </select>
-              </label>
-            )}
+            {location.view !== 'analytics' &&
+              location.view !== 'network' &&
+              location.evidence === 'curated' && (
+                <label className={styles.field}>
+                  <span>Relationships</span>
+                  <select
+                    aria-label="Relationship scope"
+                    value={location.scope}
+                    onChange={(event) => {
+                      const scope = event.target.value;
+                      if (scope === 'all' || scope === 'same-surah' || scope === 'cross-surah') {
+                        navigate({ ...location, scope, selectedLink: null });
+                      }
+                    }}
+                  >
+                    <option value="all">All curated links</option>
+                    <option value="same-surah">Within one surah</option>
+                    <option value="cross-surah">Across surahs</option>
+                  </select>
+                </label>
+              )}
             {location.view === 'threads' && location.evidence === 'curated' && (
               <label className={styles.field}>
                 <span>Direction</span>
@@ -606,7 +620,9 @@ export function QuranApp() {
             {location.view === 'network' && (
               <>
                 {(topologyState.status === 'loading' || topologyState.status === 'idle') && (
-                  <p className={styles.loading} role="status">Loading verified curated graph topology…</p>
+                  <p className={styles.loading} role="status">
+                    Loading verified curated graph topology…
+                  </p>
                 )}
                 {topologyState.status === 'error' && (
                   <section className={styles.topologyPanel} role="alert">
@@ -695,60 +711,73 @@ export function QuranApp() {
                         rangeEnd: null,
                       });
                     }}
-                    surahHref={(surah) => quranLocationUrl({
-                      ...location,
-                      reference: { surah, ayah: 1 },
-                      rangeEnd: null,
-                      selectedLink: null,
-                    }, import.meta.env.BASE_URL)}
-                    ayahHref={(ayah) => quranLocationUrl({
-                      ...location,
-                      networkMode: 'ayah',
-                      reference: data.relationships.versification.refAt(ayah),
-                      rangeEnd: null,
-                      selectedLink: null,
-                    }, import.meta.env.BASE_URL)}
+                    surahHref={(surah) =>
+                      quranLocationUrl(
+                        {
+                          ...location,
+                          reference: { surah, ayah: 1 },
+                          rangeEnd: null,
+                          selectedLink: null,
+                        },
+                        import.meta.env.BASE_URL,
+                      )
+                    }
+                    ayahHref={(ayah) =>
+                      quranLocationUrl(
+                        {
+                          ...location,
+                          networkMode: 'ayah',
+                          reference: data.relationships.versification.refAt(ayah),
+                          rangeEnd: null,
+                          selectedLink: null,
+                        },
+                        import.meta.env.BASE_URL,
+                      )
+                    }
                   />
                 )}
               </>
             )}
-            {location.view !== 'analytics' && location.view !== 'network' && location.evidence === 'exact' && (
-              <>
-                {(expressionState.status === 'idle' || expressionState.status === 'loading') && (
-                  <p className={styles.loading} role="status">
-                    Loading and checking exact Arabic expression evidence…
-                  </p>
-                )}
-                {expressionState.status === 'error' && (
-                  <section className={styles.expressionCard} role="alert">
-                    <p className={styles.empty}>{expressionState.message}</p>
-                    <button
-                      type="button"
-                      className={styles.goButton}
-                      onClick={() => {
-                        setExpressionState({ status: 'loading' });
-                        setExpressionAttempt((value) => value + 1);
+            {location.view !== 'analytics' &&
+              location.view !== 'network' &&
+              location.evidence === 'exact' && (
+                <>
+                  {(expressionState.status === 'idle' || expressionState.status === 'loading') && (
+                    <p className={styles.loading} role="status">
+                      Loading and checking exact Arabic expression evidence…
+                    </p>
+                  )}
+                  {expressionState.status === 'error' && (
+                    <section className={styles.expressionCard} role="alert">
+                      <p className={styles.empty}>{expressionState.message}</p>
+                      <button
+                        type="button"
+                        className={styles.goButton}
+                        onClick={() => {
+                          setExpressionState({ status: 'loading' });
+                          setExpressionAttempt((value) => value + 1);
+                        }}
+                      >
+                        Retry expressions
+                      </button>
+                    </section>
+                  )}
+                  {expressionIndex && (
+                    <QuranExpressions
+                      index={expressionIndex}
+                      ayahIndex={focusStart}
+                      selected={selectedExpression}
+                      onSelect={(id) => {
+                        navigate({ ...location, selectedExpression: id, selectedLink: null });
                       }}
-                    >
-                      Retry expressions
-                    </button>
-                  </section>
-                )}
-                {expressionIndex && (
-                  <QuranExpressions
-                    index={expressionIndex}
-                    ayahIndex={focusStart}
-                    selected={selectedExpression}
-                    onSelect={(id) => {
-                      navigate({ ...location, selectedExpression: id, selectedLink: null });
-                    }}
-                    onNavigate={navigateExpressionOccurrence}
-                  />
-                )}
-              </>
-            )}
+                      onNavigate={navigateExpressionOccurrence}
+                    />
+                  )}
+                </>
+              )}
 
-            {location.view !== 'analytics' && location.view !== 'network' &&
+            {location.view !== 'analytics' &&
+              location.view !== 'network' &&
               (location.evidence === 'exact' ? (
                 location.view === 'arcs' ? (
                   selectedExpression && (

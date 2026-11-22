@@ -72,7 +72,9 @@ export async function loadQuranTopology(
     throw new Error('The curated topology report exceeds its 512 KiB transfer budget.');
   }
   const hash = await globalThis.crypto.subtle.digest('SHA-256', bytes);
-  const actual = Array.from(new Uint8Array(hash), (byte) => byte.toString(16).padStart(2, '0')).join('');
+  const actual = Array.from(new Uint8Array(hash), (byte) =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('');
   if (actual !== expectedDigest) {
     throw new Error('Curated topology failed its SHA-256 publication checksum.');
   }

@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { QuranRelationshipIndex } from '../core/quran/relationship-index.ts';
 import { CANONICAL_QURAN } from '../core/quran/quran-versification.ts';
-import {
-  buildQuranTopology,
-  curatedNeighborhood,
-  topologyNeighbors,
-} from './topology-model.ts';
+import { buildQuranTopology, curatedNeighborhood, topologyNeighbors } from './topology-model.ts';
 import { verifyQuranTopology } from './topology.ts';
 
 const sha = 'a'.repeat(64);
@@ -95,9 +91,7 @@ describe('Phase 2C.2 curated network topology', () => {
   it('expands only a selected page of first-hop evidence into a bounded second hop', () => {
     const index = fixture();
     const single = curatedNeighborhood(index, 0, 'outgoing', 1, 0);
-    expect(single.first).toEqual([
-      { id: 1, via: 0, neighbor: 7, direction: 'outgoing', hop: 1 },
-    ]);
+    expect(single.first).toEqual([{ id: 1, via: 0, neighbor: 7, direction: 'outgoing', hop: 1 }]);
     expect(single.second).toEqual([]);
     expect(single.pages).toBe(1);
 
@@ -154,9 +148,9 @@ describe('Phase 2C.2 curated network topology', () => {
     const report = buildQuranTopology(index, sha);
     const data = { relationships: index, text: { arabic: [], english: [] } };
     expect(verifyQuranTopology(report, data, sha)).toEqual(report);
-    expect(() =>
-      verifyQuranTopology({ ...report, directedPairIncidences: 6 }, data, sha),
-    ).toThrow('does not match');
+    expect(() => verifyQuranTopology({ ...report, directedPairIncidences: 6 }, data, sha)).toThrow(
+      'does not match',
+    );
     expect(() =>
       verifyQuranTopology(
         {
