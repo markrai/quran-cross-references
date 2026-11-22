@@ -39,7 +39,7 @@ export function quranMetadata(): Plugin {
         { tag: 'meta', attrs: { name: 'twitter:description', content: DESCRIPTION } },
         { tag: 'meta', attrs: { name: 'twitter:image', content: image } },
       ];
-      return tags.map((tag) => ({ ...tag, injectTo: 'head' }));
+      return tags.map((tag) => ({ ...tag, injectTo: 'head' as const }));
     },
   };
 }
