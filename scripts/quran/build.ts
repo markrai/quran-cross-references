@@ -49,13 +49,13 @@ function readPinned(id: string): string {
 
 const text = importQuranText(readPinned('tanzil-uthmani'), readPinned('pickthall'));
 const links = importMutashabihat(readPinned('mutashabihat'));
-const destination = 'data/quran/generated';
-mkdirSync(destination, { recursive: true });
+const destinations = ['data/quran/generated', 'public/data/quran'];
+for (const destination of destinations) mkdirSync(destination, { recursive: true });
 
 const outputs: Record<string, string> = {};
 function writeDataset(name: string, payload: unknown): void {
   const content = `${JSON.stringify(payload)}\n`;
-  writeFileSync(join(destination, name), content);
+  for (const destination of destinations) writeFileSync(join(destination, name), content);
   outputs[name] = createHash('sha256').update(content).digest('hex');
 }
 
