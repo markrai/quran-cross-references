@@ -46,7 +46,7 @@ export function siteHead(): Plugin {
       base = config.base;
     },
     transformIndexHtml(html, context) {
-      if (context.path === '/quran/index.html') {
+      if (context.path === '/quran/index.html' || context.path === '/quran/' || context.path === '/quran') {
         return atEndOfHead([
           { tag: 'meta', attrs: { name: 'robots', content: 'noindex' } },
           { tag: 'meta', attrs: { name: 'theme-color', content: '#0d0d0d' } },
