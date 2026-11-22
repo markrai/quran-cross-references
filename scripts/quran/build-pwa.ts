@@ -16,6 +16,7 @@ for (const required of [
   'data/quran/evidence.json',
   'data/quran/manifest.json',
   'data/quran/analytics.json',
+  'data/quran/topology.json',
   'manifest.webmanifest',
   'icons/icon-192.png',
   'icons/icon-512.png',

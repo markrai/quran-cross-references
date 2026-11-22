@@ -12,6 +12,7 @@ describe('Quran offline release shell', () => {
       'data/quran/relationships.json',
       'data/quran/evidence.json',
       'data/quran/analytics.json',
+      'data/quran/topology.json',
       'data/quran/manifest.json',
       'data/quran/expressions.json',
       'manifest.webmanifest',
@@ -27,6 +28,7 @@ describe('Quran offline release shell', () => {
       'assets/index-abc.js',
       'data/quran/analytics.json',
       'data/quran/evidence.json',
+      'data/quran/topology.json',
       'data/quran/manifest.json',
       'data/quran/relationships.json',
       'data/quran/text.json',
@@ -115,6 +117,7 @@ describe('Quran offline release shell', () => {
           'data/quran/relationships.json',
           'data/quran/evidence.json',
           'data/quran/analytics.json',
+          'data/quran/topology.json',
         ],
         'revision-1',
       ),
@@ -156,6 +159,9 @@ describe('Quran offline release shell', () => {
     });
     expect(await offlineFetch('data/quran/evidence.json', 'cors')).toEqual({
       path: '/quran-cross-references/data/quran/evidence.json',
+    });
+    expect(await offlineFetch('data/quran/topology.json', 'cors')).toEqual({
+      path: '/quran-cross-references/data/quran/topology.json',
     });
     expect(await offlineFetch('data/quran/analytics.json', 'cors')).toEqual({
       path: '/quran-cross-references/data/quran/analytics.json',
