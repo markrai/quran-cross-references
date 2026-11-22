@@ -40,5 +40,5 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
   if (location.view !== 'arcs') params.set('view', location.view);
   if (location.direction !== 'both') params.set('direction', location.direction);
   if (location.scope !== 'all') params.set('scope', location.scope);
-  return base + 'quran/?' + params.toString();
+  return base + '?' + params.toString();
 }
