@@ -55,6 +55,7 @@ export function QuranArcs({
   const [focusOnly, setFocusOnly] = useState(false);
   const [dragging, setDragging] = useState(false);
   const drag = useRef<ActiveDrag | null>(null);
+  const graphRef = useRef<SVGSVGElement | null>(null);
   const ids = useMemo(
     () => selectQuranRelationshipIds(index, { scope, surahs: new Set([surah]) }),
     [index, surah, scope],
@@ -114,7 +115,7 @@ export function QuranArcs({
     onNavigate(index.versification.refAt(ayah));
   };
 
-  const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
+  const onPointerDown = (event: PointerEvent<SVGSVGElement | HTMLDivElement>) => {
     if (
       event.button !== 0 ||
       (event.target instanceof Element && event.target.closest('[data-graph-interactive]'))
@@ -122,20 +123,20 @@ export function QuranArcs({
       return;
     }
     drag.current = { pointerId: event.pointerId, lastX: event.clientX };
-    event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
   };
 
-  const onPointerMove = (event: PointerEvent<SVGSVGElement>) => {
+  const onPointerMove = (event: PointerEvent<SVGSVGElement | HTMLDivElement>) => {
     if (drag.current?.pointerId !== event.pointerId) return;
-    const width = event.currentTarget.getBoundingClientRect().width;
+    const width = graphRef.current?.getBoundingClientRect().width ?? 0;
     if (width <= 0) return;
     const difference = event.clientX - drag.current.lastX;
     drag.current.lastX = event.clientX;
     setViewport((current) => panGraphViewport(current, (-difference / width) * current.width));
   };
 
-  const endDrag = (event: PointerEvent<SVGSVGElement>) => {
+  const endDrag = (event: PointerEvent<SVGSVGElement | HTMLDivElement>) => {
     if (drag.current?.pointerId !== event.pointerId) return;
     drag.current = null;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -191,11 +192,12 @@ export function QuranArcs({
         </label>
       </div>
       <p id="quran-graph-help" className={styles.graphHelp}>
-        Drag open space to pan; Ctrl or Cmd + wheel to zoom. Click the horizontal axis to choose an ayah.
+        Drag the handle below the graph or open space to pan; Ctrl or Cmd + wheel to zoom. Click the horizontal axis to choose an ayah.
         Use its arrow keys to move one ayah at a time.
       </p>
       <div className={styles.graphScroll}>
         <svg
+          ref={graphRef}
           className={dragging ? styles.graphDragging : styles.graph}
           viewBox={`${viewport.x} 0 ${viewport.width} 400`}
           preserveAspectRatio="none"
@@ -206,6 +208,7 @@ export function QuranArcs({
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
+          onLostPointerCapture={endDrag}
           onWheel={onWheel}
         >
           <rect x="0" y="0" width={GRAPH_WIDTH} height="400" fill="transparent" />
@@ -294,6 +297,20 @@ export function QuranArcs({
             }}
           />
         </svg>
+      </div>
+      <div
+        className={styles.graphPanHandle}
+        role="group"
+        aria-label="Drag graph horizontally"
+        data-graph-pan-handle=""
+        data-dragging={dragging ? 'true' : 'false'}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onLostPointerCapture={endDrag}
+      >
+        <span aria-hidden="true">↔</span> Drag here to pan the graph
       </div>
       <div className={styles.graphSummary}>
         <p>Focused passage: {formatIndexRange(index.versification, focus.start, focus.end)} · {focusedArcs.length.toLocaleString('en')} related links</p>
