@@ -15,9 +15,16 @@ const types: Record<string, string> = {
 export async function serveQuranBuild(): Promise<{
   readonly url: string;
   readonly stop: () => Promise<void>;
+  readonly setUnavailable: () => void;
 }> {
   const output = resolve('dist');
+  let unavailable = false;
   const server = createServer((request, response) => {
+    if (unavailable) {
+      response.writeHead(503, { 'Cache-Control': 'no-store' });
+      response.end('Origin unavailable');
+      return;
+    }
     const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
     if (!pathname.startsWith(QURAN_DEPLOY_BASE)) {
       response.writeHead(404);
@@ -61,6 +68,9 @@ export async function serveQuranBuild(): Promise<{
   let stopped = false;
   return {
     url: 'http://127.0.0.1:' + String(address.port) + QURAN_DEPLOY_BASE,
+    setUnavailable() {
+      unavailable = true;
+    },
     async stop() {
       if (stopped) return;
       stopped = true;
