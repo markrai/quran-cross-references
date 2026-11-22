@@ -14,6 +14,7 @@ interface QuranThreadsProps {
   readonly scope: QuranRelationshipScope;
   readonly direction: QuranDirection;
   readonly onNavigate: (reference: AyahRef) => void;
+  readonly showCurated?: boolean;
 }
 
 function connectionLabel(connection: QuranConnection, data: QuranReaderData): string {
@@ -24,7 +25,14 @@ function connectionLabel(connection: QuranConnection, data: QuranReaderData): st
   );
 }
 
-export function QuranThreads({ data, reference, scope, direction, onNavigate }: QuranThreadsProps) {
+export function QuranThreads({
+  data,
+  reference,
+  scope,
+  direction,
+  onNavigate,
+  showCurated = true,
+}: QuranThreadsProps) {
   const { relationships: index, text } = data;
   const surah = getSurah(reference.surah);
   const range = index.versification.surahRange(reference.surah);
@@ -40,7 +48,12 @@ export function QuranThreads({ data, reference, scope, direction, onNavigate }: 
   const markers = visible.slice(0, 80);
 
   return (
-    <section className={styles.threadsLayout} aria-label="Quran text and relationship threads">
+    <section
+      className={showCurated ? styles.threadsLayout : styles.expressionsReaderLayout}
+      aria-label={
+        showCurated ? 'Quran text and relationship threads' : 'Quran text and exact expressions'
+      }
+    >
       <div className={styles.reader}>
         <div className={styles.panelHeading}>
           <h2>
@@ -81,7 +94,11 @@ export function QuranThreads({ data, reference, scope, direction, onNavigate }: 
           })}
         </ol>
       </div>
-      <aside className={styles.threadPanel} aria-label="Selected ayah relationships">
+      <aside
+        className={styles.threadPanel}
+        aria-label="Selected ayah relationships"
+        hidden={!showCurated}
+      >
         <div className={styles.panelHeading}>
           <h2>
             Threads from {reference.surah}:{reference.ayah}
