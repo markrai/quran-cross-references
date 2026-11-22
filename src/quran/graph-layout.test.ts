@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { elementAt } from '../core/lib/array.ts';
 import { buildQuranArcGeometry, selectQuranRelationshipIds } from '../core/quran/graph-adapters.ts';
 import { QuranRelationshipIndex } from '../core/quran/relationship-index.ts';
 import {
@@ -24,27 +25,29 @@ const index = new QuranRelationshipIndex({
 describe('Quran graph layout and focused passages', () => {
   const selected = selectQuranRelationshipIds(index);
   const arcs = buildQuranGraphPaths(index, buildQuranArcGeometry(index, selected));
+  const first = elementAt(arcs, 0);
+  const second = elementAt(arcs, 1);
 
   it('creates stable labeled paths for the selected relationship index', () => {
     expect(arcs).toHaveLength(2);
-    expect(arcs[0]?.id).toBe(0);
-    expect(arcs[0]?.label).toContain('Al-Baqarah 2:1 to Al-Baqarah 2:255');
-    expect(arcs[0]?.path).toContain(' Q ');
-    expect(arcs[1]?.left).toBeLessThan(arcs[1]?.right ?? 0);
+    expect(first.id).toBe(0);
+    expect(first.label).toContain('Al-Baqarah 2:1 to Al-Baqarah 2:255');
+    expect(first.path).toContain(' Q ');
+    expect(second.left).toBeLessThan(second.right);
   });
 
   it('includes both directed endpoints and range members in focus matching', () => {
     expect(arcs.every((arc) => arcTouchesRange(arc, { start: 7, end: 7 }))).toBe(true);
-    expect(arcTouchesRange(arcs[0]!, { start: 8, end: 8 })).toBe(true);
-    expect(arcTouchesRange(arcs[1]!, { start: 261, end: 261 })).toBe(false);
+    expect(arcTouchesRange(first, { start: 8, end: 8 })).toBe(true);
+    expect(arcTouchesRange(second, { start: 261, end: 261 })).toBe(false);
     expect(rangesOverlap({ start: 10, end: 13 }, { start: 13, end: 14 })).toBe(true);
     expect(rangesOverlap({ start: 10, end: 13 }, { start: 14, end: 15 })).toBe(false);
   });
 
   it('culls paths only when both endpoints are outside the viewport on one side', () => {
-    const spanning = arcs[1]!;
+    const spanning = second;
     expect(arcVisibleInViewport(spanning, { x: 450, width: 100 })).toBe(true);
-    expect(arcVisibleInViewport(arcs[0]!, { x: 900, width: 100 })).toBe(false);
+    expect(arcVisibleInViewport(first, { x: 900, width: 100 })).toBe(false);
     expect(arcVisibleInViewport(arcs[0]!, { x: 0, width: 1200 })).toBe(true);
   });
 });
