@@ -13,7 +13,7 @@ describe('Quran-first canonical route', () => {
     expect(parseQuranLocation(invalid)).toEqual(DEFAULT_QURAN_LOCATION);
   });
 
-  it('accepts numeric and named surah references with explicit view and filters', () => {
+  it('accepts numeric and named references with explicit view and filters', () => {
     const url = new URL('https://example.test/');
     url.searchParams.set('ref', '2:255');
     url.searchParams.set('view', 'threads');
@@ -24,6 +24,8 @@ describe('Quran-first canonical route', () => {
       scope: 'cross-surah',
       direction: 'incoming',
       reference: { surah: 2, ayah: 255 },
+      rangeEnd: null,
+      selectedLink: null,
     });
     const named = new URL('https://example.test/?ref=Al-Baqarah+255');
     expect(parseQuranLocation(named).reference).toEqual({ surah: 2, ayah: 255 });
@@ -47,6 +49,7 @@ describe('Quran-first canonical route', () => {
 
   it('round-trips canonical deep links under a deployment base', () => {
     const location = {
+      ...DEFAULT_QURAN_LOCATION,
       reference: { surah: 114, ayah: 6 },
       view: 'threads' as const,
       scope: 'same-surah' as const,
@@ -57,5 +60,30 @@ describe('Quran-first canonical route', () => {
     expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(location);
     const defaultUrl = quranLocationUrl(DEFAULT_QURAN_LOCATION, '/my-site/');
     expect(defaultUrl).toBe('/my-site/?ref=2%3A1');
+  });
+
+  it('restores a selected range and relationship ID from a shared URL', () => {
+    const location = {
+      ...DEFAULT_QURAN_LOCATION,
+      rangeEnd: { surah: 2, ayah: 5 },
+      selectedLink: 0,
+    };
+    const href = quranLocationUrl(location, '/site/');
+    expect(href).toBe('/site/?ref=2%3A1&end=2%3A5&link=0');
+    expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(location);
+  });
+
+  it('discards invalid range ends and noncanonical relationship identifiers', () => {
+    for (const query of [
+      '?ref=2%3A5&end=2%3A4&link=-1',
+      '?ref=2%3A5&end=3%3A1&link=1.2',
+      '?ref=2%3A5&end=2%3A999&link=Infinity',
+      '?ref=2%3A5&end=2%3A5&link=0001',
+      '?ref=2%3A5&end=2%3A1&link=999999999999999999',
+    ]) {
+      const location = parseQuranLocation(new URL('https://example.test/' + query));
+      expect(location.rangeEnd).toBeNull();
+      expect(location.selectedLink).toBeNull();
+    }
   });
 });

@@ -27,6 +27,8 @@ export default defineConfig(({ command, isPreview = false }) => ({
       include: [
         'src/core/lib/**/*.ts',
         'src/core/quran/**/*.ts',
+        'src/quran/graph-layout.ts',
+        'src/quran/graph-viewport.ts',
         'src/quran/location.ts',
         'src/quran/model.ts',
         'src/quran/share.ts',

@@ -164,3 +164,97 @@ test.describe('Quran production readiness', () => {
     expect(copied).toBe('http://localhost:4173/quran-cross-references/?ref=2%3A255');
   });
 });
+
+test.describe('Quran Phase 2A graph exploration', () => {
+  test('zooms, pans and restores the full Quran viewport', async ({ page }) => {
+    await page.goto('./?ref=2%3A1');
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeVisible();
+    const graph = page.getByRole('group', { name: 'Relationships along the 6,236-ayah Quran' });
+    await expect(graph).toHaveAttribute('viewBox', '0 0 1200 400');
+
+    await page.getByRole('button', { name: 'Zoom in graph' }).click();
+    const zoomed = await graph.getAttribute('viewBox');
+    expect(zoomed).not.toBe('0 0 1200 400');
+    await expect(page.getByText('1.8×')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Pan graph right' }).click();
+    expect(await graph.getAttribute('viewBox')).not.toBe(zoomed);
+
+    const box = await graph.boundingBox();
+    expect(box).toBeTruthy();
+    if (box) {
+      const startX = box.x + box.width * 0.6;
+      const startY = box.y + box.height * 0.98;
+      const beforeDrag = await graph.getAttribute('viewBox');
+      await page.mouse.move(startX, startY);
+      await page.mouse.down();
+      await page.mouse.move(startX - 90, startY, { steps: 6 });
+      await page.mouse.up();
+      expect(await graph.getAttribute('viewBox')).not.toBe(beforeDrag);
+    }
+
+    await page.getByRole('button', { name: 'Reset graph view' }).click();
+    await expect(graph).toHaveAttribute('viewBox', '0 0 1200 400');
+  });
+
+  test('focuses on a Quran passage range and restores it on browser back', async ({ page }) => {
+    await page.goto('./?ref=2%3A1');
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeVisible();
+    await page.getByRole('combobox', { name: 'Graph focus end ayah' }).selectOption('5');
+    await expect(page).toHaveURL(/ref=2%3A1&end=2%3A5/);
+    await expect(page.getByText(/Focused passage: Al-Baqarah 2:1–5/)).toBeVisible();
+
+    await page.getByRole('checkbox', { name: 'Only links touching selected passage' }).check();
+    const links = page.locator('[data-graph-interactive][aria-pressed]');
+    expect(await links.count()).toBeGreaterThan(0);
+
+    await page.getByRole('combobox', { name: 'Graph focus end ayah' }).selectOption('');
+    await expect(page).not.toHaveURL(/end=/);
+    await page.goBack();
+    await expect(page.getByRole('combobox', { name: 'Graph focus end ayah' })).toHaveValue('5');
+  });
+
+  test('shares relationship selections through the URL and returns to the reader', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=2%3A2');
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:2/ })).toBeVisible();
+
+    const arc = page.locator('[data-graph-interactive][aria-pressed]').first();
+    await expect(arc).toBeVisible();
+    await arc.focus();
+    await arc.press('Enter');
+    await expect(page).toHaveURL(/link=\d+/);
+    await expect(page.getByRole('heading', { name: 'Selected relationship' })).toBeVisible();
+    const selectedURL = page.url();
+
+    await page.reload();
+    await expect(page).toHaveURL(selectedURL);
+    await expect(page.getByRole('heading', { name: 'Selected relationship' })).toBeVisible();
+    await page.getByRole('button', { name: 'Read in Threads' }).click();
+    await expect(page).toHaveURL(/view=threads/);
+    await expect(page.getByRole('heading', { name: /Threads from/ })).toBeVisible();
+  });
+
+  test('selects ayahs through the graph axis keyboard and synchronizes history', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=2%3A1');
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeVisible();
+    const axis = page.getByRole('button', { name: 'Select ayah on Quran axis' });
+    await axis.focus();
+    await axis.press('ArrowRight');
+    await expect(page).toHaveURL(/ref=2%3A2/);
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:2/ })).toBeVisible();
+    await page.goBack();
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeVisible();
+  });
+
+  test('rejects invalid relationship URL IDs without crashing the graph', async ({ page }) => {
+    await page.goto('./?ref=2%3A255&link=999999999');
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Selected relationship' })).toHaveCount(0);
+    await expect(page.getByRole('group', { name: 'Relationships along the 6,236-ayah Quran' }))
+      .toBeVisible();
+  });
+});

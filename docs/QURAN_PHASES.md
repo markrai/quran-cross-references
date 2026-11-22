@@ -149,6 +149,26 @@ under `BASE_PATH=/`, open `/quran/`.
 - Retain `noindex` until the manual device and source-rights review passes.
   Check `docs/RELEASE_CHECKLIST.md` before public release.
 
+### Phase 2A: Interactive relationship exploration
+
+- Add a bounded pan/zoom coordinate system for the Quran arc visualization,
+  including button controls, drag gestures and Ctrl/Cmd-wheel zoom.
+- Precompute labeled SVG paths after corpus/filter changes, then cull
+  off-screen arcs during navigation while preserving long-distance links.
+- Highlight all links intersecting a selected passage range, including
+  multi-ayah source/target ranges. Support an optional focus-only view.
+- Select ayahs from the graph axis with mouse/touch or keyboard arrows,
+  synchronized with the bilingual reader and browser history.
+- Round-trip `ref=`, optional `end=` and optional `link=` in deep links.
+  Malformed values are ignored and stale selections are cleared when
+  the reader moves to another passage.
+- Add unit/browser acceptance, plus `npm run bench:graph` for an
+  initial CPU layout baseline. Actual browser paint and frame timing
+  remain prerequisites for considering Canvas or WebGL.
+- Document controls and measurements in `docs/GRAPH_PHASE_2A.md`.
+  Scripture sources, hashes, attribution and relationship semantics
+  remain unchanged.
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows
@@ -181,8 +201,12 @@ dedicated CC0 and is not a complete scholarly cross-reference set.
 1. **Phase 1D.3 release verification.** Complete real-device installation,
    offline, screen-reader and Pickthall digital-edition rights review. Remove
    `noindex` only in a separate verified release change.
-2. **Phase 2: Relationship exploration.** Improve Quran arc and thread navigation,
-   relationship semantics and supported corpus breadth without fabricating rankings.
+2. **Phase 2B: Relationship classification.** Distinguish curated similar passages,
+   repeated expressions and other verified relationship types without fabricating rankings.
+3. **Phase 2C: Quran analytics.** Make cross-surah distributions, repeated terms and
+   graph structure explorable with links to their source ayahs.
+4. **Phase 2D: Corpus expansion.** Review additional attributable sources without
+   blending generated similarity suggestions with curated evidence.
 
 Each phase must remain reviewable and pass its release gates. The original
 WIP implementation remains in commit `82ae6b54995ba059f08c84e19946e82be70d71c0`

@@ -26,7 +26,8 @@
     "check": "npm run typecheck && npm run typecoverage && npm run lint && npm run format:check && npm run test:coverage",
     "data:quran": "node scripts/quran/build.ts",
     "assets:quran": "node scripts/quran/build-assets.ts",
-    "pwa:build": "node scripts/quran/build-pwa.ts"
+    "pwa:build": "node scripts/quran/build-pwa.ts",
+    "bench:graph": "node scripts/quran/bench-graph.ts"
   },
   "dependencies": {
     "react": "^19.3.0",

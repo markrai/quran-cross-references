@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { formatAyahId, type AyahRef } from '../core/quran/ayah-ref.ts';
 import { formatIndexRange, parseReference } from '../core/quran/reference.ts';
+import { passesQuranRelationshipFilter } from '../core/quran/relationship-filter.ts';
 import { SURAHS, getSurah } from '../core/quran/surahs.ts';
 import { QuranArcs } from './QuranArcs.tsx';
 import { QuranThreads } from './QuranThreads.tsx';
@@ -43,14 +44,13 @@ function useQuranLocation(): readonly [
 }
 
 function linkReference(location: QuranLocation, reference: AyahRef): QuranLocation {
-  return { ...location, reference };
+  return { ...location, reference, rangeEnd: null, selectedLink: null };
 }
 
 export function QuranApp() {
   const [location, navigate] = useQuranLocation();
   const [loadState, setLoadState] = useState<LoadState>({ status: 'loading' });
   const [attempt, setAttempt] = useState(0);
-  const [selected, setSelected] = useState<{ readonly id: number; readonly surah: number; readonly scope: string } | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const [offline, setOffline] = useState(() => !navigator.onLine);
@@ -99,13 +99,31 @@ export function QuranApp() {
   const changeSurah = (surah: number) => {
     focus({ surah, ayah: 1 });
   };
-  const selectedId =
-    selected?.surah === location.reference.surah && selected.scope === location.scope
-      ? selected.id
-      : null;
   const data = loadState.status === 'ready' ? loadState.data : null;
-  const link = selectedId === null || !data ? null : data.relationships.link(selectedId);
+  const candidate =
+    data && location.selectedLink !== null && location.selectedLink < data.relationships.linkCount
+      ? data.relationships.link(location.selectedLink)
+      : null;
+  const link =
+    candidate &&
+    data &&
+    passesQuranRelationshipFilter(
+      candidate,
+      { scope: location.scope, surahs: new Set([location.reference.surah]) },
+      data.relationships.versification,
+    )
+      ? candidate
+      : null;
   const activeIndex = data?.relationships.versification.indexOf(location.reference);
+  const focusStart = activeIndex ?? 0;
+  const focusEnd =
+    data && location.rangeEnd
+      ? (data.relationships.versification.indexOf(location.rangeEnd) ?? focusStart)
+      : focusStart;
+  const focusedRange = useMemo(
+    () => ({ start: focusStart, end: focusEnd }),
+    [focusStart, focusEnd],
+  );
   const activeSurah = getSurah(location.reference.surah);
   const defaultLink = quranLocationUrl(DEFAULT_QURAN_LOCATION, import.meta.env.BASE_URL);
 
@@ -181,6 +199,31 @@ export function QuranApp() {
               </label>
               <button className={styles.goButton} type="submit">Go</button>
             </form>
+            {location.view === 'arcs' && (
+              <label className={styles.field}>
+                <span>Graph focus through ayah</span>
+                <select
+                  aria-label="Graph focus end ayah"
+                  value={location.rangeEnd?.ayah ?? ''}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    const rangeEnd = value === ''
+                      ? null
+                      : { surah: location.reference.surah, ayah: Number(value) };
+                    navigate({ ...location, rangeEnd, selectedLink: null });
+                  }}
+                >
+                  <option value="">Selected ayah only</option>
+                  {Array.from(
+                    { length: activeSurah.ayahCount - location.reference.ayah },
+                    (_, offset) => {
+                      const ayah = location.reference.ayah + offset + 1;
+                      return <option key={ayah} value={ayah}>Through {ayah}</option>;
+                    },
+                  )}
+                </select>
+              </label>
+            )}
             <label className={styles.field}>
               <span>Relationships</span>
               <select
@@ -189,7 +232,7 @@ export function QuranApp() {
                 onChange={(event) => {
                   const scope = event.target.value;
                   if (scope === 'all' || scope === 'same-surah' || scope === 'cross-surah') {
-                    navigate({ ...location, scope });
+                    navigate({ ...location, scope, selectedLink: null });
                   }
                 }}
               >
@@ -293,10 +336,12 @@ export function QuranApp() {
                   index={data.relationships}
                   surah={location.reference.surah}
                   scope={location.scope}
-                  selectedId={selectedId}
+                  focus={focusedRange}
+                  selectedId={link?.id ?? null}
                   onSelect={(id) => {
-                    setSelected({ id, surah: location.reference.surah, scope: location.scope });
+                    navigate({ ...location, selectedLink: id });
                   }}
+                  onNavigate={focus}
                 />
                 {link && (
                   <section className={styles.linkDetail} aria-live="polite">
@@ -320,6 +365,8 @@ export function QuranApp() {
                         ...location,
                         view: 'threads',
                         reference: data.relationships.versification.refAt(link.source.start),
+                        rangeEnd: null,
+                        selectedLink: null,
                       });
                     }}>Read in Threads</button>
                   </section>
