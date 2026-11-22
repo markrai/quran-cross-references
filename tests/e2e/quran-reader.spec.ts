@@ -738,3 +738,91 @@ test.describe('Quran Phase 2C.2 curated graph network', () => {
     await expect(page.getByRole('heading', { name: 'Verbatim Arabic repetitions' })).toBeVisible();
   });
 });
+
+
+test.describe('Quran Phase 2B.4 original QAC morphology', () => {
+  test('fetches QAC only on demand and lets the user explore real word, lemma and root occurrences', async ({
+    page,
+    request,
+  }) => {
+    const morphologyRequests: string[] = [];
+    page.on('request', (event) => {
+      if (event.url().endsWith('/data/quran/morphology.json')) {
+        morphologyRequests.push(event.url());
+      }
+    });
+    await page.goto('./?ref=1%3A1');
+    await expect(page.getByRole('heading', { name: /Al-Fatihah.*1:1/ })).toBeVisible();
+    expect(morphologyRequests).toEqual([]);
+    await page.getByRole('combobox', { name: 'Evidence type' }).selectOption('morphology');
+    await expect(page).toHaveURL(/evidence=morphology/);
+    await expect(page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' })).toBeVisible();
+    expect(morphologyRequests).toHaveLength(1);
+
+    const response = await request.get('data/quran/morphology.json');
+    expect(response.ok()).toBe(true);
+    const dataset = (await response.json()) as {
+      format: string;
+      wordCount: number;
+      segmentCount: number;
+      stemCount: number;
+      ayahs: unknown[][];
+      qacNotice: string;
+    };
+    expect(dataset).toMatchObject({
+      format: 'quran-qac-morphology',
+      wordCount: 77429,
+      segmentCount: 128219,
+      stemCount: 77915,
+    });
+    expect(dataset.ayahs).toHaveLength(6236);
+    expect(dataset.ayahs[0]).toHaveLength(4);
+    expect(dataset.qacNotice).toContain('Copyright (C) 2011 Kais Dukes');
+
+    await page.getByRole('combobox', { name: 'Morphology grouping' }).selectOption('root');
+    await page.getByRole('button', { name: 'Inspect annotated word 3' }).click();
+    await expect(page).toHaveURL(/morph=root&term=rHm&word=3/);
+    await expect(page.getByLabel('Original word segment analysis')).toContainText('ROOT:rHm');
+    const occurrences = page.getByRole('button', { name: /Open morphology source/ });
+    await expect(occurrences.first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Next occurrences' })).toBeEnabled();
+    await page.getByRole('button', { name: 'Next occurrences' }).click();
+    await expect(page.getByText(/Page 2 of/)).toBeVisible();
+    await occurrences.first().click();
+    await expect(page).toHaveURL(/word=\d+/);
+    await expect(page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' })).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/morph=root&term=rHm&word=3/);
+  });
+
+  test('supports Arabic root search, deep-link restoration, and separate evidence switching', async ({ page }) => {
+    await page.goto('./?ref=1%3A1&evidence=morphology&morph=root');
+    await expect(page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' })).toBeVisible();
+    await page.getByRole('textbox', { name: 'Search morphology term' }).fill('رحم');
+    await page.getByRole('button', { name: 'Find', exact: true }).click();
+    await expect(page).toHaveURL(/term=rHm/);
+    await expect(page.getByLabel('Morphology occurrence evidence')).toContainText('rHm');
+    await page.getByRole('combobox', { name: 'Evidence type' }).selectOption('exact');
+    await expect(page).toHaveURL(/evidence=exact/);
+    await expect(page).not.toHaveURL(/term=/);
+    await expect(page.getByRole('heading', { name: 'Verbatim Arabic repetitions' })).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/evidence=morphology&morph=root&term=rHm/);
+  });
+
+  test('does not precache the large QAC sidecar with the offline reader', async ({ page }) => {
+    await page.goto('./?ref=2%3A255&evidence=morphology');
+    await expect(page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' })).toBeVisible();
+    const cached = await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready;
+      const names = await caches.keys();
+      const name = names.find((candidate) => candidate.startsWith('quran-cross-references-shell-'));
+      if (!name) return { morphology: false, text: false };
+      const cache = await caches.open(name);
+      const morphology = await cache.match(new URL('data/quran/morphology.json', registration.scope));
+      const text = await cache.match(new URL('data/quran/text.json', registration.scope));
+      return { morphology: morphology !== undefined, text: text !== undefined };
+    });
+    expect(cached).toEqual({ morphology: false, text: true });
+  });
+});
