@@ -10,8 +10,9 @@ export async function shareQuranReference(url: string, title: string): Promise<S
     }
   }
   try {
-    if (!navigator.clipboard?.writeText) return 'unavailable';
-    await navigator.clipboard.writeText(url);
+    const clipboard = (navigator as Partial<Navigator>).clipboard;
+    if (typeof clipboard?.writeText !== 'function') return 'unavailable';
+    await clipboard.writeText(url);
     return 'copied';
   } catch {
     return 'unavailable';
