@@ -87,7 +87,7 @@ export function QuranExpressions({
           </h3>
           {unique.length === 0 ? (
             <p className={styles.empty}>
-              No repeated 3–8-word expression from this dataset starts in the selected ayah. Try
+              No repeated 3–8-word expression from this dataset occurs in the selected ayah. Try
               another reference, or follow an existing selected phrase.
             </p>
           ) : (

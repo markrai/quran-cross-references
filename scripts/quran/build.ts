@@ -103,7 +103,7 @@ const arabicPin = pins.find((pin) => pin.id === 'tanzil-uthmani');
 if (!arabicPin) throw new Error('Missing pinned Arabic source.');
 const expressions = createExactExpressionEvidence(text.arabic, arabicPin);
 validateExactExpressionEvidence(expressions, text.arabic, arabicPin);
-writeDataset('expressions.json', expressions);
+writeDataset('expressions.json', { ...expressions, tanzilNotice });
 writeDataset('manifest.json', {
   format: 'quran-foundation-manifest',
   schemaVersion: 1,

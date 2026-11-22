@@ -453,6 +453,7 @@ test.describe('Quran Phase 2B.3 computed expression exploration', () => {
     expect(response.ok()).toBe(true);
     const published = (await response.json()) as {
       format: string;
+      tanzilNotice: string;
       expressions: {
         id: string;
         words: string[];
@@ -460,6 +461,7 @@ test.describe('Quran Phase 2B.3 computed expression exploration', () => {
       }[];
     };
     expect(published.format).toBe('quran-exact-expressions');
+    expect(published.tanzilNotice).toContain('Copyright (C) 2007-2021 Tanzil Project');
     expect(published.expressions).toHaveLength(5084);
     const expression = published.expressions.find(
       (item) => new Set(item.occurrences.map((site) => site.ayah)).size > 32,
