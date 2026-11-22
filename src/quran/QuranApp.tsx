@@ -247,7 +247,7 @@ export function QuranApp() {
                       <button type="button" onClick={() => focus(data.relationships.versification.refAt(link.source.start))}>
                         Source: {formatIndexRange(data.relationships.versification, link.source.start, link.source.end)}
                       </button>
-                      <span aria-hidden="true">↔</span>
+                      <span aria-hidden="true">→</span>
                       <button type="button" onClick={() => focus(data.relationships.versification.refAt(link.target.start))}>
                         Target: {formatIndexRange(data.relationships.versification, link.target.start, link.target.end)}
                       </button>
