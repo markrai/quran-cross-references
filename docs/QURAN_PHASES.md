@@ -1,14 +1,14 @@
 # Quran Cross-References: phased adoption
 
-## Merge boundary: Quran foundation and graph adapter, no UI cutover
+## Merge boundary: Quran reader preview, no default-app cutover
 
 This repository is currently a fork of Bible Cross-References. The original application
 remains the working default while the Quran implementation is introduced in isolated,
 reviewable phases.
 
-Phases 1A and 1B deliberately **do not** replace the existing app shell, routes, dataset
-registry, WebGL renderer, PWA cache or translation picker. Switching those piecemeal
-would break the working application.
+Phases 1A and 1B retain their isolation. Phase 1C introduces an independent Quran route at
+`/quran/` without changing the default Bible app shell, existing visualization routes,
+Bible datasets, or its translation picker.
 
 ### Included in Phase 1A
 
@@ -51,6 +51,31 @@ The generated text has separate source and license entries for Arabic and Englis
 Run `npm run check` and `npm run data:quran` for acceptance. The checked-in scripture sources
 also use explicit LF checkout rules to preserve their reviewed SHA-256 values on Windows.
 
+### Phase 1C: independent bilingual Quran reader preview
+
+- `/quran/?ref=2:255` and `/quran/?ref=2:255&view=threads` open a static-host-friendly
+  separate Quran application with shareable canonical ayah references.
+- Arabic Tanzil Uthmani is rendered in a dedicated right-to-left, `lang=ar` element.
+  English Pickthall is displayed separately left-to-right with `lang=en`.
+- The Quran arc view draws the selected surah's curated links in a whole-Quran
+  coordinate diagram, with selectable source and target ranges. A lightweight SVG
+  implementation avoids making the Bible-specific WebGL scene depend on Quran APIs.
+- Threads provide a full surah reader, per-ayah outgoing and incoming connections,
+  contextual previews, filtered scope and direction, and a position map.
+- `npm run data:quran` verifies raw SHA-256 source pins and publishes deterministic
+  JSON datasets under ignored `public/data/quran/`. `npm run build` and `npm run dev`
+  now execute this step after the legacy Bible dataset build.
+- The route is intentionally `noindex` and not included in the existing Bible PWA
+  app manifest or offline-page precache. Mobile/offline acceptance and product
+  metadata/branding cutover remain in Phase 1D.
+- Added unit and Chromium end-to-end tests for dataset validation, deep links,
+  filters, browser history, bilingual text direction and interactive views.
+
+Run `npm run check`, `npm run data:quran`, `npm run build`, then
+`npx playwright test tests/e2e/quran-reader.spec.ts --project=desktop --project=phone`.
+On a preview built at its default base path, open `/bible-cross-references/quran/`;
+under `BASE_PATH=/`, open `/quran/`.
+
 ### Licensing and provenance
 
 See `data/quran/sources.json` for each exact source URL, SHA-256 digest, attribution,
@@ -63,11 +88,7 @@ dedicated CC0 and is not a complete scholarly cross-reference set.
 
 ### Next merges
 
-1. **Phase 1C: Quran reader and visualization.** Introduce the Quran text and
-   arc/Threads experience as an independently navigable route, with appropriate
-   Arabic RTL and English LTR display. Remove old Bible APIs from Quran-specific
-   components instead of renaming their parameters.
-2. **Phase 1D: Product cutover.** Replace metadata, link previews, PWA assets,
+1. **Phase 1D: Product cutover.** Replace metadata, link previews, PWA assets,
    help text, and all Bible-specific UI; validate mobile, offline, accessibility
    and end-to-end flows before replacing the default landing page.
 
