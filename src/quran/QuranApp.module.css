@@ -28,18 +28,6 @@
   text-decoration: none;
 }
 
-.previewLabel {
-  font-size: 0.73rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-.legacyLink {
-  font-size: 0.84rem;
-  white-space: nowrap;
-}
-
 .main {
   max-width: 86rem;
   margin: 0 auto;
