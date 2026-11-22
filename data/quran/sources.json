@@ -1,0 +1,34 @@
+{
+  "sources": [
+    {
+      "id": "tanzil-uthmani",
+      "description": "Tanzil Quran Text Uthmani 1.1, Hafs/Kufan",
+      "url": "https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&marks=true&sajdah=true&rub=true&tatweel=true&agree=true",
+      "fileName": "quran-uthmani-1.1.txt",
+      "sha256": "7f30c647331a61100ebf24a80507dc0fcdd9f2df97f1312b5b2dfcb982a7f326",
+      "retrievedAt": "2026-11-01",
+      "license": "CC BY 3.0, Tanzil verbatim reproduction terms",
+      "attribution": "Arabic text © Tanzil Project. Tanzil Quran Text Uthmani v1.1; see https://tanzil.net/docs/Text_License"
+    },
+    {
+      "id": "pickthall",
+      "description": "Pickthall 1930 English translation, Tanzil digital 2010-09-04 edition",
+      "url": "https://tanzil.net/trans/en.pickthall",
+      "fileName": "en.pickthall.txt",
+      "sha256": "4aabbfa9d96796f5a6b0217d2c39dce1a3084f772bf6f2650e37082a774e3cc7",
+      "retrievedAt": "2026-11-01",
+      "license": "1930 English translation (public domain in United States); validate digital text edition",
+      "attribution": "Marmaduke Pickthall, The Meaning of the Glorious Koran (1930). Digitized by Tanzil; https://tanzil.net/trans/"
+    },
+    {
+      "id": "mutashabihat",
+      "description": "Waqar144 Quran Mutashabihat Data, pinned commit 5d147d0a68f55d16af2c9d6f2cbf8ee01790511c",
+      "url": "https://raw.githubusercontent.com/Waqar144/Quran_Mutashabihat_Data/5d147d0a68f55d16af2c9d6f2cbf8ee01790511c/mutashabiha_data.json",
+      "fileName": "mutashabiha_data.json",
+      "sha256": "785d5efa266a19c405a449b0a01ebf34fe7dc09836d5b6ef301eae874db780f0",
+      "retrievedAt": "2026-11-01",
+      "license": "CC0 1.0 Universal",
+      "attribution": "Quran Mutashabihat Data, Waqar144, drawing on Qari Idrees Al Asim; https://github.com/Waqar144/Quran_Mutashabihat_Data"
+    }
+  ]
+}
