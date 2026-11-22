@@ -1,4 +1,8 @@
-import { CANONICAL_QURAN, type AyahIndexRange, type QuranVersification } from './quran-versification.ts';
+import {
+  CANONICAL_QURAN,
+  type AyahIndexRange,
+  type QuranVersification,
+} from './quran-versification.ts';
 import type { QuranRelationship } from './relationship-index.ts';
 
 export type QuranRelationshipScope = 'all' | 'same-surah' | 'cross-surah';
