@@ -111,12 +111,14 @@ it accepts the data **only if** changing CRLF to LF reproduces the pinned bytes
 exactly. Any other byte change still fails. The pinned digests and Quran text are
 unchanged.
 
-GitHub Actions runs on pull requests and pushes to main. The CI workflow includes
-type checking, type coverage, ESLint, Prettier, unit coverage, verified Quran dataset
-generation on Linux and Windows, a deterministic Bible dataset manifest check,
-the full legacy browser suite, and dedicated Quran desktop/phone browser scenarios.
-Deployments depend on the active Quran release jobs. A fork owner may have to enable GitHub Actions
-in the repository's Actions tab or Settings before any jobs can run.
+GitHub Actions is configured to run on pull requests and pushes to main. Active release
+checks include TypeScript, type coverage, ESLint, Prettier, unit coverage, verified
+Quran generation on Linux and Windows, a Quran-only distribution check, and
+desktop/phone Quran browser scenarios. The old Bible manifest and browser suites
+remain in source but are not part of the current build and CI release gates.
+GitHub Pages deployment depends on the active Quran jobs passing.
+A fork owner may have to enable GitHub Actions in the repository's Actions tab
+or Settings before jobs can run.
 
 ### Licensing and provenance
 
