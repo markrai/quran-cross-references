@@ -2,48 +2,17 @@
 import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import { analytics } from './vite/analytics.ts';
-import { firstFrame } from './vite/first-frame.ts';
-import { offline } from './vite/offline.ts';
-import { writeLocaleEntries } from './vite/locale-entries.ts';
-import { DEPLOY_BASE, PAGES, ROOT_DIR, SITE_NAME, SITE_URL } from './vite/site.ts';
-import { siteHead } from './vite/site-head.ts';
+import { QURAN_DEPLOY_BASE } from './vite/quran-site.ts';
 
-// Every language that is not the default needs a real HTML file for the bundler to take as an
-// input and for the dev server to serve, and those files are generated from `src/i18n/site-copy.ts`
-// rather than committed. Written here, before the config names its inputs, because by the time a
-// plugin runs the inputs have already been read.
-writeLocaleEntries();
-
-// https://vite.dev/config/
 export default defineConfig(({ command, isPreview = false }) => ({
-  // The dev server runs at the root; builds, and their preview, at the deployed sub-path, so a
-  // path that ignores the base breaks in `npm run preview` rather than in production. Runtime code
-  // builds every URL from `import.meta.env.BASE_URL`.
-  base: process.env['BASE_PATH'] ?? (command === 'build' || isPreview ? DEPLOY_BASE : '/'),
-  define: {
-    'import.meta.env.SITE_NAME': JSON.stringify(SITE_NAME),
-    'import.meta.env.SITE_URL': JSON.stringify(SITE_URL),
-  },
-  plugins: [react(), siteHead(), firstFrame(), offline(), analytics()],
+  base: process.env['BASE_PATH'] ?? (command === 'build' || isPreview ? QURAN_DEPLOY_BASE : '/'),
+  publicDir: resolve(import.meta.dirname, 'public/quran-only'),
+  plugins: [react()],
   build: {
-    // Three.js alone is ~550 kB minified (~140 kB gzipped); only the WebGL pages load it.
-    chunkSizeWarningLimit: 600,
     rolldownOptions: {
       input: {
-        ...Object.fromEntries(
-          Object.entries(PAGES).map(([name, { entry }]) => [name, resolve(ROOT_DIR, entry)]),
-        ),
-        quran: resolve(ROOT_DIR, 'quran/index.html'),
-      },
-      output: {
-        // Named vendor chunks: cacheable across pages and readable in the build report.
-        codeSplitting: {
-          groups: [
-            { name: 'three', test: /node_modules[\\/]three[\\/]/ },
-            { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/ },
-          ],
-        },
+        home: resolve(import.meta.dirname, 'index.html'),
+        quranAlias: resolve(import.meta.dirname, 'quran/index.html'),
       },
     },
   },
