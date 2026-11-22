@@ -11,10 +11,11 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   fullyParallel: true,
   forbidOnly: Boolean(process.env['CI']),
-  retries: process.env['CI'] ? 2 : 0,
-  ...(process.env['CI'] ? { workers: 2 } : {}),
+  retries: process.env['CI'] ? 1 : 0,
+  failOnFlakyTests: Boolean(process.env['CI']),
+  workers: process.env['CI'] ? 2 : 4,
   reporter: process.env['CI']
-    ? [['github'], ['html', { open: 'never' }]]
+    ? [['github'], ['html', { open: 'never' }], ['junit', { outputFile: 'test-results/junit.xml' }]]
     : [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: BASE_URL,
@@ -32,9 +33,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run preview',
+    command: 'npm run preview -- --strictPort',
     url: BASE_URL,
-    reuseExistingServer: !process.env['CI'],
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });
