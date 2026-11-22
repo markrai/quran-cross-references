@@ -11,6 +11,7 @@ export default defineConfig([
     'coverage/',
     'data/raw/',
     'public/data/',
+    'public/quran-only/data/',
     'test-results/',
     'playwright-report/',
   ]),
@@ -26,7 +27,6 @@ export default defineConfig([
     },
     rules: {
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
-      // Bracket access for index signatures is required by `noPropertyAccessFromIndexSignature`.
       '@typescript-eslint/dot-notation': ['error', { allowIndexSignaturePropertyAccess: true }],
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
@@ -40,7 +40,6 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   {
-    // Node-side code: the data pipeline CLIs report progress on stdout.
     files: ['scripts/**/*.ts', 'tests/**/*.ts', 'vite/**/*.ts', '*.config.{js,ts}'],
     languageOptions: { globals: globals.node },
     rules: { 'no-console': 'off' },
