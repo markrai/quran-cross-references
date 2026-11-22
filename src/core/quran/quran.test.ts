@@ -3,6 +3,9 @@ import { formatAyahId, parseAyahId } from './ayah-ref.ts';
 import {
   surahPassageOf,
   ayahPassage,
+  formatPassage,
+  isSamePassage,
+  passageFromReference,
   parsePassageId,
   passageRange,
   toPassageId,
@@ -97,4 +100,28 @@ describe('Quran foundations', () => {
       surah: 2,
     });
   });
+
+  it('compares and formats surah and ayah passages without conflating them', () => {
+    const ayah = ayahPassage(261);
+    const same = ayahPassage(261);
+    const different = ayahPassage(262);
+    const surah = { kind: 'surah' as const, surah: 2 };
+    expect(isSamePassage(null, null)).toBe(true);
+    expect(isSamePassage(null, surah)).toBe(false);
+    expect(isSamePassage(ayah, null)).toBe(false);
+    expect(isSamePassage(ayah, same)).toBe(true);
+    expect(isSamePassage(ayah, different)).toBe(false);
+    expect(isSamePassage(ayah, surah)).toBe(false);
+    expect(isSamePassage(surah, { kind: 'surah', surah: 2 })).toBe(true);
+    expect(isSamePassage(surah, { kind: 'surah', surah: 3 })).toBe(false);
+    expect(formatPassage(ayah, QURAN_VERSIFICATION)).toBe('Al-Baqarah 2:255');
+    expect(formatPassage(surah, QURAN_VERSIFICATION)).toBe('Surah 2');
+    expect(passageFromReference({ surah: 2, ayah: 255 }, QURAN_VERSIFICATION)).toEqual(ayah);
+    expect(() =>
+      passageFromReference({ surah: 2, ayah: 287 }, QURAN_VERSIFICATION),
+    ).toThrow(RangeError);
+    expect(QURAN_VERSIFICATION.surahAt(261).name).toBe('Al-Baqarah');
+    expect(() => QURAN_VERSIFICATION.surahAt(-1)).toThrow(RangeError);
+  });
+
 });
