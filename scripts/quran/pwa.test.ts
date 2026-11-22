@@ -39,6 +39,7 @@ describe('Quran offline release shell', () => {
     const source = offlineWorkerSource(['index.html', 'data/quran/text.json'], 'revision-1');
     expect(source).toContain('quran-cross-references-shell-revision-1');
     expect(source).toContain('cache.addAll');
+    expect(source).toContain('ignoreVary: true');
     expect(source).toContain("request.mode === 'navigate'");
     expect(source).toContain("alias ? 'quran/index.html' : 'index.html'");
     expect(source).toContain('url.origin !== root.origin');
@@ -72,8 +73,9 @@ describe('Quran offline release shell', () => {
       },
       async match(
         request: { readonly url: string } | URL,
-        options?: { readonly ignoreSearch?: boolean },
+        options?: { readonly ignoreSearch?: boolean; readonly ignoreVary?: boolean },
       ) {
+        if (!options?.ignoreVary) return undefined;
         const url = new URL(request instanceof URL ? request.href : request.url);
         if (options?.ignoreSearch) url.search = '';
         return stored.get(url.href);
@@ -154,5 +156,4 @@ describe('Quran offline release shell', () => {
     });
     expect(network).not.toHaveBeenCalled();
   });
-
 });
