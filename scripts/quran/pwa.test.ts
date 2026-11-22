@@ -54,9 +54,7 @@ describe('Quran offline release shell', () => {
   it('serves actual canonical and compatibility routes and Quran data without network', async () => {
     const scope = 'https://example.test/quran-cross-references/';
     const stored = new Map<string, { readonly path: string }>();
-    const network = vi.fn(async () => {
-      throw new Error('Network unavailable');
-    });
+    const network = vi.fn(() => Promise.reject(new Error('Network unavailable')));
     const handlers = new Map<
       string,
       (event: {
@@ -66,19 +64,20 @@ describe('Quran offline release shell', () => {
       }) => void
     >();
     const cache = {
-      async addAll(requests: readonly Request[]) {
+      addAll(requests: readonly Request[]) {
         for (const request of requests) {
           stored.set(request.url, { path: new URL(request.url).pathname });
         }
+        return Promise.resolve();
       },
-      async match(
+      match(
         request: { readonly url: string } | URL,
         options?: { readonly ignoreSearch?: boolean; readonly ignoreVary?: boolean },
       ) {
-        if (!options?.ignoreVary) return undefined;
+        if (!options?.ignoreVary) return Promise.resolve(undefined);
         const url = new URL(request instanceof URL ? request.href : request.url);
         if (options?.ignoreSearch) url.search = '';
-        return stored.get(url.href);
+        return Promise.resolve(stored.get(url.href));
       },
     };
     const self = {
@@ -93,13 +92,13 @@ describe('Quran offline release shell', () => {
       ) {
         handlers.set(name, handler);
       },
-      skipWaiting: async () => undefined,
-      clients: { claim: async () => undefined },
+      skipWaiting: () => Promise.resolve(undefined),
+      clients: { claim: () => Promise.resolve(undefined) },
     };
     const caches = {
-      open: async () => cache,
-      keys: async () => ['quran-cross-references-shell-revision-1'],
-      delete: async () => true,
+      open: () => Promise.resolve(cache),
+      keys: () => Promise.resolve(['quran-cross-references-shell-revision-1']),
+      delete: () => Promise.resolve(true),
     };
     runInNewContext(
       offlineWorkerSource(
@@ -130,7 +129,7 @@ describe('Quran offline release shell', () => {
 
     const onFetch = handlers.get('fetch');
     expect(onFetch).toBeDefined();
-    async function offlineFetch(path: string, mode: string) {
+    function offlineFetch(path: string, mode: string) {
       let response: Promise<unknown> | undefined;
       onFetch?.({
         request: { method: 'GET', url: new URL(path, scope).href, mode },
