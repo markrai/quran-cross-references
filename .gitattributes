@@ -1,0 +1,3 @@
+data/raw/quran-uthmani-1.1.txt text eol=lf
+data/raw/en.pickthall.txt text eol=lf
+data/raw/mutashabiha_data.json text eol=lf
