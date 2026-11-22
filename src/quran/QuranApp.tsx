@@ -70,7 +70,10 @@ export function QuranApp() {
       formatAyahId(location.reference) + ' · Quran Cross-References';
   }, [location.reference]);
 
-  const focus = (reference: AyahRef) => navigate(linkReference(location, reference));
+  const focus = (reference: AyahRef) => {
+    setSearchError(null);
+    navigate(linkReference(location, reference));
+  };
   const changeSurah = (surah: number) => focus({ surah, ayah: 1 });
   const selectedId =
     selected?.surah === location.reference.surah && selected.scope === location.scope
