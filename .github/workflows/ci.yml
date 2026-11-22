@@ -31,6 +31,14 @@ jobs:
         run: npm run typecoverage
       - name: Enforce unit-test coverage
         run: npm run test:coverage
+      - name: Archive unit coverage detail
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: quran-unit-coverage
+          path: coverage
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Validate pinned Quran datasets
         run: npm run data:quran
       - name: Record full-corpus SVG layout benchmark
