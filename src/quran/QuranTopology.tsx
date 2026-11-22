@@ -215,7 +215,9 @@ export function QuranTopology({
             type="button"
             className={mode === 'surah' ? styles.activeTab : styles.tab}
             aria-pressed={mode === 'surah'}
-            onClick={() => { onMode('surah'); }}
+            onClick={() => {
+              onMode('surah');
+            }}
           >
             Surah network
           </button>
@@ -223,7 +225,9 @@ export function QuranTopology({
             type="button"
             className={mode === 'ayah' ? styles.activeTab : styles.tab}
             aria-pressed={mode === 'ayah'}
-            onClick={() => { onMode('ayah'); }}
+            onClick={() => {
+              onMode('ayah');
+            }}
           >
             Ayah neighborhood
           </button>
@@ -435,7 +439,9 @@ export function QuranTopology({
                     type="button"
                     key={entry.surah}
                     aria-pressed={partner?.surah === entry.surah}
-                    onClick={() => { selectPartner(entry.surah); }}
+                    onClick={() => {
+                      selectPartner(entry.surah);
+                    }}
                   >
                     <strong>
                       {entry.surah}. {getSurah(entry.surah).name}
@@ -495,7 +501,9 @@ export function QuranTopology({
                 <button
                   type="button"
                   disabled={currentAyahPage === 0}
-                  onClick={() => { setAyahPage(currentAyahPage - 1); }}
+                  onClick={() => {
+                    setAyahPage(currentAyahPage - 1);
+                  }}
                 >
                   Previous neighborhood links
                 </button>
@@ -505,7 +513,9 @@ export function QuranTopology({
                 <button
                   type="button"
                   disabled={currentAyahPage + 1 >= shownNeighborhood.pages}
-                  onClick={() => { setAyahPage(currentAyahPage + 1); }}
+                  onClick={() => {
+                    setAyahPage(currentAyahPage + 1);
+                  }}
                 >
                   Next neighborhood links
                 </button>
@@ -517,7 +527,9 @@ export function QuranTopology({
                     <button
                       key={[edge.hop, edge.id, edge.via, edge.direction].join(':')}
                       type="button"
-                      onClick={() => { onOpenLink(link.id); }}
+                      onClick={() => {
+                        onOpenLink(link.id);
+                      }}
                     >
                       <span>
                         Hop {edge.hop} · Link #{link.id + 1}
@@ -533,7 +545,13 @@ export function QuranTopology({
                   </p>
                 )}
               </div>
-              <button type="button" className={styles.goButton} onClick={() => { onReadAyah(focus); }}>
+              <button
+                type="button"
+                className={styles.goButton}
+                onClick={() => {
+                  onReadAyah(focus);
+                }}
+              >
                 Read {label(focus)} in the Quran
               </button>
             </>
@@ -560,7 +578,13 @@ export function QuranTopology({
                   </p>
                   <div className={styles.topologyLinkList} aria-label="Verified surah pair links">
                     {partnerIds.map((id) => (
-                      <button type="button" key={id} onClick={() => { onOpenLink(id); }}>
+                      <button
+                        type="button"
+                        key={id}
+                        onClick={() => {
+                          onOpenLink(id);
+                        }}
+                      >
                         <span>Curated link #{id + 1}</span>
                         <strong>{curatedLinkLabel(relationships.link(id))}</strong>
                         <small>Open source and target ayahs</small>
@@ -571,7 +595,9 @@ export function QuranTopology({
                     <button
                       type="button"
                       disabled={currentEvidencePage === 0}
-                      onClick={() => { setEvidencePage(currentEvidencePage - 1); }}
+                      onClick={() => {
+                        setEvidencePage(currentEvidencePage - 1);
+                      }}
                     >
                       Previous evidence
                     </button>
@@ -581,7 +607,9 @@ export function QuranTopology({
                     <button
                       type="button"
                       disabled={currentEvidencePage + 1 >= partnerPages}
-                      onClick={() => { setEvidencePage(currentEvidencePage + 1); }}
+                      onClick={() => {
+                        setEvidencePage(currentEvidencePage + 1);
+                      }}
                     >
                       Next evidence
                     </button>

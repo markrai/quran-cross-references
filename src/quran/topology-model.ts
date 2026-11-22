@@ -1,4 +1,7 @@
-import type { QuranRelationship, QuranRelationshipIndex } from '../core/quran/relationship-index.ts';
+import type {
+  QuranRelationship,
+  QuranRelationshipIndex,
+} from '../core/quran/relationship-index.ts';
 import { CANONICAL_QURAN, type AyahIndexRange } from '../core/quran/quran-versification.ts';
 
 export const TOPOLOGY_SURAH_PAGE_SIZE = 12;
@@ -275,5 +278,13 @@ export function curatedNeighborhood(
 export function curatedLinkLabel(link: QuranRelationship): string {
   const source = CANONICAL_QURAN.refAt(link.source.start);
   const target = CANONICAL_QURAN.refAt(link.target.start);
-  return String(source.surah) + ':' + String(source.ayah) + ' → ' + String(target.surah) + ':' + String(target.ayah);
+  return (
+    String(source.surah) +
+    ':' +
+    String(source.ayah) +
+    ' → ' +
+    String(target.surah) +
+    ':' +
+    String(target.ayah)
+  );
 }
