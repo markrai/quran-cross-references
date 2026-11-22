@@ -52,8 +52,7 @@ export function QuranArcs({ index, surah, scope, selectedId, onSelect }: QuranAr
             const x2 = xOf(target, index.ayahCount);
             const distance = Math.abs(x2 - x1);
             const peak = Math.min(325, Math.max(30, Math.sqrt(distance) * 14));
-            const d = 'M ' + x1 + ' ' + AXIS_Y + ' Q ' + ((x1 + x2) / 2) + ' ' +
-              (AXIS_Y - peak * 2) + ' ' + x2 + ' ' + AXIS_Y;
+            const d = `M ${x1} ${AXIS_Y} Q ${(x1 + x2) / 2} ${AXIS_Y - peak * 2} ${x2} ${AXIS_Y}`;
             const link = index.link(id);
             const label = formatIndexRange(index.versification, link.source.start, link.source.end) +
               ' to ' + formatIndexRange(index.versification, link.target.start, link.target.end);
@@ -66,7 +65,9 @@ export function QuranArcs({ index, surah, scope, selectedId, onSelect }: QuranAr
                 aria-label={label}
                 aria-pressed={active}
                 className={active ? styles.arcActive : styles.arc}
-                onClick={() => onSelect(id)}
+                onClick={() => {
+                  onSelect(id);
+                }}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();

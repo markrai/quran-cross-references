@@ -41,11 +41,13 @@ describe('Quran reader dataset loading', () => {
   });
 
   it('fetches both published datasets and builds the Phase 1B index', async () => {
-    const fetcher = vi.fn(async (url: string) => ({
-      ok: true,
-      status: 200,
-      json: async () => url.endsWith('/text.json') ? text : relationships,
-    }));
+    const fetcher = vi.fn((url: string) =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(url.endsWith('/text.json') ? text : relationships),
+      }),
+    );
     vi.stubGlobal('fetch', fetcher);
     const data = await loadQuranReaderData();
     expect(fetcher).toHaveBeenCalledTimes(2);
@@ -61,7 +63,9 @@ describe('Quran reader dataset loading', () => {
 
   it('passes through abort signals and reports HTTP failures', async () => {
     const controller = new AbortController();
-    const fetcher = vi.fn(async () => ({ ok: false, status: 404, json: async () => null }));
+    const fetcher = vi.fn(() =>
+      Promise.resolve({ ok: false, status: 404, json: () => Promise.resolve(null) }),
+    );
     vi.stubGlobal('fetch', fetcher);
     await expect(loadQuranReaderData(controller.signal)).rejects.toThrow('HTTP 404');
     expect(fetcher).toHaveBeenCalledWith('/data/quran/text.json', { signal: controller.signal });

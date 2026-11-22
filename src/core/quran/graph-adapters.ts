@@ -6,7 +6,7 @@ import {
   type QuranRelationshipFilter,
 } from './relationship-filter.ts';
 import type { QuranRelationship } from './relationship-index.ts';
-import { QuranRelationshipIndex } from './relationship-index.ts';
+import type { QuranRelationshipIndex } from './relationship-index.ts';
 
 export interface QuranConnection {
   readonly link: QuranRelationship;

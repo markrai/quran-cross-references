@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { importMutashabihat, importQuranText } from './datasets.ts';
+import { verifyPinnedQuranSource } from './pinned-source.ts';
 
 interface SourcePin {
   readonly id: string;
@@ -40,11 +41,7 @@ function readPinned(id: string): string {
   const source = pins.find((pin) => pin.id === id);
   if (!source) throw new Error(`Unknown Quran data source: ${id}.`);
   const content = readFileSync(join('data/raw', source.fileName));
-  const actual = createHash('sha256').update(content).digest('hex');
-  if (actual !== source.sha256) {
-    throw new Error(`Quran source ${id} has checksum ${actual}, expected ${source.sha256}.`);
-  }
-  return content.toString('utf8');
+  return verifyPinnedQuranSource(content, source.sha256, id).toString('utf8');
 }
 
 const text = importQuranText(readPinned('tanzil-uthmani'), readPinned('pickthall'));
