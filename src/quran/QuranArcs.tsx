@@ -63,7 +63,7 @@ export function QuranArcs({
   const arcs = useMemo(() => buildQuranGraphPaths(index, geometry), [index, geometry]);
   const focusedArcs = useMemo(
     () => arcs.filter((arc) => arcTouchesRange(arc, focus)),
-    [arcs, focus.start, focus.end],
+    [arcs, focus],
   );
   const displayedArcs = useMemo(() => {
     const pool = focusOnly ? focusedArcs : arcs;
@@ -73,19 +73,29 @@ export function QuranArcs({
 
   const focusedCenter = graphXOfAyah((focus.start + focus.end + 1) / 2, index.ayahCount);
   useEffect(() => {
-    setViewport((current) =>
-      current.width === GRAPH_WIDTH ? current : centerGraphViewport(current, focusedCenter),
-    );
+    const frame = window.requestAnimationFrame(() => {
+      setViewport((current) =>
+        current.width === GRAPH_WIDTH ? current : centerGraphViewport(current, focusedCenter),
+      );
+    });
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
   }, [focusedCenter]);
 
   useEffect(() => {
     const selectedArc = arcs.find((arc) => arc.id === selectedId);
     if (!selectedArc) return;
-    setViewport((current) =>
-      current.width === GRAPH_WIDTH
-        ? current
-        : centerGraphViewport(current, (selectedArc.left + selectedArc.right) / 2),
-    );
+    const frame = window.requestAnimationFrame(() => {
+      setViewport((current) =>
+        current.width === GRAPH_WIDTH
+          ? current
+          : centerGraphViewport(current, (selectedArc.left + selectedArc.right) / 2),
+      );
+    });
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
   }, [arcs, selectedId]);
 
   const surahRange = index.versification.surahRange(surah);
@@ -240,7 +250,9 @@ export function QuranArcs({
             return (
               <g key={item.number}>
                 <line x1={x} x2={x} y1={GRAPH_AXIS_Y} y2={GRAPH_AXIS_Y + 8} className={styles.axis} />
-                <text x={x} y={GRAPH_AXIS_Y + 24} className={styles.axisText} textAnchor="middle">{item.number}</text>
+                {zoom <= 1.5 && (
+                  <text x={x} y={GRAPH_AXIS_Y + 24} className={styles.axisText} textAnchor="middle">{item.number}</text>
+                )}
               </g>
             );
           })}
