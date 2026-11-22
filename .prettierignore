@@ -4,6 +4,8 @@ test-results/
 playwright-report/
 public/data/
 public/quran-only/data/
+data/quran/generated/
+data/raw/
 package-lock.json
 
 # The HTML entry of every language but the default one, generated from src/i18n/site-copy.ts by
