@@ -41,8 +41,8 @@ self.addEventListener('fetch', (event) => {
     const destination = new URL(alias ? 'quran/index.html' : 'index.html', scope);
     event.respondWith(caches.open(CACHE_NAME)
       .then(async (cache) =>
-        (await cache.match(request, { ignoreSearch: true })) ||
-        (await cache.match(destination)) ||
+        (await cache.match(request, { ignoreSearch: true, ignoreVary: true })) ||
+        (await cache.match(destination, { ignoreVary: true })) ||
         fetch(request)
       )
     );
@@ -50,7 +50,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(caches.open(CACHE_NAME)
-    .then((cache) => cache.match(request, { ignoreSearch: true }))
+    .then((cache) => cache.match(request, { ignoreSearch: true, ignoreVary: true }))
     .then((response) => response || fetch(request))
   );
 });
