@@ -46,7 +46,7 @@ function readPinned(id: string): string {
 
 const text = importQuranText(readPinned('tanzil-uthmani'), readPinned('pickthall'));
 const links = importMutashabihat(readPinned('mutashabihat'));
-const destinations = ['data/quran/generated', 'public/data/quran'];
+const destinations = ['data/quran/generated', 'public/quran-only/data/quran'];
 for (const destination of destinations) mkdirSync(destination, { recursive: true });
 
 const outputs: Record<string, string> = {};

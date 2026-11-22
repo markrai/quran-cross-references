@@ -1,16 +1,16 @@
 {
-  "name": "bible-cross-references",
+  "name": "quran-cross-references",
   "version": "0.1.0",
   "private": true,
-  "description": "A minimalist, interactive explorer of Bible cross-references.",
+  "description": "An interactive bilingual Quran cross-reference explorer.",
   "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=24"
   },
   "scripts": {
-    "dev": "npm run data:build && npm run data:quran && vite",
-    "build": "npm run data:build && npm run data:quran && tsc -b && vite build",
+    "dev": "npm run data:quran && vite",
+    "build": "npm run data:quran && tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "typecoverage": "node scripts/type-coverage.ts",
@@ -21,8 +21,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:built": "vitest run scripts/data/built-datasets.test.ts",
-    "test:e2e": "playwright test --project=desktop --project=phone --project=offline",
-    "test:e2e:ci": "CI=1 playwright test --project=desktop --project=phone --project=offline",
+    "test:e2e": "playwright test tests/e2e/quran-reader.spec.ts --project=desktop --project=phone",
+    "test:e2e:ci": "CI=1 playwright test tests/e2e/quran-reader.spec.ts --project=desktop --project=phone",
     "test:visual": "playwright test --project=visual-desktop --project=visual-phone",
     "test:visual:update": "npm run test:visual -- --update-snapshots",
     "test:report": "playwright show-report",

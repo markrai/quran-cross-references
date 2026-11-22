@@ -1,9 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
-import { DEPLOY_BASE } from './vite/site.ts';
+import { QURAN_DEPLOY_BASE } from './vite/quran-site.ts';
 
 /** Where `npm run preview` serves the built site, base path and all. */
 const PORT = 4173;
-export const BASE_URL = `http://localhost:${String(PORT)}${DEPLOY_BASE}`;
+export const BASE_URL = `http://localhost:${String(PORT)}${QURAN_DEPLOY_BASE}`;
 
 /**
  * End-to-end tests: the built site in a real browser.

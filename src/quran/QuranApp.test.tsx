@@ -26,18 +26,20 @@ const data: QuranReaderData = {
 };
 
 beforeEach(() => {
-  window.history.replaceState(null, '', '/quran/?ref=2%3A1');
+  window.history.replaceState(null, '', '/?ref=2%3A1');
   vi.mocked(loadQuranReaderData).mockReset();
   vi.mocked(loadQuranReaderData).mockResolvedValue(data);
 });
 
-describe('Quran Phase 1C reader', () => {
+describe('Quran-first reader', () => {
   it('renders verified Arabic and English text with an isolated Quran header', async () => {
     render(<QuranApp />);
     expect(await screen.findByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeTruthy();
     expect(screen.getByLabelText('Selected ayah').querySelector('[lang="ar"]')).not.toBeNull();
     expect(screen.getByLabelText('Selected ayah').querySelector('[dir="ltr"]')).not.toBeNull();
-    expect(screen.getByRole('link', { name: 'Bible Explorer' }).getAttribute('href')).toBe('/');
+    expect(screen.queryByRole('link', { name: 'Bible Explorer' })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Quran Cross-References' }).getAttribute('href'))
+      .toBe('/?ref=2%3A1');
     expect(screen.getByText(/2 visible links/)).toBeTruthy();
   });
 
@@ -64,7 +66,7 @@ describe('Quran Phase 1C reader', () => {
     expect(screen.getByRole('heading', { name: /An-Nas.*114:6/ })).toBeTruthy();
     expect(window.location.search).toContain('114%3A6');
 
-    window.history.replaceState(null, '', '/quran/?ref=2%3A1&view=threads');
+    window.history.replaceState(null, '', '/?ref=2%3A1&view=threads');
     fireEvent(window, new PopStateEvent('popstate'));
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Threads from 2:1' })).toBeTruthy();

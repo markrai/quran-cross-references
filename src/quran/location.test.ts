@@ -5,36 +5,44 @@ import {
   quranLocationUrl,
 } from './location.ts';
 
-describe('standalone Quran route', () => {
+describe('Quran-first canonical route', () => {
   it('defaults to a valid Quran passage and does not depend on Bible URLs', () => {
-    expect(parseQuranLocation(new URL('https://example.test/quran/'))).toEqual(
-      DEFAULT_QURAN_LOCATION,
-    );
-    expect(parseQuranLocation(new URL('https://example.test/quran/?ref=John.3.16'))).toEqual(
-      DEFAULT_QURAN_LOCATION,
-    );
+    const home = new URL('https://example.test/');
+    const invalid = new URL('https://example.test/?ref=John.3.16');
+    expect(parseQuranLocation(home)).toEqual(DEFAULT_QURAN_LOCATION);
+    expect(parseQuranLocation(invalid)).toEqual(DEFAULT_QURAN_LOCATION);
   });
 
   it('accepts numeric and named surah references with explicit view and filters', () => {
-    expect(
-      parseQuranLocation(new URL(
-        'https://example.test/quran/?ref=2%3A255&view=threads&scope=cross-surah&direction=incoming',
-      )),
-    ).toEqual({
+    const url = new URL('https://example.test/');
+    url.searchParams.set('ref', '2:255');
+    url.searchParams.set('view', 'threads');
+    url.searchParams.set('scope', 'cross-surah');
+    url.searchParams.set('direction', 'incoming');
+    expect(parseQuranLocation(url)).toEqual({
       view: 'threads',
       scope: 'cross-surah',
       direction: 'incoming',
       reference: { surah: 2, ayah: 255 },
     });
-    expect(parseQuranLocation(new URL('https://example.test/quran/?ref=Al-Baqarah+255')).reference)
-      .toEqual({ surah: 2, ayah: 255 });
-    expect(parseQuranLocation(new URL('https://example.test/quran/?ref=2%3A287')).reference)
-      .toEqual(DEFAULT_QURAN_LOCATION.reference);
+    const named = new URL('https://example.test/?ref=Al-Baqarah+255');
+    expect(parseQuranLocation(named).reference).toEqual({ surah: 2, ayah: 255 });
+    const invalid = new URL('https://example.test/?ref=2%3A287');
+    expect(parseQuranLocation(invalid).reference).toEqual(DEFAULT_QURAN_LOCATION.reference);
   });
 
   it('rejects unknown filter and direction values rather than putting them into the UI', () => {
-    expect(parseQuranLocation(new URL('https://example.test/quran/?view=no&scope=no&direction=no')))
-      .toEqual(DEFAULT_QURAN_LOCATION);
+    const url = new URL('https://example.test/?view=no&scope=no&direction=no');
+    expect(parseQuranLocation(url)).toEqual(DEFAULT_QURAN_LOCATION);
+  });
+
+  it('continues reading existing /quran/ deep links at the same reference', () => {
+    const legacy = new URL('https://example.test/quran/?ref=2%3A255&view=threads');
+    expect(parseQuranLocation(legacy)).toEqual({
+      ...DEFAULT_QURAN_LOCATION,
+      reference: { surah: 2, ayah: 255 },
+      view: 'threads',
+    });
   });
 
   it('round-trips canonical deep links under a deployment base', () => {
@@ -45,9 +53,9 @@ describe('standalone Quran route', () => {
       direction: 'outgoing' as const,
     };
     const href = quranLocationUrl(location, '/my-site/');
-    expect(href).toContain('/my-site/quran/?ref=114%3A6');
+    expect(href).toContain('/my-site/?ref=114%3A6');
     expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(location);
-    expect(quranLocationUrl(DEFAULT_QURAN_LOCATION, '/my-site/'))
-      .toBe('/my-site/quran/?ref=2%3A1');
+    const defaultUrl = quranLocationUrl(DEFAULT_QURAN_LOCATION, '/my-site/');
+    expect(defaultUrl).toBe('/my-site/?ref=2%3A1');
   });
 });
