@@ -1488,3 +1488,163 @@
     font-size: 0.75rem;
   }
 }
+
+
+.morphologyPanel {
+  display: grid;
+  gap: 0.9rem;
+  min-width: 0;
+  padding-bottom: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  background: var(--color-surface);
+}
+
+.morphologyControls {
+  padding: 0 1.3rem;
+}
+
+.morphologyControls select {
+  max-width: 100%;
+}
+
+.morphologyColumns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+  padding: 0 1.3rem;
+}
+
+.morphologySection {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.7rem;
+}
+
+.morphologySection h3 {
+  margin: 0 0 0.85rem;
+  font-size: 1.05rem;
+}
+
+.morphologySection p {
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+}
+
+.morphologySection h3 span {
+  margin-inline-start: 0.3rem;
+  font-size: 1.3rem;
+}
+
+.morphologyWords {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 0.55rem;
+  max-height: 35rem;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.morphologyWords button,
+.morphologyHits button {
+  display: grid;
+  gap: 0.3rem;
+  min-height: 48px;
+  padding: 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.morphologyWords button[aria-pressed='true'],
+.morphologyWords button:not(:disabled):hover,
+.morphologyHits button:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.morphologyWords button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.morphologyWords button > span,
+.morphologyHits button > span[lang='ar'] {
+  font-size: 1.3rem;
+}
+
+.morphologyWords button strong {
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+
+.morphologyWords button small,
+.morphologyHits button small {
+  color: var(--color-text-muted);
+}
+
+.morphologyHits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.5rem;
+  max-height: 29rem;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.morphologyPager {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.morphologyPager button {
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  padding: 0.55rem;
+  cursor: pointer;
+}
+
+.morphologyPager button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.morphologyNote {
+  padding: 0 1.3rem;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.81rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 55rem) {
+  .morphologyColumns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 35rem) {
+  .morphologyColumns {
+    padding: 0 0.7rem;
+  }
+  .morphologySection {
+    padding: 0.7rem;
+  }
+  .morphologyWords {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
