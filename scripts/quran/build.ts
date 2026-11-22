@@ -1,6 +1,11 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import {
+  createCuratedRelationshipEvidence,
+  QuranRelationshipEvidenceIndex,
+} from '../../src/core/quran/relationship-evidence.ts';
+import { QuranRelationshipIndex } from '../../src/core/quran/relationship-index.ts';
 import { importMutashabihat, importQuranText } from './datasets.ts';
 import { verifyPinnedQuranSource } from './pinned-source.ts';
 
@@ -46,6 +51,11 @@ function readPinned(id: string): string {
 
 const text = importQuranText(readPinned('tanzil-uthmani'), readPinned('pickthall'));
 const links = importMutashabihat(readPinned('mutashabihat'));
+const curatedPin = pins.find((pin) => pin.id === 'mutashabihat');
+if (!curatedPin) throw new Error('Missing pinned curated relationship source.');
+const relationshipIndex = new QuranRelationshipIndex(links);
+const evidence = createCuratedRelationshipEvidence(relationshipIndex, curatedPin);
+new QuranRelationshipEvidenceIndex(evidence, relationshipIndex, curatedPin);
 const destinations = ['data/quran/generated', 'public/quran-only/data/quran'];
 for (const destination of destinations) mkdirSync(destination, { recursive: true });
 
@@ -84,6 +94,7 @@ const tanzilNotice = [
 writeDataset('text.json', { ...text, tanzilNotice });
 
 writeDataset('relationships.json', links);
+writeDataset('evidence.json', evidence);
 writeDataset('manifest.json', {
   format: 'quran-foundation-manifest',
   schemaVersion: 1,
