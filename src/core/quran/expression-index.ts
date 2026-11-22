@@ -1,3 +1,4 @@
+import { elementAt } from '../lib/array.ts';
 import { tokenizeQuranArabic } from './arabic-tokens.ts';
 
 export const EXACT_EXPRESSION_MIN_WORDS = 3;
@@ -41,11 +42,10 @@ function sameLocations(
   offset: number,
 ): boolean {
   if (shorter.length !== longer.length) return false;
-  return shorter.every(
-    (occurrence, position) =>
-      occurrence.ayah === longer[position]?.ayah &&
-      occurrence.start === (longer[position]?.start ?? -1) + offset,
-  );
+  return shorter.every((occurrence, position) => {
+    const parent = elementAt(longer, position);
+    return occurrence.ayah === parent.ayah && occurrence.start === parent.start + offset;
+  });
 }
 
 function sequenceKey(words: readonly string[]): string {
@@ -93,8 +93,7 @@ export function detectExactArabicExpressions(ayahs: readonly string[]): ExactExp
         const shortKey = sequenceKey(longer.words.slice(offset, offset + length));
         const shorter = repeated.get(shortKey);
         if (
-          shorter &&
-          shorter.occurrences.length === longer.occurrences.length &&
+          shorter?.occurrences.length === longer.occurrences.length &&
           sameLocations(shorter.occurrences, longer.occurrences, offset)
         ) {
           redundant.add(shortKey);
