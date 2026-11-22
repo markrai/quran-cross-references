@@ -93,32 +93,38 @@ describe('QuranRelationshipIndex', () => {
     );
     expect(() => new QuranRelationshipIndex({ ...DATA, links: null })).toThrow('links');
     expect(() => new QuranRelationshipIndex({ ...DATA, links: [null] })).toThrow('links[0]');
-    expect(() =>
-      new QuranRelationshipIndex({
-        ...DATA,
-        links: [{ source: { start: 0, end: 6236 }, target: { start: 0, end: 0 }, contextAfter: 0 }],
-      }),
+    expect(
+      () =>
+        new QuranRelationshipIndex({
+          ...DATA,
+          links: [
+            { source: { start: 0, end: 6236 }, target: { start: 0, end: 0 }, contextAfter: 0 },
+          ],
+        }),
     ).toThrow('canonical ayah boundaries');
-    expect(() =>
-      new QuranRelationshipIndex({
-        ...DATA,
-        links: [{ source: { start: 3, end: 2 }, target: { start: 0, end: 0 }, contextAfter: 0 }],
-      }),
+    expect(
+      () =>
+        new QuranRelationshipIndex({
+          ...DATA,
+          links: [{ source: { start: 3, end: 2 }, target: { start: 0, end: 0 }, contextAfter: 0 }],
+        }),
     ).toThrow('canonical ayah boundaries');
-    expect(() =>
-      new QuranRelationshipIndex({
-        ...DATA,
-        links: [{ source: { start: -1, end: 0 }, target: { start: 0, end: 0 }, contextAfter: 0 }],
-      }),
+    expect(
+      () =>
+        new QuranRelationshipIndex({
+          ...DATA,
+          links: [{ source: { start: -1, end: 0 }, target: { start: 0, end: 0 }, contextAfter: 0 }],
+        }),
     ).toThrow('nonnegative integer');
-    expect(() =>
-      new QuranRelationshipIndex({
-        ...DATA,
-        links: [{ source: { start: 0, end: 0 }, target: { start: 0, end: 0 }, contextAfter: -1 }],
-      }),
+    expect(
+      () =>
+        new QuranRelationshipIndex({
+          ...DATA,
+          links: [{ source: { start: 0, end: 0 }, target: { start: 0, end: 0 }, contextAfter: -1 }],
+        }),
     ).toThrow('contextAfter');
-    expect(() =>
-      new QuranRelationshipIndex({ ...DATA, links: [...DATA.links, DATA.links[0]] }),
+    expect(
+      () => new QuranRelationshipIndex({ ...DATA, links: [...DATA.links, DATA.links[0]] }),
     ).toThrow('duplicates');
   });
 
@@ -149,18 +155,16 @@ describe('Quran-specific filtering and rendering adapters', () => {
 
   it('filters by either endpoint, including ranges that cross surah boundaries', () => {
     const index = makeIndex();
-    expect([
-      ...selectQuranRelationshipIds(index, { scope: 'all', surahs: new Set([2]) }),
-    ]).toEqual([0, 2, 3, 4]);
-    expect([
-      ...selectQuranRelationshipIds(index, { scope: 'all', surahs: new Set([3]) }),
-    ]).toEqual([4]);
+    expect([...selectQuranRelationshipIds(index, { scope: 'all', surahs: new Set([2]) })]).toEqual([
+      0, 2, 3, 4,
+    ]);
+    expect([...selectQuranRelationshipIds(index, { scope: 'all', surahs: new Set([3]) })]).toEqual([
+      4,
+    ]);
     expect([
       ...selectQuranRelationshipIds(index, { scope: 'cross-surah', surahs: new Set([1]) }),
     ]).toEqual([0, 3, 4]);
-    expect([...selectQuranRelationshipIds(index, { scope: 'all', surahs: new Set() })]).toEqual(
-      [],
-    );
+    expect([...selectQuranRelationshipIds(index, { scope: 'all', surahs: new Set() })]).toEqual([]);
   });
 
   it('produces deterministic midpoint arc coordinates without vote-based weights', () => {
@@ -194,10 +198,14 @@ describe('Quran-specific filtering and rendering adapters', () => {
       here: { start: 1, end: 2 },
       other: { start: 8, end: 8 },
     });
-    const filtered = collectQuranConnections(index, { start: 1, end: 2 }, {
-      scope: 'same-surah',
-      surahs: null,
-    });
+    const filtered = collectQuranConnections(
+      index,
+      { start: 1, end: 2 },
+      {
+        scope: 'same-surah',
+        surahs: null,
+      },
+    );
     expect(ids(filtered.outgoing.map(({ link }) => link))).toEqual([1]);
     expect(ids(filtered.incoming.map(({ link }) => link))).toEqual([1]);
   });

@@ -43,9 +43,7 @@ describe('Quran graph viewport', () => {
   });
 
   it('handles nonfinite viewport or invalid zoom factors conservatively', () => {
-    expect(constrainGraphViewport({ x: NaN, width: Infinity })).toEqual(
-      DEFAULT_GRAPH_VIEWPORT,
-    );
+    expect(constrainGraphViewport({ x: NaN, width: Infinity })).toEqual(DEFAULT_GRAPH_VIEWPORT);
     expect(zoomGraphViewport(DEFAULT_GRAPH_VIEWPORT, -2)).toEqual(DEFAULT_GRAPH_VIEWPORT);
     expect(zoomGraphViewport(DEFAULT_GRAPH_VIEWPORT, Infinity)).toEqual(DEFAULT_GRAPH_VIEWPORT);
   });

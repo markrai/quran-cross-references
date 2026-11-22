@@ -35,8 +35,9 @@ describe('Quran reader dataset loading', () => {
     expect(() => parseQuranText({ ...text, schemaVersion: 2 })).toThrow('incompatible');
     expect(() => parseQuranText({ ...text, versification: 'other' })).toThrow('incompatible');
     expect(() => parseQuranText({ ...text, arabic: arabic.slice(1) })).toThrow('6,236');
-    expect(() => parseQuranText({ ...text, english: [...english.slice(0, 6235), ''] }))
-      .toThrow('6,236');
+    expect(() => parseQuranText({ ...text, english: [...english.slice(0, 6235), ''] })).toThrow(
+      '6,236',
+    );
     expect(() => parseQuranText({ ...text, english: 'invalid' })).toThrow('6,236');
   });
 

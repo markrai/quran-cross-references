@@ -57,7 +57,9 @@ function parseText(source: string, label: string): readonly string[] {
       throw new Error(`${label} line ${String(lineIndex + 1)}: invalid ayah.`);
     }
     if (seen[index] !== 0) {
-      throw new Error(`${label} line ${String(lineIndex + 1)}: duplicate ${String(surah)}:${String(ayah)}.`);
+      throw new Error(
+        `${label} line ${String(lineIndex + 1)}: duplicate ${String(surah)}:${String(ayah)}.`,
+      );
     }
     seen[index] = 1;
     texts[index] = value;
@@ -81,13 +83,12 @@ export function importQuranText(arabicText: string, englishText: string): Paired
   };
 }
 
-function parseRange(
-  value: unknown,
-  where: string,
-  repeated: () => void,
-): AyahRange {
+function parseRange(value: unknown, where: string, repeated: () => void): AyahRange {
   const values: unknown[] = typeof value === 'number' ? [value] : Array.isArray(value) ? value : [];
-  if (values.length === 0 || !values.every((member) => typeof member === 'number' && Number.isInteger(member))) {
+  if (
+    values.length === 0 ||
+    !values.every((member) => typeof member === 'number' && Number.isInteger(member))
+  ) {
     throw new Error(`${where}: ayah must be an integer or a nonempty integer array.`);
   }
   const indices: number[] = [];
@@ -119,9 +120,7 @@ export function importMutashabihat(json: string): SimilarPassagesData {
     repeatedRangeMemberCount += 1;
   };
 
-  for (const [group, values] of Object.entries(groups).sort(
-    ([a], [b]) => Number(a) - Number(b),
-  )) {
+  for (const [group, values] of Object.entries(groups).sort(([a], [b]) => Number(a) - Number(b))) {
     if (!/^\d+$/.test(group) || !Array.isArray(values)) {
       throw new Error(`Mutashabihat group ${group}: invalid group.`);
     }
@@ -129,7 +128,11 @@ export function importMutashabihat(json: string): SimilarPassagesData {
       sourceRowCount += 1;
       const where = `Mutashabihat group ${group}, row ${String(offset + 1)}`;
       const row = object(value, where);
-      const source = parseRange(object(row['src'], `${where}.src`)['ayah'], `${where}.src`, repeated);
+      const source = parseRange(
+        object(row['src'], `${where}.src`)['ayah'],
+        `${where}.src`,
+        repeated,
+      );
       const matches = row['muts'];
       if (!Array.isArray(matches) || matches.length === 0) {
         throw new Error(`${where}.muts: expected a nonempty array.`);

@@ -59,14 +59,15 @@ self.addEventListener('fetch', (event) => {
 
 export function pwaCacheFiles(files: readonly string[]): string[] {
   return files
-    .filter((file) =>
-      file === 'index.html' ||
-      file === 'quran/index.html' ||
-      file === 'manifest.webmanifest' ||
-      file.startsWith('assets/') ||
-      file.startsWith('data/quran/') ||
-      file.startsWith('icons/') ||
-      file === 'social-preview.png',
+    .filter(
+      (file) =>
+        file === 'index.html' ||
+        file === 'quran/index.html' ||
+        file === 'manifest.webmanifest' ||
+        file.startsWith('assets/') ||
+        file.startsWith('data/quran/') ||
+        file.startsWith('icons/') ||
+        file === 'social-preview.png',
     )
     .sort();
 }

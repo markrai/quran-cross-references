@@ -42,16 +42,8 @@ export function buildQuranGraphPaths(
     const distance = Math.abs(x2 - x1);
     const peak = Math.min(325, Math.max(30, Math.sqrt(distance) * 14));
     const link = index.link(id);
-    const sourceLabel = formatIndexRange(
-      index.versification,
-      link.source.start,
-      link.source.end,
-    );
-    const targetLabel = formatIndexRange(
-      index.versification,
-      link.target.start,
-      link.target.end,
-    );
+    const sourceLabel = formatIndexRange(index.versification, link.source.start, link.source.end);
+    const targetLabel = formatIndexRange(index.versification, link.target.start, link.target.end);
     return {
       id,
       source: link.source,

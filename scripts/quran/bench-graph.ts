@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
-import { buildQuranArcGeometry, selectQuranRelationshipIds } from '../../src/core/quran/graph-adapters.ts';
+import {
+  buildQuranArcGeometry,
+  selectQuranRelationshipIds,
+} from '../../src/core/quran/graph-adapters.ts';
 import { QuranRelationshipIndex } from '../../src/core/quran/relationship-index.ts';
 import { buildQuranGraphPaths } from '../../src/quran/graph-layout.ts';
 import { importMutashabihat } from './datasets.ts';
@@ -35,7 +38,9 @@ for (const scenario of scenarios) {
   }
   console.log(
     `${scenario.label}: ${String(ids.length)} arcs, ${String(ids.length * 3)} SVG nodes minimum, ` +
-    `layout median ${percentile(samples, 0.5).toFixed(2)} ms, p95 ${percentile(samples, 0.95).toFixed(2)} ms`,
+      `layout median ${percentile(samples, 0.5).toFixed(2)} ms, p95 ${percentile(samples, 0.95).toFixed(2)} ms`,
   );
 }
-console.log('CPU geometry benchmark only. Use browser profiling for SVG paint and interaction latency.');
+console.log(
+  'CPU geometry benchmark only. Use browser profiling for SVG paint and interaction latency.',
+);

@@ -32,15 +32,21 @@ export function formatPassage(passage: Passage, versification: QuranVersificatio
     : `Surah ${String(passage.surah)}`;
 }
 
-export function passageFromReference(reference: { readonly surah: number; readonly ayah: number }, versification: QuranVersification): Passage {
+export function passageFromReference(
+  reference: { readonly surah: number; readonly ayah: number },
+  versification: QuranVersification,
+): Passage {
   const index = versification.indexOf(reference);
-  if (index === undefined) throw new RangeError(`No such ayah: ${String(reference.surah)}:${String(reference.ayah)}`);
+  if (index === undefined)
+    throw new RangeError(`No such ayah: ${String(reference.surah)}:${String(reference.ayah)}`);
   return ayahPassage(index);
 }
 
 /** Stable deep-link ID (`2:255` for an ayah, `2` for a surah). */
 export function toPassageId(passage: Passage, versification: QuranVersification): string {
-  return passage.kind === 'ayah' ? formatAyahId(versification.refAt(passage.ayah)) : String(passage.surah);
+  return passage.kind === 'ayah'
+    ? formatAyahId(versification.refAt(passage.ayah))
+    : String(passage.surah);
 }
 
 export function parsePassageId(id: string, versification: QuranVersification): Passage | undefined {

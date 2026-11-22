@@ -33,7 +33,9 @@ export class QuranVersification {
     this.#starts[SURAHS.length] = total;
     this.ayahCount = total;
     if (SURAHS.length !== 114 || total !== 6236) {
-      throw new RangeError(`Invalid Quran boundaries: ${String(SURAHS.length)} surahs, ${String(total)} ayahs.`);
+      throw new RangeError(
+        `Invalid Quran boundaries: ${String(SURAHS.length)} surahs, ${String(total)} ayahs.`,
+      );
     }
 
     this.#indexSurahs = new Uint8Array(total);
@@ -83,4 +85,3 @@ export class QuranVersification {
 
 export const QURAN_VERSIFICATION = new QuranVersification();
 export const CANONICAL_QURAN = QURAN_VERSIFICATION;
-

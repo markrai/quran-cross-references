@@ -29,11 +29,7 @@ describe('pinned Quran source verification', () => {
 
   it('rejects unrecognized line ending or expected-checksum changes', () => {
     const carriageReturn = Buffer.from(canonical.toString('utf8').replaceAll('\n', '\r'), 'utf8');
-    expect(() => verifyPinnedQuranSource(carriageReturn, expected, 'fixture')).toThrow(
-      /checksum/,
-    );
-    expect(() => verifyPinnedQuranSource(canonical, '0'.repeat(64), 'fixture')).toThrow(
-      /checksum/,
-    );
+    expect(() => verifyPinnedQuranSource(carriageReturn, expected, 'fixture')).toThrow(/checksum/);
+    expect(() => verifyPinnedQuranSource(canonical, '0'.repeat(64), 'fixture')).toThrow(/checksum/);
   });
 });

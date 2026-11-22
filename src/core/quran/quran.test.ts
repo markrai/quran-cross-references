@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { formatAyahId, parseAyahId } from './ayah-ref.ts';
-import { surahPassageOf, ayahPassage, parsePassageId, passageRange, toPassageId } from './passage.ts';
+import {
+  surahPassageOf,
+  ayahPassage,
+  parsePassageId,
+  passageRange,
+  toPassageId,
+} from './passage.ts';
 import { QURAN_VERSIFICATION } from './quran-versification.ts';
 import { formatReference, parseReference } from './reference.ts';
 import { SURAHS, getSurah, isSurahNumber } from './surahs.ts';

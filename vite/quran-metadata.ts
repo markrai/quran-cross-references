@@ -33,7 +33,10 @@ export function quranMetadata(): Plugin {
         { tag: 'meta', attrs: { property: 'og:image', content: image } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
-        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Quran Cross-References passage explorer' } },
+        {
+          tag: 'meta',
+          attrs: { property: 'og:image:alt', content: 'Quran Cross-References passage explorer' },
+        },
         { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
         { tag: 'meta', attrs: { name: 'twitter:title', content: TITLE } },
         { tag: 'meta', attrs: { name: 'twitter:description', content: DESCRIPTION } },

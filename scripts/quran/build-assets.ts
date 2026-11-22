@@ -100,7 +100,14 @@ function emblem(image: Canvas, x: number, y: number, radius: number): void {
     const angle = (step * Math.PI) / 180;
     image.dot(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius, radius * 0.045, AQUA);
   }
-  image.line(x + radius * 0.25, y + radius * 0.3, x + radius * 0.9, y + radius * 0.93, radius * 0.065, GOLD);
+  image.line(
+    x + radius * 0.25,
+    y + radius * 0.3,
+    x + radius * 0.9,
+    y + radius * 0.93,
+    radius * 0.065,
+    GOLD,
+  );
   const arc = (rise: number, span: number, color: RGB): void => {
     let previous: [number, number] | null = null;
     for (let step = 0; step <= 70; step += 1) {
@@ -121,7 +128,7 @@ function checksum(buffer: Buffer): number {
   for (const byte of buffer) {
     crc ^= byte;
     for (let bit = 0; bit < 8; bit += 1) {
-      crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
     }
   }
   return (crc ^ 0xffffffff) >>> 0;
@@ -177,7 +184,8 @@ const manifest = {
   id: './',
   name: 'Quran Cross-References',
   short_name: 'Quran Links',
-  description: 'Explore Quranic passage relationships with Arabic, Pickthall English, arcs and threads.',
+  description:
+    'Explore Quranic passage relationships with Arabic, Pickthall English, arcs and threads.',
   start_url: './',
   scope: './',
   display: 'standalone',
@@ -188,7 +196,12 @@ const manifest = {
   icons: [
     { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
     { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-    { src: 'icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+    {
+      src: 'icons/icon-maskable-512.png',
+      sizes: '512x512',
+      type: 'image/png',
+      purpose: 'maskable',
+    },
   ],
 };
 writeFileSync(resolve(root, 'manifest.webmanifest'), JSON.stringify(manifest, null, 2) + '\n');

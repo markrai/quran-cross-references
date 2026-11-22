@@ -43,15 +43,14 @@ export function parseQuranText(value: unknown): QuranText {
 
 async function fetchJson(path: string, signal?: AbortSignal): Promise<unknown> {
   const response = await fetch(import.meta.env.BASE_URL + path, signal ? { signal } : undefined);
-  if (!response.ok) throw new Error('Unable to load ' + path + ' (HTTP ' + String(response.status) + ').');
+  if (!response.ok)
+    throw new Error('Unable to load ' + path + ' (HTTP ' + String(response.status) + ').');
   const value: unknown = await response.json();
   return value;
 }
 
 export async function loadQuranReaderData(signal?: AbortSignal): Promise<QuranReaderData> {
-  const [text, links] = await Promise.all(
-    QURAN_DATA_FILES.map((path) => fetchJson(path, signal)),
-  );
+  const [text, links] = await Promise.all(QURAN_DATA_FILES.map((path) => fetchJson(path, signal)));
   return {
     text: parseQuranText(text),
     relationships: new QuranRelationshipIndex(links),

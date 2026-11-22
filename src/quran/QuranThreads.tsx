@@ -43,7 +43,12 @@ export function QuranThreads({ data, reference, scope, direction, onNavigate }: 
     <section className={styles.threadsLayout} aria-label="Quran text and relationship threads">
       <div className={styles.reader}>
         <div className={styles.panelHeading}>
-          <h2>{surah.name} <span lang="ar" dir="rtl">{surah.arabicName}</span></h2>
+          <h2>
+            {surah.name}{' '}
+            <span lang="ar" dir="rtl">
+              {surah.arabicName}
+            </span>
+          </h2>
           <p>{surah.ayahCount} ayahs · Select any ayah to explore its connections</p>
         </div>
         <ol className={styles.ayahList} start={1}>
@@ -61,9 +66,15 @@ export function QuranThreads({ data, reference, scope, direction, onNavigate }: 
                     onNavigate({ surah: reference.surah, ayah });
                   }}
                 >
-                  <span className={styles.ayahNumber}>{reference.surah}:{ayah}</span>
-                  <span lang="ar" dir="rtl" className={styles.arabic}>{text.arabic[position]}</span>
-                  <span lang="en" dir="ltr" className={styles.english}>{text.english[position]}</span>
+                  <span className={styles.ayahNumber}>
+                    {reference.surah}:{ayah}
+                  </span>
+                  <span lang="ar" dir="rtl" className={styles.arabic}>
+                    {text.arabic[position]}
+                  </span>
+                  <span lang="en" dir="ltr" className={styles.english}>
+                    {text.english[position]}
+                  </span>
                 </button>
               </li>
             );
@@ -72,14 +83,26 @@ export function QuranThreads({ data, reference, scope, direction, onNavigate }: 
       </div>
       <aside className={styles.threadPanel} aria-label="Selected ayah relationships">
         <div className={styles.panelHeading}>
-          <h2>Threads from {reference.surah}:{reference.ayah}</h2>
-          <p>{visible.length} curated connections · {direction === 'both' ? 'Both directions' : direction}</p>
+          <h2>
+            Threads from {reference.surah}:{reference.ayah}
+          </h2>
+          <p>
+            {visible.length} curated connections ·{' '}
+            {direction === 'both' ? 'Both directions' : direction}
+          </p>
         </div>
         {visible.length === 0 ? (
-          <p className={styles.empty}>No relationships in this dataset match your current filters.</p>
+          <p className={styles.empty}>
+            No relationships in this dataset match your current filters.
+          </p>
         ) : (
           <>
-            <svg viewBox="0 0 320 250" className={styles.threadMap} aria-label="Positions of related passages in the Quran" role="img">
+            <svg
+              viewBox="0 0 320 250"
+              className={styles.threadMap}
+              aria-label="Positions of related passages in the Quran"
+              role="img"
+            >
               <line x1="24" y1="10" x2="24" y2="240" className={styles.axis} />
               <line x1="296" y1="10" x2="296" y2="240" className={styles.axis} />
               {markers.map((connection) => {
@@ -98,16 +121,22 @@ export function QuranThreads({ data, reference, scope, direction, onNavigate }: 
                 );
               })}
               <circle cx="24" cy="125" r="5" fill="#f2e5cb" />
-              <text x="24" y="247" textAnchor="middle" className={styles.threadMapLabel}>Here</text>
+              <text x="24" y="247" textAnchor="middle" className={styles.threadMapLabel}>
+                Here
+              </text>
             </svg>
             <ol className={styles.connectionList}>
               {visible.map((connection) => {
                 const otherRef = index.versification.refAt(connection.other.start);
                 return (
                   <li key={connection.direction + String(connection.link.id)}>
-                    <button type="button" className={styles.connectionButton} onClick={() => {
+                    <button
+                      type="button"
+                      className={styles.connectionButton}
+                      onClick={() => {
                         onNavigate(otherRef);
-                      }}>
+                      }}
+                    >
                       <span className={styles.connectionHeading}>
                         <span>{connection.direction === 'outgoing' ? 'Outgoing' : 'Incoming'}</span>
                         <strong>{connectionLabel(connection, data)}</strong>
