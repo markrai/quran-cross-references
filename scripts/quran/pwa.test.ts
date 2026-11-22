@@ -11,6 +11,7 @@ describe('Quran offline release shell', () => {
       'data/quran/text.json',
       'data/quran/relationships.json',
       'data/quran/evidence.json',
+      'data/quran/analytics.json',
       'data/quran/manifest.json',
       'data/quran/expressions.json',
       'manifest.webmanifest',
@@ -24,6 +25,7 @@ describe('Quran offline release shell', () => {
     ];
     expect(pwaCacheFiles(files)).toEqual([
       'assets/index-abc.js',
+      'data/quran/analytics.json',
       'data/quran/evidence.json',
       'data/quran/manifest.json',
       'data/quran/relationships.json',
@@ -112,6 +114,7 @@ describe('Quran offline release shell', () => {
           'data/quran/text.json',
           'data/quran/relationships.json',
           'data/quran/evidence.json',
+          'data/quran/analytics.json',
         ],
         'revision-1',
       ),
@@ -153,6 +156,9 @@ describe('Quran offline release shell', () => {
     });
     expect(await offlineFetch('data/quran/evidence.json', 'cors')).toEqual({
       path: '/quran-cross-references/data/quran/evidence.json',
+    });
+    expect(await offlineFetch('data/quran/analytics.json', 'cors')).toEqual({
+      path: '/quran-cross-references/data/quran/analytics.json',
     });
     expect(await offlineFetch('data/quran/text.json', 'cors')).toEqual({
       path: '/quran-cross-references/data/quran/text.json',

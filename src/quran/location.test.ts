@@ -31,6 +31,17 @@ describe('Quran-first canonical route', () => {
     expect(parseQuranLocation(invalid).reference).toEqual(DEFAULT_QURAN_LOCATION.reference);
   });
 
+  it('round-trips analytics URLs while preserving their selected ayah', () => {
+    const location = {
+      ...DEFAULT_QURAN_LOCATION,
+      view: 'analytics' as const,
+      reference: { surah: 55, ayah: 13 },
+    };
+    const href = quranLocationUrl(location, '/site/');
+    expect(href).toBe('/site/?ref=55%3A13&view=analytics');
+    expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(location);
+  });
+
   it('rejects unknown filter and direction values rather than putting them into the UI', () => {
     const url = new URL('https://example.test/?view=no&scope=no&direction=no');
     expect(parseQuranLocation(url)).toEqual(DEFAULT_QURAN_LOCATION);

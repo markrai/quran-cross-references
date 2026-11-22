@@ -884,3 +884,285 @@
     grid-template-columns: 1fr;
   }
 }
+
+.analyticsDashboard {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.analyticsIntro {
+  padding: clamp(1rem, 2.5vw, 1.7rem);
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  background: var(--color-surface);
+}
+
+.analyticsIntro h1 {
+  margin: 0;
+  font: 500 clamp(1.4rem, 2.8vw, 2rem) / 1.2 var(--font-serif);
+}
+
+.analyticsIntro > div > p:last-child {
+  margin-bottom: 0;
+  max-width: 58rem;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+
+.analyticsKpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.analyticsKpi {
+  display: grid;
+  align-content: center;
+  gap: 0.4rem;
+  min-height: 7.4rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.8rem;
+  background: var(--color-surface);
+}
+
+.analyticsKpi strong {
+  font-size: clamp(1.3rem, 2.4vw, 1.95rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent);
+}
+
+.analyticsKpi span {
+  font-size: 0.81rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.analyticsColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 1.15rem;
+  align-items: start;
+}
+
+.analyticsPanel {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  background: var(--color-surface);
+}
+
+.analyticsSidePanels {
+  display: grid;
+  gap: 1.15rem;
+  min-width: 0;
+}
+
+.analyticsControls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  padding: 1rem 1.2rem 0.4rem;
+}
+
+.analyticsControls .field select,
+.analyticsControls .field input {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+.analyticsHint {
+  margin: 0;
+  padding: 0.6rem 1.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.analyticsBars {
+  max-height: 35rem;
+  overflow-y: auto;
+  padding: 0.35rem 0.8rem 1rem;
+  scrollbar-gutter: stable;
+}
+
+.analyticsBarButton {
+  display: grid;
+  grid-template-columns: minmax(7.4rem, 11rem) minmax(0, 1fr) 3.65rem;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.45rem;
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.analyticsBarButton:hover,
+.analyticsBarButton[data-selected='true'] {
+  background: var(--color-accent-soft);
+  border-color: var(--color-border);
+}
+
+.analyticsBarName {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.82rem;
+}
+
+.analyticsBarTrack {
+  display: block;
+  height: 0.9rem;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: var(--color-surface-muted);
+}
+
+.analyticsCuratedFill,
+.analyticsExactFill {
+  display: block;
+  min-height: 100%;
+  border-radius: inherit;
+}
+
+.analyticsCuratedFill {
+  background: #59ad9d;
+}
+
+.analyticsExactFill {
+  background: #c59a60;
+}
+
+.analyticsBarValue {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+}
+
+.analyticsBreakdown {
+  display: grid;
+  gap: 1rem;
+  padding: 1.1rem 1.3rem;
+}
+
+.analyticsBreakdown h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.analyticsBreakdown p {
+  margin: 0.45rem 0 0;
+  font-size: 0.81rem;
+  color: var(--color-text-muted);
+}
+
+.analyticsStack {
+  display: flex;
+  width: 100%;
+  height: 1rem;
+  border-radius: 0.3rem;
+  overflow: hidden;
+  background: var(--color-surface-muted);
+}
+
+.analyticsStack span:first-child {
+  background: #59ad9d;
+}
+
+.analyticsStack span:last-child {
+  background: #c59a60;
+}
+
+.analyticsPhraseList {
+  margin: 0;
+  padding: 0;
+  max-height: 36rem;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-gutter: stable;
+}
+
+.analyticsPhraseList li {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.analyticsPhraseList button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 60px;
+  padding: 0.75rem 1.15rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.analyticsPhraseList button:hover {
+  background: var(--color-accent-soft);
+}
+
+.analyticsPhraseRank {
+  min-width: 2rem;
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+}
+
+.analyticsPhraseDetail {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.analyticsPhraseDetail .expressionArabic {
+  font-size: 1.25rem;
+}
+
+.analyticsPhraseDetail small {
+  color: var(--color-text-muted);
+  font-size: 0.77rem;
+}
+
+.analyticsFootnote {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.81rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 68rem) {
+  .analyticsColumns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 44rem) {
+  .analyticsKpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .analyticsBarButton {
+    grid-template-columns: minmax(6rem, 8rem) minmax(0, 1fr) 3.1rem;
+    gap: 0.45rem;
+  }
+
+  .analyticsControls {
+    grid-template-columns: 1fr 1fr;
+    padding-inline: 0.8rem;
+  }
+
+  .analyticsBarName {
+    font-size: 0.75rem;
+  }
+}

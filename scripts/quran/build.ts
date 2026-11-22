@@ -11,6 +11,7 @@ import {
   validateExactExpressionEvidence,
 } from './expression-evidence.ts';
 import { importMutashabihat, importQuranText } from './datasets.ts';
+import { buildQuranAnalytics } from './analytics.ts';
 import { verifyPinnedQuranSource } from './pinned-source.ts';
 
 interface SourcePin {
@@ -104,6 +105,13 @@ if (!arabicPin) throw new Error('Missing pinned Arabic source.');
 const expressions = createExactExpressionEvidence(text.arabic, arabicPin);
 validateExactExpressionEvidence(expressions, text.arabic, arabicPin);
 writeDataset('expressions.json', { ...expressions, tanzilNotice });
+const analytics = buildQuranAnalytics(
+  relationshipIndex,
+  expressions,
+  { arabic: arabicPin.sha256, curated: curatedPin.sha256 },
+  tanzilNotice,
+);
+writeDataset('analytics.json', analytics);
 writeDataset('manifest.json', {
   format: 'quran-foundation-manifest',
   schemaVersion: 1,

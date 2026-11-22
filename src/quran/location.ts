@@ -2,7 +2,7 @@ import { formatAyahId, type AyahRef } from '../core/quran/ayah-ref.ts';
 import { parseReference } from '../core/quran/reference.ts';
 import type { QuranRelationshipScope } from '../core/quran/relationship-filter.ts';
 
-export type QuranView = 'arcs' | 'threads';
+export type QuranView = 'arcs' | 'threads' | 'analytics';
 export type QuranDirection = 'outgoing' | 'incoming' | 'both';
 export type QuranEvidenceMode = 'curated' | 'exact';
 
@@ -61,7 +61,7 @@ export function parseQuranLocation(url: URL): QuranLocation {
       evidence === 'exact' && expression !== null && /^exact:v1:[a-f0-9]{64}$/.test(expression)
         ? expression
         : null,
-    view: view === 'threads' ? 'threads' : 'arcs',
+    view: view === 'threads' || view === 'analytics' ? view : 'arcs',
     direction: direction === 'incoming' || direction === 'outgoing' ? direction : 'both',
     scope: scope === 'same-surah' || scope === 'cross-surah' ? scope : 'all',
   };
