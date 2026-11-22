@@ -253,25 +253,25 @@ export function QuranApp() {
             {location.view !== 'analytics' && (
               <label className={styles.field}>
                 <span>Evidence type</span>
-              <select
-                aria-label="Evidence type"
-                value={location.evidence}
-                onChange={(event) => {
-                  const evidence = event.target.value;
-                  if (evidence === 'curated' || evidence === 'exact') {
-                    setExpressionState({ status: 'idle' });
-                    navigate({
-                      ...location,
-                      evidence,
-                      selectedLink: null,
-                      selectedExpression: null,
-                    });
-                  }
-                }}
-              >
-                <option value="curated">Curated similar passages</option>
-                <option value="exact">Computed exact Arabic phrases</option>
-              </select>
+                <select
+                  aria-label="Evidence type"
+                  value={location.evidence}
+                  onChange={(event) => {
+                    const evidence = event.target.value;
+                    if (evidence === 'curated' || evidence === 'exact') {
+                      setExpressionState({ status: 'idle' });
+                      navigate({
+                        ...location,
+                        evidence,
+                        selectedLink: null,
+                        selectedExpression: null,
+                      });
+                    }
+                  }}
+                >
+                  <option value="curated">Curated similar passages</option>
+                  <option value="exact">Computed exact Arabic phrases</option>
+                </select>
               </label>
             )}
             <label className={styles.field}>
