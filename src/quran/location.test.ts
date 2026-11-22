@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  DEFAULT_QURAN_LOCATION,
-  parseQuranLocation,
-  quranLocationUrl,
-} from './location.ts';
+import { DEFAULT_QURAN_LOCATION, parseQuranLocation, quranLocationUrl } from './location.ts';
 
 describe('Quran-first canonical route', () => {
   it('defaults to a valid Quran passage and does not depend on Bible URLs', () => {

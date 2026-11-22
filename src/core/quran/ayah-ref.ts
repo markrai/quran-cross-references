@@ -20,4 +20,3 @@ export function parseAyahId(id: string): AyahRef | undefined {
   const ayah = Number(match[2]);
   return isSurahNumber(surah) && ayah >= 1 ? { surah, ayah } : undefined;
 }
-

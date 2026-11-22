@@ -38,8 +38,9 @@ describe('Quran-first reader', () => {
     expect(screen.getByLabelText('Selected ayah').querySelector('[lang="ar"]')).not.toBeNull();
     expect(screen.getByLabelText('Selected ayah').querySelector('[dir="ltr"]')).not.toBeNull();
     expect(screen.queryByRole('link', { name: 'Bible Explorer' })).toBeNull();
-    expect(screen.getByRole('link', { name: 'Quran Cross-References' }).getAttribute('href'))
-      .toBe('/?ref=2%3A1');
+    expect(screen.getByRole('link', { name: 'Quran Cross-References' }).getAttribute('href')).toBe(
+      '/?ref=2%3A1',
+    );
     expect(screen.getByText(/2 visible links/)).toBeTruthy();
   });
 
@@ -103,9 +104,11 @@ describe('Quran-first reader', () => {
     expect(window.location.search).toContain('end=2%3A3');
     expect(screen.getByText(/Focused passage: Al-Baqarah 2:1–3/)).toBeTruthy();
 
-    fireEvent.click(screen.getByRole('button', {
-      name: 'Al-Baqarah 2:1 to Al-Baqarah 2:255',
-    }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Al-Baqarah 2:1 to Al-Baqarah 2:255',
+      }),
+    );
     expect(window.location.search).toContain('link=0');
     expect(screen.getByRole('heading', { name: 'Selected relationship' })).toBeTruthy();
 

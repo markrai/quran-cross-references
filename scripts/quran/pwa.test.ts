@@ -76,7 +76,7 @@ describe('Quran offline release shell', () => {
       ) {
         if (!options?.ignoreVary) return Promise.resolve(undefined);
         const url = new URL(request instanceof URL ? request.href : request.url);
-        if (options?.ignoreSearch) url.search = '';
+        if (options.ignoreSearch) url.search = '';
         return Promise.resolve(stored.get(url.href));
       },
     };

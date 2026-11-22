@@ -25,9 +25,7 @@ describe('Quran source imports', () => {
       /missing 1:1/,
     );
     expect(() => importQuranText(arabic, `1|1|a\n${english}`)).toThrow(/duplicate 1:1/);
-    expect(() => importQuranText(arabic, `115|1|invalid\n${english}`)).toThrow(
-      /invalid ayah/,
-    );
+    expect(() => importQuranText(arabic, `115|1|invalid\n${english}`)).toThrow(/invalid ayah/);
     expect(() => importQuranText(arabic, `broken\n${english}`)).toThrow(/malformed row/);
   });
 
@@ -55,9 +53,9 @@ describe('Quran source imports', () => {
     expect(() => importMutashabihat('{"1":[{"src":{"ayah":0},"muts":[{"ayah":1}]}]}')).toThrow(
       /out of range/,
     );
-    expect(() =>
-      importMutashabihat('{"1":[{"src":{"ayah":[1,3]},"muts":[{"ayah":4}]}]}'),
-    ).toThrow(/consecutive/);
+    expect(() => importMutashabihat('{"1":[{"src":{"ayah":[1,3]},"muts":[{"ayah":4}]}]}')).toThrow(
+      /consecutive/,
+    );
     expect(() => importMutashabihat('{"1":[{"src":{"ayah":1},"muts":[]}]}')).toThrow(
       /nonempty array/,
     );
@@ -71,5 +69,17 @@ describe('Quran source imports', () => {
     expect(data.repeatedRangeMemberCount).toBe(1);
     expect(data.links).toHaveLength(1);
     expect(data.links[0]?.source).toEqual({ start: 0, end: 1 });
+  });
+
+  it('rejects noninteger ranges and invalid relationship context values', () => {
+    expect(() => importMutashabihat('{"1":[{"src":{"ayah":[]},"muts":[{"ayah":1}]}]}')).toThrow(
+      /nonempty integer array/,
+    );
+    expect(() => importMutashabihat('{"1":[{"src":{"ayah":1.5},"muts":[{"ayah":2}]}]}')).toThrow(
+      /integer/,
+    );
+    expect(() =>
+      importMutashabihat('{"1":[{"src":{"ayah":1},"muts":[{"ayah":2}],"ctx":-1}]}'),
+    ).toThrow(/nonnegative integer/);
   });
 });

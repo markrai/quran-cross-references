@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { serveQuranBuild } from './serve-quran-build.ts';
 
 test.describe('Quran-first application', () => {
   test('loads a canonical root ayah link without requesting Bible datasets', async ({ page }) => {
@@ -26,8 +27,11 @@ test.describe('Quran-first application', () => {
     await page.getByRole('button', { name: 'Threads & Reader' }).click();
     await expect(page.getByRole('heading', { name: 'Threads from 2:255' })).toBeVisible();
     await expect(page).toHaveURL(/view=threads/);
-    await expect(page.locator('[aria-label="Quran text and relationship threads"] [lang="ar"][dir="rtl"]').first())
-      .toBeVisible();
+    await expect(
+      page
+        .locator('[aria-label="Quran text and relationship threads"] [lang="ar"][dir="rtl"]')
+        .first(),
+    ).toBeVisible();
     await page.getByRole('button', { name: 'Next ayah' }).click();
     await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:256/ })).toBeVisible();
     await page.goBack();
@@ -72,7 +76,9 @@ test.describe('Quran production readiness', () => {
     expect(manifest.start_url).toBe('./');
     expect(manifest.scope).toBe('./');
     for (const size of [192, 512]) {
-      const icon = manifest.icons.find((entry) => entry.sizes === `${String(size)}x${String(size)}` && entry.purpose === 'any');
+      const icon = manifest.icons.find(
+        (entry) => entry.sizes === `${String(size)}x${String(size)}` && entry.purpose === 'any',
+      );
       expect(icon).toBeDefined();
       const response = await request.get(new URL(icon?.src ?? '', manifestResponse.url()).href);
       expect(response.ok()).toBe(true);
@@ -101,55 +107,60 @@ test.describe('Quran production readiness', () => {
     );
   });
 
-  test('loads Arabic, English and related passages after losing network access', async ({
+  test('loads Arabic, English and related passages when origin content is unavailable', async ({
     page,
     context,
   }) => {
-    await page.goto('./?ref=2%3A255');
-    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
-    await page.waitForFunction(async () => {
-      const registration = await navigator.serviceWorker.ready;
-      const controller = navigator.serviceWorker.controller;
-      if (controller?.state !== 'activated' || !controller.scriptURL.endsWith('/sw.js')) {
-        return false;
-      }
-      const names = await caches.keys();
-      const name = names.find((candidate) =>
-        candidate.startsWith('quran-cross-references-shell-'),
-      );
-      if (!name) return false;
-      const cache = await caches.open(name);
-      const required = [
-        '',
-        'index.html',
-        'quran/',
-        'quran/index.html',
-        'data/quran/text.json',
-        'data/quran/relationships.json',
-      ];
-      const responses = await Promise.all(
-        required.map((path) => cache.match(new URL(path, registration.scope))),
-      );
-      return responses.every((response) => response !== undefined);
-    });
-    const failures: string[] = [];
-    page.on('pageerror', (error) => failures.push('Page error: ' + error.message));
-    page.on('requestfailed', (request) => {
-      failures.push('Failed request: ' + request.url() + ' ' + (request.failure()?.errorText ?? ''));
-    });
-    await context.setOffline(true);
+    const site = await serveQuranBuild();
     try {
+      await page.goto(site.url + '?ref=2%3A255');
+      await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
+      await page.waitForFunction(async () => {
+        const registration = await navigator.serviceWorker.ready;
+        const controller = navigator.serviceWorker.controller;
+        if (controller?.state !== 'activated' || !controller.scriptURL.endsWith('/sw.js')) {
+          return false;
+        }
+        const names = await caches.keys();
+        const name = names.find((candidate) =>
+          candidate.startsWith('quran-cross-references-shell-'),
+        );
+        if (!name) return false;
+        const cache = await caches.open(name);
+        const required = [
+          '',
+          'index.html',
+          'quran/',
+          'quran/index.html',
+          'data/quran/text.json',
+          'data/quran/relationships.json',
+        ];
+        const responses = await Promise.all(
+          required.map((path) => cache.match(new URL(path, registration.scope))),
+        );
+        return responses.every((response) => response !== undefined);
+      });
+      const failures: string[] = [];
+      page.on('pageerror', (error) => failures.push('Page error: ' + error.message));
+      page.on('requestfailed', (request) => {
+        failures.push(
+          'Failed request: ' + request.url() + ' ' + (request.failure()?.errorText ?? ''),
+        );
+      });
+      site.setUnavailable();
       const probe = await page.evaluate(async () => {
         const scope = (await navigator.serviceWorker.ready).scope;
         const paths = ['', 'quran/', 'data/quran/text.json', 'data/quran/relationships.json'];
-        return Promise.all(paths.map(async (path) => {
-          try {
-            const response = await fetch(new URL(path, scope));
-            return { path, status: response.status };
-          } catch (error: unknown) {
-            return { path, status: -1, error: String(error) };
-          }
-        }));
+        return Promise.all(
+          paths.map(async (path) => {
+            try {
+              const response = await fetch(new URL(path, scope));
+              return { path, status: response.status };
+            } catch (error: unknown) {
+              return { path, status: -1, error: String(error) };
+            }
+          }),
+        );
       });
       expect(probe).toEqual([
         { path: '', status: 200 },
@@ -164,22 +175,40 @@ test.describe('Quran production readiness', () => {
       } catch (error: unknown) {
         await test.info().attach('offline-reload-diagnostics.json', {
           contentType: 'application/json',
-          body: Buffer.from(JSON.stringify({
-            url: page.url(),
-            body: await page.locator('body').innerText().catch(() => 'unavailable'),
-            failures,
-            probe,
-          }, null, 2)),
+          body: Buffer.from(
+            JSON.stringify(
+              {
+                url: page.url(),
+                body: await page
+                  .locator('body')
+                  .innerText()
+                  .catch(() => 'unavailable'),
+                failures,
+                probe,
+              },
+              null,
+              2,
+            ),
+          ),
         });
         throw error;
       }
       await expect(page.locator('[aria-label="Selected ayah"] [lang="ar"]')).toBeVisible();
       await expect(page.locator('[aria-label="Selected ayah"] [lang="en"]')).toBeVisible();
-      await page.goto('quran/?ref=114%3A6&view=threads');
+      await page.goto(site.url + 'quran/?ref=114%3A6&view=threads');
       await expect(page.getByRole('heading', { name: /An-Nas.*114:6/ })).toBeVisible();
       await expect(page.getByRole('heading', { name: 'Threads from 114:6' })).toBeVisible();
+      if (process.platform !== 'win32') {
+        await context.setOffline(true);
+        try {
+          await page.reload();
+          await expect(page.getByRole('heading', { name: /An-Nas.*114:6/ })).toBeVisible();
+        } finally {
+          await context.setOffline(false);
+        }
+      }
     } finally {
-      await context.setOffline(false);
+      await site.stop();
     }
   });
 
@@ -238,6 +267,7 @@ test.describe('Quran Phase 2A graph exploration', () => {
 
     const handle = page.getByRole('group', { name: 'Drag graph horizontally' });
     await expect(handle).toBeVisible();
+    await handle.scrollIntoViewIfNeeded();
     const box = await handle.boundingBox();
     expect(box).toBeTruthy();
     if (box) {
@@ -317,7 +347,8 @@ test.describe('Quran Phase 2A graph exploration', () => {
     await page.goto('./?ref=2%3A255&link=999999999');
     await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Selected relationship' })).toHaveCount(0);
-    await expect(page.getByRole('group', { name: 'Relationships along the 6,236-ayah Quran' }))
-      .toBeVisible();
+    await expect(
+      page.getByRole('group', { name: 'Relationships along the 6,236-ayah Quran' }),
+    ).toBeVisible();
   });
 });

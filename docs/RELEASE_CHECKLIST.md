@@ -25,38 +25,38 @@ GitHub Actions must be enabled and green before merging or deploying.
 ## Real-device acceptance
 
 - [ ] On Android Chrome, install the Quran app; launch from the home screen
-  without browser chrome, including from the `/quran/` compatibility page.
+      without browser chrome, including from the `/quran/` compatibility page.
 - [ ] On iOS Safari, use Add to Home Screen and verify that the app icon,
-  launch URL, and bilingual reader display correctly.
+      launch URL, and bilingual reader display correctly.
 - [ ] Open the site while online, allow its first full offline download to finish,
-  then disable connectivity. Refresh both `/?ref=2%3A255` and
-  `/quran/?ref=114%3A6&view=threads`; verify both scripts, Quran texts
-  and relationship dataset are available without network access.
+      then disable connectivity. Refresh both `/?ref=2%3A255` and
+      `/quran/?ref=114%3A6&view=threads`; verify both scripts, Quran texts
+      and relationship dataset are available without network access.
 - [ ] Deploy an updated version and verify the previous offline cache is not
-  discarded until the replacement has been downloaded successfully.
+      discarded until the replacement has been downloaded successfully.
 - [ ] Check Arabic shaping, diacritics, RTL direction, English LTR direction,
-  small phones (320–375px), 200% text scaling, portrait/landscape and pinch zoom.
+      small phones (320–375px), 200% text scaling, portrait/landscape and pinch zoom.
 - [ ] Use only a keyboard: focus the Skip to Quran content link, move among
-  tabs, select a surah, search, and activate verse/arc controls with visible focus.
+      tabs, select a surah, search, and activate verse/arc controls with visible focus.
 - [ ] Use VoiceOver and NVDA/TalkBack to check labels, reading order,
-  language changes, heading levels, aria-live states and contrast.
+      language changes, heading levels, aria-live states and contrast.
 - [ ] Confirm the exact ayah URL survives browser history, native sharing
-  and copy-to-clipboard fallback.
+      and copy-to-clipboard fallback.
 - [ ] Verify a link preview in at least one major messaging application.
-  Static hosting provides a site-wide OG image, not dynamic per-ayah card images.
+      Static hosting provides a site-wide OG image, not dynamic per-ayah card images.
 
 ## Source-rights and provenance gate
 
 - [ ] Compare `data/quran/sources.json` against the pinned reviewed snapshots.
-  Confirm the generated `text.json` contains the full Tanzil copyright notice
-  without modifying its Arabic ayah data.
+      Confirm the generated `text.json` contains the full Tanzil copyright notice
+      without modifying its Arabic ayah data.
 - [ ] Confirm the app and the generated dataset preserve a clear link to
-  Tanzil and comply with the terms at https://tanzil.net/docs/Text_License.
+      Tanzil and comply with the terms at https://tanzil.net/docs/Text_License.
 - [ ] Confirm rights for the **specific Tanzil digital transcription** of
-  Pickthall, not merely the 1930 original translation in US public domain.
+      Pickthall, not merely the 1930 original translation in US public domain.
 - [ ] Verify the CC0 license and proper upstream attribution for the
-  Waqar144 Mutashabihat corpus. It represents curated textual similarity,
-  not certified tafsir and not a complete Quran cross-reference index.
+      Waqar144 Mutashabihat corpus. It represents curated textual similarity,
+      not certified tafsir and not a complete Quran cross-reference index.
 - [ ] Ensure original inherited code attribution and MIT notice remain intact.
 
 ## Domain and indexing

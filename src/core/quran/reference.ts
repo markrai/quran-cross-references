@@ -2,7 +2,12 @@ import { formatAyahId, type AyahRef } from './ayah-ref.ts';
 import { CANONICAL_QURAN, type QuranVersification } from './quran-versification.ts';
 import { SURAHS, getSurah } from './surahs.ts';
 
-const normalize = (value: string) => value.toLocaleLowerCase('en').normalize('NFKD').replace(/\p{M}/gu, '').replace(/[^\p{L}\p{N}]/gu, '');
+const normalize = (value: string) =>
+  value
+    .toLocaleLowerCase('en')
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^\p{L}\p{N}]/gu, '');
 
 const NAME_LOOKUP = new Map<string, number>();
 for (const surah of SURAHS) {
@@ -44,16 +49,24 @@ export function parseReference(
         const nameQuery = match[1] ?? '';
         surah = NAME_LOOKUP.get(normalize(nameQuery));
         ayah = Number(match[2]);
-        if (surah === undefined) return { ok: false, error: { kind: 'unknown-surah', query: nameQuery } };
+        if (surah === undefined)
+          return { ok: false, error: { kind: 'unknown-surah', query: nameQuery } };
       }
     }
   }
-  if (surah === undefined || ayah === undefined || !Number.isInteger(surah) || !Number.isInteger(ayah)) {
+  if (
+    surah === undefined ||
+    ayah === undefined ||
+    !Number.isInteger(surah) ||
+    !Number.isInteger(ayah)
+  ) {
     return { ok: false, error: { kind: 'unreadable' } };
   }
   const count = versification.ayahCountOf(surah);
-  if (count === undefined) return { ok: false, error: { kind: 'unknown-surah', query: String(surah) } };
-  if (ayah < 1 || ayah > count) return { ok: false, error: { kind: 'no-such-ayah', surah, ayahs: count } };
+  if (count === undefined)
+    return { ok: false, error: { kind: 'unknown-surah', query: String(surah) } };
+  if (ayah < 1 || ayah > count)
+    return { ok: false, error: { kind: 'no-such-ayah', surah, ayahs: count } };
   return { ok: true, reference: { surah, ayah } };
 }
 

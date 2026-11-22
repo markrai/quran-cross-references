@@ -6,11 +6,7 @@ import { formatIndexRange } from '../core/quran/reference.ts';
 import type { QuranRelationshipScope } from '../core/quran/relationship-filter.ts';
 import type { QuranRelationshipIndex } from '../core/quran/relationship-index.ts';
 import { SURAHS } from '../core/quran/surahs.ts';
-import {
-  arcTouchesRange,
-  arcVisibleInViewport,
-  buildQuranGraphPaths,
-} from './graph-layout.ts';
+import { arcTouchesRange, arcVisibleInViewport, buildQuranGraphPaths } from './graph-layout.ts';
 import {
   centerGraphViewport,
   DEFAULT_GRAPH_VIEWPORT,
@@ -159,27 +155,66 @@ export function QuranArcs({
       <div className={styles.graphIntro}>
         <div>
           <h2>Explore connections across the Quran</h2>
-          <p>Zoom or drag to navigate, select a curve to inspect its passages, or select an ayah on the axis.</p>
+          <p>
+            Zoom or drag to navigate, select a curve to inspect its passages, or select an ayah on
+            the axis.
+          </p>
         </div>
         <strong aria-live="polite">{ids.length.toLocaleString('en')} visible links</strong>
       </div>
       <div className={styles.graphControls} role="group" aria-label="Graph navigation">
-        <button type="button" aria-label="Zoom in graph" disabled={zoom >= MAX_GRAPH_ZOOM} onClick={() => {
-          setViewport((current) => zoomGraphViewport(current, 1.8));
-        }}>+</button>
-        <button type="button" aria-label="Zoom out graph" disabled={zoom <= 1} onClick={() => {
-          setViewport((current) => zoomGraphViewport(current, 1 / 1.8));
-        }}>−</button>
-        <button type="button" aria-label="Pan graph left" disabled={viewport.x <= 0} onClick={() => {
-          setViewport((current) => panGraphViewport(current, -current.width * 0.35));
-        }}>←</button>
-        <button type="button" aria-label="Pan graph right" disabled={viewport.x >= GRAPH_WIDTH - viewport.width} onClick={() => {
-          setViewport((current) => panGraphViewport(current, current.width * 0.35));
-        }}>→</button>
-        <button type="button" aria-label="Reset graph view" onClick={() => {
-          setViewport(DEFAULT_GRAPH_VIEWPORT);
-        }}>Reset</button>
-        <span className={styles.graphZoom} aria-live="polite">{zoom.toFixed(1)}×</span>
+        <button
+          type="button"
+          aria-label="Zoom in graph"
+          disabled={zoom >= MAX_GRAPH_ZOOM}
+          onClick={() => {
+            setViewport((current) => zoomGraphViewport(current, 1.8));
+          }}
+        >
+          +
+        </button>
+        <button
+          type="button"
+          aria-label="Zoom out graph"
+          disabled={zoom <= 1}
+          onClick={() => {
+            setViewport((current) => zoomGraphViewport(current, 1 / 1.8));
+          }}
+        >
+          −
+        </button>
+        <button
+          type="button"
+          aria-label="Pan graph left"
+          disabled={viewport.x <= 0}
+          onClick={() => {
+            setViewport((current) => panGraphViewport(current, -current.width * 0.35));
+          }}
+        >
+          ←
+        </button>
+        <button
+          type="button"
+          aria-label="Pan graph right"
+          disabled={viewport.x >= GRAPH_WIDTH - viewport.width}
+          onClick={() => {
+            setViewport((current) => panGraphViewport(current, current.width * 0.35));
+          }}
+        >
+          →
+        </button>
+        <button
+          type="button"
+          aria-label="Reset graph view"
+          onClick={() => {
+            setViewport(DEFAULT_GRAPH_VIEWPORT);
+          }}
+        >
+          Reset
+        </button>
+        <span className={styles.graphZoom} aria-live="polite">
+          {zoom.toFixed(1)}×
+        </span>
         <label className={styles.graphFocusToggle}>
           <input
             type="checkbox"
@@ -192,8 +227,8 @@ export function QuranArcs({
         </label>
       </div>
       <p id="quran-graph-help" className={styles.graphHelp}>
-        Drag the handle below the graph or open space to pan; Ctrl or Cmd + wheel to zoom. Click the horizontal axis to choose an ayah.
-        Use its arrow keys to move one ayah at a time.
+        Drag the handle below the graph or open space to pan; Ctrl or Cmd + wheel to zoom. Click the
+        horizontal axis to choose an ayah. Use its arrow keys to move one ayah at a time.
       </p>
       <div className={styles.graphScroll}>
         <svg
@@ -212,8 +247,20 @@ export function QuranArcs({
           onWheel={onWheel}
         >
           <rect x="0" y="0" width={GRAPH_WIDTH} height="400" fill="transparent" />
-          <rect x={surahLeft} y="8" width={Math.max(2, surahRight - surahLeft)} height="352" className={styles.activeSurah} />
-          <rect x={focusLeft} y="8" width={Math.max(2, focusRight - focusLeft)} height="352" className={styles.focusedPassage} />
+          <rect
+            x={surahLeft}
+            y="8"
+            width={Math.max(2, surahRight - surahLeft)}
+            height="352"
+            className={styles.activeSurah}
+          />
+          <rect
+            x={focusLeft}
+            y="8"
+            width={Math.max(2, focusRight - focusLeft)}
+            height="352"
+            className={styles.focusedPassage}
+          />
           {displayedArcs.map((arc) => {
             const selected = selectedId === arc.id;
             const touching = focusedIds.has(arc.id);
@@ -247,14 +294,33 @@ export function QuranArcs({
               </g>
             );
           })}
-          <line x1={GRAPH_AXIS_LEFT} x2={GRAPH_AXIS_LEFT + GRAPH_AXIS_WIDTH} y1={GRAPH_AXIS_Y} y2={GRAPH_AXIS_Y} className={styles.axis} />
-          {SURAHS.filter((item) => item.number === 1 || item.number % 10 === 0 || item.number === 114).map((item) => {
-            const x = graphXOfAyah(index.versification.surahRange(item.number).start, index.ayahCount);
+          <line
+            x1={GRAPH_AXIS_LEFT}
+            x2={GRAPH_AXIS_LEFT + GRAPH_AXIS_WIDTH}
+            y1={GRAPH_AXIS_Y}
+            y2={GRAPH_AXIS_Y}
+            className={styles.axis}
+          />
+          {SURAHS.filter(
+            (item) => item.number === 1 || item.number % 10 === 0 || item.number === 114,
+          ).map((item) => {
+            const x = graphXOfAyah(
+              index.versification.surahRange(item.number).start,
+              index.ayahCount,
+            );
             return (
               <g key={item.number}>
-                <line x1={x} x2={x} y1={GRAPH_AXIS_Y} y2={GRAPH_AXIS_Y + 8} className={styles.axis} />
+                <line
+                  x1={x}
+                  x2={x}
+                  y1={GRAPH_AXIS_Y}
+                  y2={GRAPH_AXIS_Y + 8}
+                  className={styles.axis}
+                />
                 {zoom <= 1.5 && (
-                  <text x={x} y={GRAPH_AXIS_Y + 24} className={styles.axisText} textAnchor="middle">{item.number}</text>
+                  <text x={x} y={GRAPH_AXIS_Y + 24} className={styles.axisText} textAnchor="middle">
+                    {item.number}
+                  </text>
                 )}
               </g>
             );
@@ -281,7 +347,9 @@ export function QuranArcs({
             onClick={(event) => {
               const rect = event.currentTarget.ownerSVGElement?.getBoundingClientRect();
               if (!rect || rect.width <= 0) return;
-              selectFromWorldX(graphWorldXAtClientX(viewport, event.clientX, rect.left, rect.width));
+              selectFromWorldX(
+                graphWorldXAtClientX(viewport, event.clientX, rect.left, rect.width),
+              );
             }}
             onKeyDown={(event) => {
               const current = focus.start;
@@ -313,10 +381,18 @@ export function QuranArcs({
         <span aria-hidden="true">↔</span> Drag here to pan the graph
       </div>
       <div className={styles.graphSummary}>
-        <p>Focused passage: {formatIndexRange(index.versification, focus.start, focus.end)} · {focusedArcs.length.toLocaleString('en')} related links</p>
-        <p>Viewport: {firstVisible.surah}:{firstVisible.ayah} to {lastVisible.surah}:{lastVisible.ayah} · {displayedArcs.length.toLocaleString('en')} arcs drawn</p>
+        <p>
+          Focused passage: {formatIndexRange(index.versification, focus.start, focus.end)} ·{' '}
+          {focusedArcs.length.toLocaleString('en')} related links
+        </p>
+        <p>
+          Viewport: {firstVisible.surah}:{firstVisible.ayah} to {lastVisible.surah}:
+          {lastVisible.ayah} · {displayedArcs.length.toLocaleString('en')} arcs drawn
+        </p>
       </div>
-      <p className={styles.graphNote}>Curves use canonical ayah positions, not inferred relevance or similarity strength.</p>
+      <p className={styles.graphNote}>
+        Curves use canonical ayah positions, not inferred relevance or similarity strength.
+      </p>
     </section>
   );
 }

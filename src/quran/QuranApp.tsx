@@ -87,8 +87,11 @@ export function QuranApp() {
   }, [attempt]);
 
   useEffect(() => {
-    document.title = getSurah(location.reference.surah).name + ' ' +
-      formatAyahId(location.reference) + ' · Quran Cross-References';
+    document.title =
+      getSurah(location.reference.surah).name +
+      ' ' +
+      formatAyahId(location.reference) +
+      ' · Quran Cross-References';
   }, [location.reference]);
 
   const focus = (reference: AyahRef) => {
@@ -129,12 +132,20 @@ export function QuranApp() {
 
   return (
     <div className={styles.shell}>
-      <a className={styles.skipLink} href="#quran-main">Skip to Quran content</a>
+      <a className={styles.skipLink} href="#quran-main">
+        Skip to Quran content
+      </a>
       <header className={styles.header}>
         <div className={styles.brand}>
-          <a href={defaultLink} className={styles.brandLink}>Quran Cross-References</a>
+          <a href={defaultLink} className={styles.brandLink}>
+            Quran Cross-References
+          </a>
         </div>
-        {offline && <span className={styles.offlineLabel} role="status">Offline</span>}
+        {offline && (
+          <span className={styles.offlineLabel} role="status">
+            Offline
+          </span>
+        )}
       </header>
 
       <main id="quran-main" className={styles.main}>
@@ -197,7 +208,9 @@ export function QuranApp() {
                   placeholder="2:255"
                 />
               </label>
-              <button className={styles.goButton} type="submit">Go</button>
+              <button className={styles.goButton} type="submit">
+                Go
+              </button>
             </form>
             {location.view === 'arcs' && (
               <label className={styles.field}>
@@ -207,9 +220,10 @@ export function QuranApp() {
                   value={location.rangeEnd?.ayah ?? ''}
                   onChange={(event) => {
                     const value = event.target.value;
-                    const rangeEnd = value === ''
-                      ? null
-                      : { surah: location.reference.surah, ayah: Number(value) };
+                    const rangeEnd =
+                      value === ''
+                        ? null
+                        : { surah: location.reference.surah, ayah: Number(value) };
                     navigate({ ...location, rangeEnd, selectedLink: null });
                   }}
                 >
@@ -218,7 +232,11 @@ export function QuranApp() {
                     { length: activeSurah.ayahCount - location.reference.ayah },
                     (_, offset) => {
                       const ayah = location.reference.ayah + offset + 1;
-                      return <option key={ayah} value={ayah}>Through {ayah}</option>;
+                      return (
+                        <option key={ayah} value={ayah}>
+                          Through {ayah}
+                        </option>
+                      );
                     },
                   )}
                 </select>
@@ -249,7 +267,11 @@ export function QuranApp() {
                   value={location.direction}
                   onChange={(event) => {
                     const direction = event.target.value;
-                    if (direction === 'incoming' || direction === 'outgoing' || direction === 'both') {
+                    if (
+                      direction === 'incoming' ||
+                      direction === 'outgoing' ||
+                      direction === 'both'
+                    ) {
                       navigate({ ...location, direction });
                     }
                   }}
@@ -261,19 +283,31 @@ export function QuranApp() {
               </label>
             )}
           </div>
-          {searchError && <p role="alert" className={styles.searchError}>{searchError}</p>}
+          {searchError && (
+            <p role="alert" className={styles.searchError}>
+              {searchError}
+            </p>
+          )}
         </div>
 
         {loadState.status === 'loading' && (
-          <div className={styles.loading} role="status">Loading verified Quran text and relationships…</div>
+          <div className={styles.loading} role="status">
+            Loading verified Quran text and relationships…
+          </div>
         )}
         {loadState.status === 'error' && (
           <div className={styles.loading} role="alert">
             <p>{loadState.message}</p>
-            <button type="button" className={styles.goButton} onClick={() => {
-              setLoadState({ status: 'loading' });
-              setAttempt((value) => value + 1);
-            }}>Retry</button>
+            <button
+              type="button"
+              className={styles.goButton}
+              onClick={() => {
+                setLoadState({ status: 'loading' });
+                setAttempt((value) => value + 1);
+              }}
+            >
+              Retry
+            </button>
           </div>
         )}
         {data && (
@@ -282,7 +316,9 @@ export function QuranApp() {
               <div className={styles.focusHeading}>
                 <div>
                   <p className={styles.eyebrow}>Selected passage</p>
-                  <h1>{activeSurah.name} · {formatAyahId(location.reference)}</h1>
+                  <h1>
+                    {activeSurah.name} · {formatAyahId(location.reference)}
+                  </h1>
                 </div>
                 <div className={styles.focusActions}>
                   <button
@@ -308,24 +344,52 @@ export function QuranApp() {
                     Share ayah
                   </button>
                   <div className={styles.stepper}>
-                    <button type="button" aria-label="Previous ayah" disabled={activeIndex === 0} onClick={() => {
-                    if (activeIndex !== undefined && activeIndex > 0) {
-                      focus(data.relationships.versification.refAt(activeIndex - 1));
-                    }
-                  }}>‹</button>
-                  <button type="button" aria-label="Next ayah" disabled={activeIndex === undefined || activeIndex === data.relationships.ayahCount - 1} onClick={() => {
-                    if (activeIndex !== undefined && activeIndex < data.relationships.ayahCount - 1) {
-                      focus(data.relationships.versification.refAt(activeIndex + 1));
-                    }
-                  }}>›</button>
+                    <button
+                      type="button"
+                      aria-label="Previous ayah"
+                      disabled={activeIndex === 0}
+                      onClick={() => {
+                        if (activeIndex !== undefined && activeIndex > 0) {
+                          focus(data.relationships.versification.refAt(activeIndex - 1));
+                        }
+                      }}
+                    >
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Next ayah"
+                      disabled={
+                        activeIndex === undefined ||
+                        activeIndex === data.relationships.ayahCount - 1
+                      }
+                      onClick={() => {
+                        if (
+                          activeIndex !== undefined &&
+                          activeIndex < data.relationships.ayahCount - 1
+                        ) {
+                          focus(data.relationships.versification.refAt(activeIndex + 1));
+                        }
+                      }}
+                    >
+                      ›
+                    </button>
                   </div>
                 </div>
               </div>
-              {shareMessage && <p className={styles.shareStatus} role="status">{shareMessage}</p>}
+              {shareMessage && (
+                <p className={styles.shareStatus} role="status">
+                  {shareMessage}
+                </p>
+              )}
               {activeIndex !== undefined && (
                 <>
-                  <p className={styles.focusArabic} lang="ar" dir="rtl">{data.text.arabic[activeIndex]}</p>
-                  <p className={styles.focusEnglish} lang="en" dir="ltr">{data.text.english[activeIndex]}</p>
+                  <p className={styles.focusArabic} lang="ar" dir="rtl">
+                    {data.text.arabic[activeIndex]}
+                  </p>
+                  <p className={styles.focusEnglish} lang="en" dir="ltr">
+                    {data.text.english[activeIndex]}
+                  </p>
                 </>
               )}
             </section>
@@ -347,28 +411,53 @@ export function QuranApp() {
                   <section className={styles.linkDetail} aria-live="polite">
                     <h2>Selected relationship</h2>
                     <div className={styles.linkPair}>
-                      <button type="button" onClick={() => {
+                      <button
+                        type="button"
+                        onClick={() => {
                           focus(data.relationships.versification.refAt(link.source.start));
-                        }}>
-                        Source: {formatIndexRange(data.relationships.versification, link.source.start, link.source.end)}
+                        }}
+                      >
+                        Source:{' '}
+                        {formatIndexRange(
+                          data.relationships.versification,
+                          link.source.start,
+                          link.source.end,
+                        )}
                       </button>
                       <span aria-hidden="true">→</span>
-                      <button type="button" onClick={() => {
+                      <button
+                        type="button"
+                        onClick={() => {
                           focus(data.relationships.versification.refAt(link.target.start));
-                        }}>
-                        Target: {formatIndexRange(data.relationships.versification, link.target.start, link.target.end)}
+                        }}
+                      >
+                        Target:{' '}
+                        {formatIndexRange(
+                          data.relationships.versification,
+                          link.target.start,
+                          link.target.end,
+                        )}
                       </button>
                     </div>
-                    <p>Original dataset context-after value: {link.contextAfter}. No votes or similarity strength are inferred.</p>
-                    <button className={styles.goButton} type="button" onClick={() => {
-                      navigate({
-                        ...location,
-                        view: 'threads',
-                        reference: data.relationships.versification.refAt(link.source.start),
-                        rangeEnd: null,
-                        selectedLink: null,
-                      });
-                    }}>Read in Threads</button>
+                    <p>
+                      Original dataset context-after value: {link.contextAfter}. No votes or
+                      similarity strength are inferred.
+                    </p>
+                    <button
+                      className={styles.goButton}
+                      type="button"
+                      onClick={() => {
+                        navigate({
+                          ...location,
+                          view: 'threads',
+                          reference: data.relationships.versification.refAt(link.source.start),
+                          rangeEnd: null,
+                          selectedLink: null,
+                        });
+                      }}
+                    >
+                      Read in Threads
+                    </button>
                   </section>
                 )}
               </>
@@ -385,11 +474,24 @@ export function QuranApp() {
         )}
       </main>
       <footer className={styles.footer}>
-        <p>Arabic text © <a href="https://tanzil.net/docs/Text_License">Tanzil Project</a>, Uthmani v1.1, reproduced without modification.
-          English: Marmaduke Pickthall (1930), Tanzil digital edition.
-          Curated similar passages: <a href="https://github.com/Waqar144/Quran_Mutashabihat_Data">Waqar144 Mutashabihat Data</a> (CC0).
-          <a href={import.meta.env.BASE_URL + 'data/quran/manifest.json'}> Verified dataset provenance</a>.</p>
-        <p>Relationships indicate upstream textual similarities only, not verified theological interpretations.</p>
+        <p>
+          Arabic text © <a href="https://tanzil.net/docs/Text_License">Tanzil Project</a>, Uthmani
+          v1.1, reproduced without modification. English: Marmaduke Pickthall (1930), Tanzil digital
+          edition. Curated similar passages:{' '}
+          <a href="https://github.com/Waqar144/Quran_Mutashabihat_Data">
+            Waqar144 Mutashabihat Data
+          </a>{' '}
+          (CC0).
+          <a href={import.meta.env.BASE_URL + 'data/quran/manifest.json'}>
+            {' '}
+            Verified dataset provenance
+          </a>
+          .
+        </p>
+        <p>
+          Relationships indicate upstream textual similarities only, not verified theological
+          interpretations.
+        </p>
       </footer>
     </div>
   );

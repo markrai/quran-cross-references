@@ -23,7 +23,7 @@ export default defineConfig(({ command, isPreview = false }) => ({
     setupFiles: ['./src/test-utils/setup.ts'],
     coverage: {
       provider: 'v8',
-      reporter: ['text-summary', 'html', 'lcov'],
+      reporter: ['text-summary', 'text', 'html', 'lcov'],
       include: [
         'src/core/lib/**/*.ts',
         'src/core/quran/**/*.ts',
