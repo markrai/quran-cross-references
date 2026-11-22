@@ -61,6 +61,18 @@ changing existing numerical `link=` URLs or Quran source texts. See
 archives. The three checksum-pinned Quran source snapshots remain explicitly
 tracked. New sources must be reviewed and allowlisted individually.
 
+## Exact Arabic expression detection (Phase 2B.2)
+
+`npm run data:expressions` scans all 6,236 pinned Tanzil Uthmani ayahs for
+verbatim repeated sequences of three through eight words, preserving
+ayah/word positions and distinguishing computed evidence from the existing
+2,445 curated relationships. The generator writes versioned evidence and
+corpus statistics only to ignored `data/quran/generated/`. No computed
+expressions are yet shipped to the PWA or rendered as curated arcs.
+
+Run `npm run bench:expressions` to regenerate and profile the corpus.
+See [Phase 2B.2 algorithm, provenance and corpus budgets](docs/QURAN_PHASE_2B2.md).
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).
