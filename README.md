@@ -4,6 +4,18 @@ Explore curated connections between Quranic passages with bilingual Arabic and E
 
 The application covers 114 surahs and 6,236 ayahs using pinned Tanzil Uthmani Arabic and Pickthall English text. Its initial relationship corpus contains 2,445 curated textual-similarity links from the Waqar144 Mutashabihat dataset. These links are not exhaustive and do not imply a scholarly relevance ranking or an interpretation.
 
+## Interactive relationship graph
+
+The Arcs view supports zooming, panning, selecting ayahs on the Quran axis,
+and highlighting connections touching a selected passage range. Use **Graph
+focus through ayah** to highlight a passage, **Only links touching selected
+passage** to narrow the display, and click a curve to inspect its source and
+target. Passage and relationship selections survive sharing and browser history
+via `ref=`, `end=` and `link=` URL parameters.
+
+Run `npm run bench:graph` to measure corpus-wide layout cost, or see
+[Phase 2A graph interaction and performance notes](docs/GRAPH_PHASE_2A.md).
+
 ## Run locally
 
 Requires Node.js 24 or later.
