@@ -1,4 +1,4 @@
-export type ShareResult = 'shared' | 'copied' | 'unavailable';
+export type ShareResult = 'shared' | 'copied' | 'cancelled' | 'unavailable';
 
 export async function shareQuranReference(url: string, title: string): Promise<ShareResult> {
   if (typeof navigator.share === 'function') {
@@ -6,7 +6,7 @@ export async function shareQuranReference(url: string, title: string): Promise<S
       await navigator.share({ title, url });
       return 'shared';
     } catch (error: unknown) {
-      if (error instanceof Error && error.name === 'AbortError') return 'unavailable';
+      if (error instanceof Error && error.name === 'AbortError') return 'cancelled';
     }
   }
   try {
