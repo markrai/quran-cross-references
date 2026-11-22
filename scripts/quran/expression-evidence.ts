@@ -174,7 +174,7 @@ export function validateExactExpressionEvidence(
     if (!Array.isArray(words) || !words.every((word: unknown) => typeof word === 'string')) {
       fail(label + '.words must contain exact strings.');
     }
-    const exactWords = words as string[];
+    const exactWords = words;
     if (
       item['id'] !== exactExpressionId(exactWords) ||
       item['origin'] !== 'computed' ||
@@ -182,7 +182,7 @@ export function validateExactExpressionEvidence(
     ) {
       fail(label + ' has invalid identity, origin or evidence kind.');
     }
-    const id = item['id'] as string;
+    const id = item['id'];
     if (seen.has(id)) fail(label + ' duplicates an expression ID.');
     seen.add(id);
 
