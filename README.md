@@ -29,11 +29,13 @@ npm run build
 npx playwright test tests/e2e/quran-reader.spec.ts --project=desktop --project=phone
 ```
 
-The build publishes `index.html`, a compatibility page at `quran/index.html`, and only the Quran datasets under `data/quran/`. Existing `/quran/?ref=2%3A255` links continue to open the same ayah; new navigations use `/?ref=2%3A255`.
+The build publishes `index.html`, a compatibility page at `quran/index.html`, and only the Quran datasets under `data/quran/`. Existing `/quran/?ref=2%3A255` links continue to open the same ayah; new navigations use `/?ref=2%3A255`. A versioned service worker precaches the entire bilingual reader and curated relationships, allowing navigation and reading offline after the initial download.
 
-The default production base path is `/quran-cross-references/`. Set `BASE_PATH=/` to build for a domain root.
+The default production base path is `/quran-cross-references/` with `SITE_ORIGIN=https://markrai.github.io`. Set both `BASE_PATH` and `SITE_ORIGIN` when building for a custom domain. The build generates original 192px/512px/maskable PNG app icons, a 1200×630 social preview image, and an installable web app manifest without additional runtime dependencies.
 
-Phase 1D.2 removed the unused Bible application, translations, data importers, visualizations, assets and obsolete tests. The repository now contains the Quran reader, validated source pipeline, core model, and a small set of reusable generic helpers. The original Bible implementation remains available in Git history. Quran PWA/offline features, complete metadata and accessibility acceptance are scheduled for Phase 1D.3; both entry pages remain `noindex` in the meantime.
+Phase 1D.2 removed the unused Bible application, translations, data importers, visualizations, assets and obsolete tests. Phase 1D.3 adds installability, offline data, link previews, exact-ayah sharing, keyboard/mobile improvements, and an embedded Tanzil copyright notice in the derived text JSON. The original Bible implementation remains available in Git history.
+
+**Search indexing remains disabled** until the remaining real-device, accessibility, and digital-edition rights checks pass. See [the release acceptance checklist](docs/RELEASE_CHECKLIST.md) before enabling indexing. A static site can provide a general link preview, but cannot generate a different Open Graph image for every ayah URL.
 
 ## Data provenance
 
