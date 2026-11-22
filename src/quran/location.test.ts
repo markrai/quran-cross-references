@@ -22,6 +22,8 @@ describe('Quran-first canonical route', () => {
       reference: { surah: 2, ayah: 255 },
       rangeEnd: null,
       selectedLink: null,
+      evidence: 'curated',
+      selectedExpression: null,
     });
     const named = new URL('https://example.test/?ref=Al-Baqarah+255');
     expect(parseQuranLocation(named).reference).toEqual({ surah: 2, ayah: 255 });
@@ -82,4 +84,33 @@ describe('Quran-first canonical route', () => {
       expect(location.selectedLink).toBeNull();
     }
   });
+  it('round-trips computed evidence and its stable SHA expression deep link', () => {
+    const expression = 'exact:v1:' + 'a'.repeat(64);
+    const location = {
+      ...DEFAULT_QURAN_LOCATION,
+      evidence: 'exact' as const,
+      selectedExpression: expression,
+      reference: { surah: 2, ayah: 255 },
+    };
+    const url = quranLocationUrl(location, '/quran-cross-references/');
+    expect(url).toContain('evidence=exact');
+    expect(url).toContain('expression=exact%3Av1%3A');
+    expect(parseQuranLocation(new URL(url, 'https://example.test'))).toEqual(location);
+    expect(parseQuranLocation(new URL('https://example.test/?expression=' + expression))).toEqual(
+      DEFAULT_QURAN_LOCATION,
+    );
+  });
+
+  it('rejects malformed expression IDs and never combines curated link IDs with computed evidence', () => {
+    for (const invalid of ['exact:v1:1234', 'curated:0', 'exact:v1:' + 'g'.repeat(64)]) {
+      const url = new URL(
+        'https://example.test/?evidence=exact&link=7&expression=' + encodeURIComponent(invalid),
+      );
+      const location = parseQuranLocation(url);
+      expect(location.evidence).toBe('exact');
+      expect(location.selectedLink).toBeNull();
+      expect(location.selectedExpression).toBeNull();
+    }
+  });
+
 });
