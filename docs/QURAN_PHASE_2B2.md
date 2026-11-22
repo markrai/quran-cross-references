@@ -45,6 +45,18 @@ index), longest expression first for ties. IDs are computed from SHA-256
 of the versioned token policy and the JSON-encoded exact token sequence.
 IDs do not depend on discovery order.
 
+## Pinned corpus baseline
+
+An initial pass over the pinned Tanzil Uthmani snapshot (no normalization)
+found **82,459 exact whitespace-delimited tokens**, **337,357 candidate
+sequence occurrences**, and **15,894 repeated 3–8-word candidates**. The
+occurrence-equivalent reduction removes **10,810** redundant groups and
+retains **5,084 unique expressions** with **16,924 positional occurrences**.
+The most frequently repeated retained expression has **114** occurrences.
+These are textual observations, not curated cross-reference counts.
+The integration test pins these figures to catch unintended tokenizer
+or reduction-policy changes.
+
 ## Independent evidence schema
 
 `data/quran/generated/expressions.json` is version 1 of
