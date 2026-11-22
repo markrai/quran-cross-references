@@ -174,15 +174,18 @@ export class QacMorphologyIndex {
     let stemCount = 0;
     let wordCount = 0;
     const converted: QacWordAnalysis[][] = [];
-    for (const [ayah, words] of ayahs.entries()) {
+    const verseRows: readonly unknown[] = ayahs;
+    for (const [ayah, rawWords] of verseRows.entries()) {
+      const words: readonly unknown[] = Array.isArray(rawWords) ? rawWords as unknown[] : [];
       if (!Array.isArray(words) || words.length < 1 || words.length > 300) {
         invalid('A QAC ayah has missing or implausible word positions.');
       }
       const entries: QacWordAnalysis[] = [];
-      for (const [word, segments] of words.entries()) {
-        if (!Array.isArray(segments) || segments.length < 1 || segments.length > 16) {
+      for (const [word, rawSegments] of words.entries()) {
+        if (!Array.isArray(rawSegments) || rawSegments.length < 1 || rawSegments.length > 16) {
           invalid('A QAC word has missing or implausible segments.');
         }
+        const segments: readonly unknown[] = rawSegments as unknown[];
         const annotated: QacSegment[] = [];
         const lemmas = new Set<string>();
         const roots = new Set<string>();
@@ -191,10 +194,11 @@ export class QacMorphologyIndex {
           if (!Array.isArray(raw) || raw.length !== 3) {
             invalid('Each QAC segment requires a form, tag and features.');
           }
-          const form: unknown = raw[0];
+          const items: readonly unknown[] = raw as unknown[];
+          const form = items[0];
           if (typeof form !== 'string') invalid('QAC segment form must be a string.');
-          const tag = string(raw[1], 'segment tag');
-          const features = string(raw[2], 'segment features');
+          const tag = string(items[1], 'segment tag');
+          const features = string(items[2], 'segment features');
           const kind = features.split('|', 1)[0];
           if (kind !== 'PREFIX' && kind !== 'STEM' && kind !== 'SUFFIX') {
             invalid('Unknown QAC segment type.');
