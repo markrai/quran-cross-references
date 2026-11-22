@@ -197,22 +197,24 @@ test.describe('Quran Phase 2A graph exploration', () => {
     await page.getByRole('button', { name: 'Pan graph right' }).click();
     expect(await graph.getAttribute('viewBox')).not.toBe(zoomed);
 
-    await expect(graph.locator('[data-graph-pan-surface]')).toHaveCount(1);
-    const box = await graph.boundingBox();
+    const handle = page.getByRole('group', { name: 'Drag graph horizontally' });
+    await expect(handle).toBeVisible();
+    const box = await handle.boundingBox();
     expect(box).toBeTruthy();
     if (box) {
-      const startX = box.x + box.width * 0.6;
-      const startY = box.y + box.height * 0.97;
+      const startX = box.x + box.width / 2;
+      const startY = box.y + box.height / 2;
       const beforeDrag = await graph.getAttribute('viewBox');
       await page.mouse.move(startX, startY);
       await page.mouse.down();
       try {
-        await expect(graph).toHaveClass(/graphDragging/);
+        await expect(handle).toHaveAttribute('data-dragging', 'true');
         await page.mouse.move(startX + 90, startY, { steps: 6 });
         await expect.poll(async () => graph.getAttribute('viewBox')).not.toBe(beforeDrag);
       } finally {
         await page.mouse.up();
       }
+      await expect(handle).toHaveAttribute('data-dragging', 'false');
     }
 
     await page.getByRole('button', { name: 'Reset graph view' }).click();
