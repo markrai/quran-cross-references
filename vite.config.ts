@@ -3,11 +3,12 @@ import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { QURAN_DEPLOY_BASE } from './vite/quran-site.ts';
+import { quranMetadata } from './vite/quran-metadata.ts';
 
 export default defineConfig(({ command, isPreview = false }) => ({
   base: process.env['BASE_PATH'] ?? (command === 'build' || isPreview ? QURAN_DEPLOY_BASE : '/'),
   publicDir: resolve(import.meta.dirname, 'public/quran-only'),
-  plugins: [react()],
+  plugins: [react(), quranMetadata()],
   build: {
     rolldownOptions: {
       input: {
