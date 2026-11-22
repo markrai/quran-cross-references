@@ -70,4 +70,17 @@ describe('Quran source imports', () => {
     expect(data.links).toHaveLength(1);
     expect(data.links[0]?.source).toEqual({ start: 0, end: 1 });
   });
+
+  it('rejects noninteger ranges and invalid relationship context values', () => {
+    expect(() =>
+      importMutashabihat('{"1":[{"src":{"ayah":[]},"muts":[{"ayah":1}]}]}'),
+    ).toThrow(/nonempty integer array/);
+    expect(() =>
+      importMutashabihat('{"1":[{"src":{"ayah":1.5},"muts":[{"ayah":2}]}]}'),
+    ).toThrow(/integer/);
+    expect(() =>
+      importMutashabihat('{"1":[{"src":{"ayah":1},"muts":[{"ayah":2}],"ctx":-1}]}'),
+    ).toThrow(/nonnegative integer/);
+  });
+
 });
