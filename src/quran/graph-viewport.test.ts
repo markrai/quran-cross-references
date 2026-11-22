@@ -3,6 +3,7 @@ import {
   centerGraphViewport,
   constrainGraphViewport,
   DEFAULT_GRAPH_VIEWPORT,
+  dragGraphViewport,
   graphAyahAtWorldX,
   graphWorldXAtClientX,
   graphXOfAyah,
@@ -40,6 +41,26 @@ describe('Quran graph viewport', () => {
       width: deep.width,
     });
     expect(zoomGraphViewport(deep, 0.00001)).toEqual(DEFAULT_GRAPH_VIEWPORT);
+  });
+
+  it('turns the first overview drag into a zoom and a real horizontal pan', () => {
+    const draggedLeft = dragGraphViewport(DEFAULT_GRAPH_VIEWPORT, -80, 400);
+    const draggedRight = dragGraphViewport(DEFAULT_GRAPH_VIEWPORT, 80, 400);
+    expect(draggedLeft.width).toBeCloseTo(GRAPH_WIDTH / 1.8);
+    expect(draggedLeft.x).toBeCloseTo(400);
+    expect(draggedRight.width).toBeCloseTo(draggedLeft.width);
+    expect(draggedRight.x).toBeCloseTo(133.33333333333334);
+    expect(draggedLeft.x).toBeGreaterThan(draggedRight.x);
+    const continued = dragGraphViewport(draggedLeft, 80, 400);
+    expect(continued.width).toBeCloseTo(draggedLeft.width);
+    expect(continued.x).toBeCloseTo(draggedLeft.x - draggedLeft.width * 0.2);
+  });
+
+  it('does not zoom on a stationary or malformed pointer movement', () => {
+    expect(dragGraphViewport(DEFAULT_GRAPH_VIEWPORT, 0, 400)).toEqual(DEFAULT_GRAPH_VIEWPORT);
+    expect(dragGraphViewport(DEFAULT_GRAPH_VIEWPORT, 80, 0)).toEqual(DEFAULT_GRAPH_VIEWPORT);
+    expect(dragGraphViewport(DEFAULT_GRAPH_VIEWPORT, NaN, 400)).toEqual(DEFAULT_GRAPH_VIEWPORT);
+    expect(dragGraphViewport(DEFAULT_GRAPH_VIEWPORT, 80, Infinity)).toEqual(DEFAULT_GRAPH_VIEWPORT);
   });
 
   it('handles nonfinite viewport or invalid zoom factors conservatively', () => {
