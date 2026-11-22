@@ -379,6 +379,33 @@
   vector-effect: non-scaling-stroke;
 }
 
+.graphPanHandle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 48px;
+  margin: 0.35rem 1.4rem 0.5rem;
+  border: 1px dashed var(--color-border);
+  border-radius: 0.55rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  font-size: 0.85rem;
+}
+
+.graphPanHandle[data-dragging='true'] {
+  cursor: grabbing;
+  border-color: var(--color-accent);
+}
+
+.graphPanHandle span {
+  color: var(--color-accent);
+  font-size: 1.3rem;
+}
+
 .graphSummary {
   display: flex;
   flex-wrap: wrap;

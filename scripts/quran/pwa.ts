@@ -4,12 +4,13 @@ export function offlineWorkerSource(files: readonly string[], revision: string):
   return `const CACHE_NAME = ${cache};
 const CACHE_PREFIX = 'quran-cross-references-shell-';
 const FILES = ${entries};
+const NAVIGATIONS = ['', 'quran/'];
 const scope = self.registration.scope;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(FILES.map((file) =>
+      .then((cache) => cache.addAll([...FILES, ...NAVIGATIONS].map((file) =>
         new Request(new URL(file, scope), { cache: 'reload' })
       )))
       .then(() => self.skipWaiting())
@@ -39,14 +40,17 @@ self.addEventListener('fetch', (event) => {
       url.pathname === root.pathname + 'quran/index.html';
     const destination = new URL(alias ? 'quran/index.html' : 'index.html', scope);
     event.respondWith(caches.open(CACHE_NAME)
-      .then((cache) => cache.match(destination))
-      .then((response) => response || fetch(request))
+      .then(async (cache) =>
+        (await cache.match(request, { ignoreSearch: true, ignoreVary: true })) ||
+        (await cache.match(destination, { ignoreVary: true })) ||
+        fetch(request)
+      )
     );
     return;
   }
 
   event.respondWith(caches.open(CACHE_NAME)
-    .then((cache) => cache.match(request, { ignoreSearch: true }))
+    .then((cache) => cache.match(request, { ignoreSearch: true, ignoreVary: true }))
     .then((response) => response || fetch(request))
   );
 });

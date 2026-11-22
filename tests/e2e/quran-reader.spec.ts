@@ -120,7 +120,9 @@ test.describe('Quran production readiness', () => {
       if (!name) return false;
       const cache = await caches.open(name);
       const required = [
+        '',
         'index.html',
+        'quran/',
         'quran/index.html',
         'data/quran/text.json',
         'data/quran/relationships.json',
@@ -130,10 +132,47 @@ test.describe('Quran production readiness', () => {
       );
       return responses.every((response) => response !== undefined);
     });
+    const failures: string[] = [];
+    page.on('pageerror', (error) => failures.push('Page error: ' + error.message));
+    page.on('requestfailed', (request) => {
+      failures.push('Failed request: ' + request.url() + ' ' + (request.failure()?.errorText ?? ''));
+    });
     await context.setOffline(true);
     try {
-      await page.reload();
-      await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
+      const probe = await page.evaluate(async () => {
+        const scope = (await navigator.serviceWorker.ready).scope;
+        const paths = ['', 'quran/', 'data/quran/text.json', 'data/quran/relationships.json'];
+        return Promise.all(paths.map(async (path) => {
+          try {
+            const response = await fetch(new URL(path, scope));
+            return { path, status: response.status };
+          } catch (error: unknown) {
+            return { path, status: -1, error: String(error) };
+          }
+        }));
+      });
+      expect(probe).toEqual([
+        { path: '', status: 200 },
+        { path: 'quran/', status: 200 },
+        { path: 'data/quran/text.json', status: 200 },
+        { path: 'data/quran/relationships.json', status: 200 },
+      ]);
+      const reloadResponse = await page.reload();
+      expect(reloadResponse?.status()).toBe(200);
+      try {
+        await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
+      } catch (error: unknown) {
+        await test.info().attach('offline-reload-diagnostics.json', {
+          contentType: 'application/json',
+          body: Buffer.from(JSON.stringify({
+            url: page.url(),
+            body: await page.locator('body').innerText().catch(() => 'unavailable'),
+            failures,
+            probe,
+          }, null, 2)),
+        });
+        throw error;
+      }
       await expect(page.locator('[aria-label="Selected ayah"] [lang="ar"]')).toBeVisible();
       await expect(page.locator('[aria-label="Selected ayah"] [lang="en"]')).toBeVisible();
       await page.goto('quran/?ref=114%3A6&view=threads');
@@ -197,22 +236,24 @@ test.describe('Quran Phase 2A graph exploration', () => {
     await page.getByRole('button', { name: 'Pan graph right' }).click();
     expect(await graph.getAttribute('viewBox')).not.toBe(zoomed);
 
-    await expect(graph.locator('[data-graph-pan-surface]')).toHaveCount(1);
-    const box = await graph.boundingBox();
+    const handle = page.getByRole('group', { name: 'Drag graph horizontally' });
+    await expect(handle).toBeVisible();
+    const box = await handle.boundingBox();
     expect(box).toBeTruthy();
     if (box) {
-      const startX = box.x + box.width * 0.6;
-      const startY = box.y + box.height * 0.97;
+      const startX = box.x + box.width / 2;
+      const startY = box.y + box.height / 2;
       const beforeDrag = await graph.getAttribute('viewBox');
       await page.mouse.move(startX, startY);
       await page.mouse.down();
       try {
-        await expect(graph).toHaveClass(/graphDragging/);
+        await expect(handle).toHaveAttribute('data-dragging', 'true');
         await page.mouse.move(startX + 90, startY, { steps: 6 });
         await expect.poll(async () => graph.getAttribute('viewBox')).not.toBe(beforeDrag);
       } finally {
         await page.mouse.up();
       }
+      await expect(handle).toHaveAttribute('data-dragging', 'false');
     }
 
     await page.getByRole('button', { name: 'Reset graph view' }).click();
