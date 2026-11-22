@@ -143,8 +143,7 @@ test.describe('Quran production readiness', () => {
       );
     });
     await site.stop();
-    {
-      const probe = await page.evaluate(async () => {
+    const probe = await page.evaluate(async () => {
         const scope = (await navigator.serviceWorker.ready).scope;
         const paths = ['', 'quran/', 'data/quran/text.json', 'data/quran/relationships.json'];
         return Promise.all(
@@ -194,7 +193,6 @@ test.describe('Quran production readiness', () => {
       await page.goto(site.url + 'quran/?ref=114%3A6&view=threads');
       await expect(page.getByRole('heading', { name: /An-Nas.*114:6/ })).toBeVisible();
       await expect(page.getByRole('heading', { name: 'Threads from 114:6' })).toBeVisible();
-    }
     } finally {
       await site.stop();
     }
