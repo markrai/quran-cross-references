@@ -24,9 +24,13 @@ function useQuranLocation(): readonly [
 ] {
   const [location, setLocation] = useState(() => parseQuranLocation(new URL(window.location.href)));
   useEffect(() => {
-    const onPopState = () => setLocation(parseQuranLocation(new URL(window.location.href)));
+    const onPopState = () => {
+      setLocation(parseQuranLocation(new URL(window.location.href)));
+    };
     window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+    };
   }, []);
   const navigate = useCallback((next: QuranLocation, replace = false) => {
     const href = quranLocationUrl(next, import.meta.env.BASE_URL);
@@ -74,7 +78,9 @@ export function QuranApp() {
     setSearchError(null);
     navigate(linkReference(location, reference));
   };
-  const changeSurah = (surah: number) => focus({ surah, ayah: 1 });
+  const changeSurah = (surah: number) => {
+    focus({ surah, ayah: 1 });
+  };
   const selectedId =
     selected?.surah === location.reference.surah && selected.scope === location.scope
       ? selected.id
@@ -104,7 +110,9 @@ export function QuranApp() {
                 type="button"
                 className={location.view === view ? styles.activeTab : styles.tab}
                 aria-pressed={location.view === view}
-                onClick={() => navigate({ ...location, view })}
+                onClick={() => {
+                  navigate({ ...location, view });
+                }}
               >
                 {view === 'arcs' ? 'Arcs' : 'Threads & Reader'}
               </button>
@@ -116,7 +124,9 @@ export function QuranApp() {
               <select
                 aria-label="Surah"
                 value={location.reference.surah}
-                onChange={(event) => changeSurah(Number(event.target.value))}
+                onChange={(event) => {
+                  changeSurah(Number(event.target.value));
+                }}
               >
                 {SURAHS.map((surah) => (
                   <option key={surah.number} value={surah.number}>
@@ -241,24 +251,34 @@ export function QuranApp() {
                   surah={location.reference.surah}
                   scope={location.scope}
                   selectedId={selectedId}
-                  onSelect={(id) => setSelected({ id, surah: location.reference.surah, scope: location.scope })}
+                  onSelect={(id) => {
+                    setSelected({ id, surah: location.reference.surah, scope: location.scope });
+                  }}
                 />
                 {link && (
                   <section className={styles.linkDetail} aria-live="polite">
                     <h2>Selected relationship</h2>
                     <div className={styles.linkPair}>
-                      <button type="button" onClick={() => focus(data.relationships.versification.refAt(link.source.start))}>
+                      <button type="button" onClick={() => {
+                          focus(data.relationships.versification.refAt(link.source.start));
+                        }}>
                         Source: {formatIndexRange(data.relationships.versification, link.source.start, link.source.end)}
                       </button>
                       <span aria-hidden="true">→</span>
-                      <button type="button" onClick={() => focus(data.relationships.versification.refAt(link.target.start))}>
+                      <button type="button" onClick={() => {
+                          focus(data.relationships.versification.refAt(link.target.start));
+                        }}>
                         Target: {formatIndexRange(data.relationships.versification, link.target.start, link.target.end)}
                       </button>
                     </div>
                     <p>Original dataset context-after value: {link.contextAfter}. No votes or similarity strength are inferred.</p>
-                    <button className={styles.goButton} type="button" onClick={() =>
-                      navigate({ ...location, view: 'threads', reference: data.relationships.versification.refAt(link.source.start) })
-                    }>Read in Threads</button>
+                    <button className={styles.goButton} type="button" onClick={() => {
+                      navigate({
+                        ...location,
+                        view: 'threads',
+                        reference: data.relationships.versification.refAt(link.source.start),
+                      });
+                    }}>Read in Threads</button>
                   </section>
                 )}
               </>
