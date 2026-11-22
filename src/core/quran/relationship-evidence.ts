@@ -54,7 +54,9 @@ function validateSource(source: QuranEvidenceSource): void {
     throw new QuranEvidenceIntegrityError('source ID must be a canonical identifier.');
   }
   if (!/^[a-f0-9]{64}$/.test(source.sha256)) {
-    throw new QuranEvidenceIntegrityError('source SHA-256 must be a lowercase 64-character hex digest.');
+    throw new QuranEvidenceIntegrityError(
+      'source SHA-256 must be a lowercase 64-character hex digest.',
+    );
   }
   if (
     !source.fileName ||
@@ -63,14 +65,13 @@ function validateSource(source: QuranEvidenceSource): void {
     !source.attribution ||
     !/^\d{4}-\d{2}-\d{2}$/.test(source.retrievedAt)
   ) {
-    throw new QuranEvidenceIntegrityError('source must include verified file, URL, rights and retrieval metadata.');
+    throw new QuranEvidenceIntegrityError(
+      'source must include verified file, URL, rights and retrieval metadata.',
+    );
   }
 }
 
-export function curatedRelationshipStableId(
-  link: QuranRelationship,
-  sourceId: string,
-): string {
+export function curatedRelationshipStableId(link: QuranRelationship, sourceId: string): string {
   return [
     'curated',
     sourceId,
@@ -138,7 +139,9 @@ export class QuranRelationshipEvidenceIndex {
       'retrievedAt',
     ] as const) {
       if (candidate[field] !== expectedSource[field]) {
-        throw new QuranEvidenceIntegrityError('sources[0].' + field + ' differs from the pinned source.');
+        throw new QuranEvidenceIntegrityError(
+          'sources[0].' + field + ' differs from the pinned source.',
+        );
       }
     }
     const values = input['relationships'];
@@ -154,7 +157,10 @@ export class QuranRelationshipEvidenceIndex {
       if (relationship['legacyId'] !== legacyId || relationship['stableId'] !== stableId) {
         throw new QuranEvidenceIntegrityError(label + ' has a mismatched legacy or stable ID.');
       }
-      if (relationship['type'] !== 'curated-similar-passage' || relationship['origin'] !== 'curated') {
+      if (
+        relationship['type'] !== 'curated-similar-passage' ||
+        relationship['origin'] !== 'curated'
+      ) {
         throw new QuranEvidenceIntegrityError(label + ' has an unsupported classification.');
       }
       const evidence = relationship['evidence'];
@@ -162,8 +168,13 @@ export class QuranRelationshipEvidenceIndex {
         throw new QuranEvidenceIntegrityError(label + ' must contain one source assertion.');
       }
       const assertion = record(evidence[0], label + '.evidence[0]');
-      if (assertion['kind'] !== 'curated-reference' || assertion['sourceId'] !== expectedSource.id) {
-        throw new QuranEvidenceIntegrityError(label + ' references unknown or unsupported evidence.');
+      if (
+        assertion['kind'] !== 'curated-reference' ||
+        assertion['sourceId'] !== expectedSource.id
+      ) {
+        throw new QuranEvidenceIntegrityError(
+          label + ' references unknown or unsupported evidence.',
+        );
       }
       if (byStableId.has(stableId)) {
         throw new QuranEvidenceIntegrityError(label + ' duplicates a stable ID.');

@@ -51,9 +51,6 @@ describe('Quran graph integration with pinned Mutashabihat snapshot', () => {
     expect(example).toBeDefined();
     if (!example) throw new Error('Known pinned relationship is missing');
     expect(evidence.forLink(example).stableId).toBe('curated:mutashabihat:8-8:1161-1161');
-    expect(source.sha256).toBe(
-      '785d5efa266a19c405a449b0a01ebf34fe7dc09836d5b6ef301eae874db780f0',
-    );
+    expect(source.sha256).toBe('785d5efa266a19c405a449b0a01ebf34fe7dc09836d5b6ef301eae874db780f0');
   });
-
 });

@@ -31,9 +31,7 @@ same sorted 2,445 curated links, numeric indices, direction and source ranges.
       "legacyId": 0,
       "type": "curated-similar-passage",
       "origin": "curated",
-      "evidence": [
-        { "kind": "curated-reference", "sourceId": "mutashabihat" }
-      ]
+      "evidence": [{ "kind": "curated-reference", "sourceId": "mutashabihat" }]
     }
   ]
 }
@@ -49,7 +47,7 @@ No confidence scores, morphology, shared roots or inferred theology are added.
 
 `legacyId` is the existing zero-based numeric index and remains the basis of
 current `?link=N` links. The new `stableId` derives from the provenance source
-ID and the two *directed, inclusive, zero-based Quran ayah ranges*, not the
+ID and the two _directed, inclusive, zero-based Quran ayah ranges_, not the
 array position. It therefore survives reordering of the source link array.
 It is not a verse-reference string or a textual hash. The source ID namespace
 must remain unique if later imports add distinct corpora.

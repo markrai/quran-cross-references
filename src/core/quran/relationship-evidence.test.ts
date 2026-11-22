@@ -63,7 +63,9 @@ describe('Phase 2B.1 curated evidence and stable relationship identity', () => {
     const reversed = new QuranRelationshipIndex({ ...DATA, links: [...DATA.links].reverse() });
     const evidence = createCuratedRelationshipEvidence(reversed, SOURCE);
     expect(evidence.relationships.map((entry) => entry.stableId)).toEqual(
-      build().relationships.map((entry) => entry.stableId).reverse(),
+      build()
+        .relationships.map((entry) => entry.stableId)
+        .reverse(),
     );
     expect(evidence.relationships.map((entry) => entry.legacyId)).toEqual([0, 1]);
     expect(curatedRelationshipStableId(index.link(0), SOURCE.id)).toBe(
@@ -86,9 +88,7 @@ describe('Phase 2B.1 curated evidence and stable relationship identity', () => {
         QuranEvidenceIntegrityError,
       );
     }
-    expect(() => parse(build(), { ...SOURCE, sha256: 'invalid' })).toThrow(
-      'source SHA-256',
-    );
+    expect(() => parse(build(), { ...SOURCE, sha256: 'invalid' })).toThrow('source SHA-256');
   });
 
   it('rejects unknown formats, mismatched numbering, missing sources and source tampering', () => {
@@ -100,18 +100,18 @@ describe('Phase 2B.1 curated evidence and stable relationship identity', () => {
     expect(() => parse({ ...dataset, sources: null })).toThrow('sources');
     expect(() => parse({ ...dataset, sources: [] })).toThrow('exactly one');
     expect(() => parse({ ...dataset, sources: [null] })).toThrow('sources[0]');
-    expect(() =>
-      parse({ ...dataset, sources: [{ ...SOURCE, sha256: 'b'.repeat(64) }] }),
-    ).toThrow('sources[0].sha256');
-    expect(() => parse({ ...dataset, sources: [{ ...SOURCE, url: 'https://wrong.test' }] })).toThrow(
-      'sources[0].url',
+    expect(() => parse({ ...dataset, sources: [{ ...SOURCE, sha256: 'b'.repeat(64) }] })).toThrow(
+      'sources[0].sha256',
     );
+    expect(() =>
+      parse({ ...dataset, sources: [{ ...SOURCE, url: 'https://wrong.test' }] }),
+    ).toThrow('sources[0].url');
     expect(() => parse({ ...dataset, sources: [{ ...SOURCE, license: 'unknown' }] })).toThrow(
       'sources[0].license',
     );
-    expect(() => parse({ ...dataset, sources: [{ ...SOURCE, retrievedAt: '2000-01-01' }] })).toThrow(
-      'sources[0].retrievedAt',
-    );
+    expect(() =>
+      parse({ ...dataset, sources: [{ ...SOURCE, retrievedAt: '2000-01-01' }] }),
+    ).toThrow('sources[0].retrievedAt');
   });
 
   it('rejects missing, reordered, fabricated, or unverified classifications', () => {
@@ -132,18 +132,18 @@ describe('Phase 2B.1 curated evidence and stable relationship identity', () => {
     expect(() =>
       parse({ ...dataset, relationships: [{ ...first, stableId: 'fabricated' }, second] }),
     ).toThrow('mismatched legacy or stable ID');
-    expect(() => parse({ ...dataset, relationships: [{ ...first, type: 'shared-root' }, second] })).toThrow(
-      'unsupported classification',
-    );
-    expect(() => parse({ ...dataset, relationships: [{ ...first, origin: 'computed' }, second] })).toThrow(
-      'unsupported classification',
-    );
-    expect(() => parse({ ...dataset, relationships: [{ ...first, evidence: [] }, second] })).toThrow(
-      'one source assertion',
-    );
-    expect(() => parse({ ...dataset, relationships: [{ ...first, evidence: [null] }, second] })).toThrow(
-      'evidence[0] must be an object',
-    );
+    expect(() =>
+      parse({ ...dataset, relationships: [{ ...first, type: 'shared-root' }, second] }),
+    ).toThrow('unsupported classification');
+    expect(() =>
+      parse({ ...dataset, relationships: [{ ...first, origin: 'computed' }, second] }),
+    ).toThrow('unsupported classification');
+    expect(() =>
+      parse({ ...dataset, relationships: [{ ...first, evidence: [] }, second] }),
+    ).toThrow('one source assertion');
+    expect(() =>
+      parse({ ...dataset, relationships: [{ ...first, evidence: [null] }, second] }),
+    ).toThrow('evidence[0] must be an object');
     expect(() =>
       parse({
         ...dataset,
@@ -171,9 +171,9 @@ describe('Phase 2B.1 curated evidence and stable relationship identity', () => {
     expect(() => evidence.byLegacyId(0.5)).toThrow(RangeError);
     expect(() => evidence.byLegacyId(Number.NaN)).toThrow(RangeError);
     const other = index.link(0);
-    expect(() =>
-      evidence.forLink({ ...other, source: { start: 0, end: 0 } }),
-    ).toThrow('link endpoints do not match');
+    expect(() => evidence.forLink({ ...other, source: { start: 0, end: 0 } })).toThrow(
+      'link endpoints do not match',
+    );
   });
 
   it('accepts empty curated corpora without inventing relationships', () => {
