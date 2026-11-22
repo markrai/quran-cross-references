@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { buckwalterToArabic, type QacMorphologyIndex } from '../core/quran/qac-index.ts';
 import { QAC_OCCURRENCE_PAGE_SIZE, type QacGrouping } from '../core/quran/qac-types.ts';
 import { formatAyahId } from '../core/quran/ayah-ref.ts';
@@ -27,7 +27,7 @@ export function QuranMorphology({
   onOccurrence,
 }: Props) {
   const words = index.wordsAt(ayahIndex);
-  const [page, setPage] = useState(0);
+  const [pagination, setPagination] = useState({ key: '', page: 0 });
   const [search, setSearch] = useState('');
   const [searchError, setSearchError] = useState<string | null>(null);
   const currentWord =
@@ -40,21 +40,19 @@ export function QuranMorphology({
   const term = selectedTerm ?? initial ?? null;
   const hits = term === null ? [] : index.occurrences(grouping, term);
   const count = Math.max(1, Math.ceil(hits.length / QAC_OCCURRENCE_PAGE_SIZE));
-  const currentPage = Math.min(page, count - 1);
+  const pageKey = grouping + ':' + (term ?? '');
+  const currentPage = pagination.key === pageKey ? Math.min(pagination.page, count - 1) : 0;
   const occurrences = hits.slice(
     currentPage * QAC_OCCURRENCE_PAGE_SIZE,
     (currentPage + 1) * QAC_OCCURRENCE_PAGE_SIZE,
   );
 
-  useEffect(() => {
-    setPage(0);
-    setSearchError(null);
-  }, [grouping, selectedTerm]);
-
   const selectWord = (position: number) => {
     const word = words[position];
     if (!word) return;
     const values = grouping === 'root' ? word.roots : word.lemmas;
+    setSearchError(null);
+    setPagination({ key: '', page: 0 });
     onSelect(values[0] ?? null, position + 1);
   };
 
@@ -82,6 +80,8 @@ export function QuranMorphology({
             aria-label="Morphology grouping"
             value={grouping}
             onChange={(event) => {
+              setSearchError(null);
+              setPagination({ key: '', page: 0 });
               onGroup(event.target.value === 'root' ? 'root' : 'lemma');
             }}
           >
@@ -99,6 +99,7 @@ export function QuranMorphology({
               return;
             }
             setSearchError(null);
+            setPagination({ key: '', page: 0 });
             onSelect(resolved, null);
           }}
         >
@@ -107,7 +108,7 @@ export function QuranMorphology({
             <input
               aria-label="Search morphology term"
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => { setSearch(event.target.value); }}
               placeholder={grouping === 'root' ? 'رحم or rHm' : 'Arabic or Buckwalter'}
             />
           </label>
@@ -135,7 +136,7 @@ export function QuranMorphology({
                   type="button"
                   aria-label={'Inspect annotated word ' + String(position + 1)}
                   aria-pressed={selectedWord === position + 1}
-                  onClick={() => selectWord(position)}
+                  onClick={() => { selectWord(position); }}
                 >
                   <span lang="ar" dir="rtl" className={styles.qacArabic}>
                     {word.form || '…'}
@@ -227,7 +228,7 @@ export function QuranMorphology({
                 <button
                   type="button"
                   disabled={currentPage === 0}
-                  onClick={() => setPage(currentPage - 1)}
+                  onClick={() => { setPagination({ key: pageKey, page: currentPage - 1 }); }}
                 >
                   Previous occurrences
                 </button>
@@ -237,7 +238,7 @@ export function QuranMorphology({
                 <button
                   type="button"
                   disabled={currentPage + 1 >= count}
-                  onClick={() => setPage(currentPage + 1)}
+                  onClick={() => { setPagination({ key: pageKey, page: currentPage + 1 }); }}
                 >
                   Next occurrences
                 </button>

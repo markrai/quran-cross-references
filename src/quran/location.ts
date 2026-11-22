@@ -80,7 +80,7 @@ export function parseQuranLocation(url: URL): QuranLocation {
     rawTerm.length > 0 &&
     rawTerm.length <= 128 &&
     rawTerm.trim() === rawTerm &&
-    !/[\u0000-\u001F]/u.test(rawTerm)
+    !Array.from(rawTerm).some((character) => character.charCodeAt(0) < 32)
       ? rawTerm
       : null;
   const rawWord = params.get('word');

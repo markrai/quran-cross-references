@@ -191,7 +191,7 @@ export class QacMorphologyIndex {
           if (!Array.isArray(raw) || raw.length !== 3) {
             invalid('Each QAC segment requires a form, tag and features.');
           }
-          const form = raw[0];
+          const form: unknown = raw[0];
           if (typeof form !== 'string') invalid('QAC segment form must be a string.');
           const tag = string(raw[1], 'segment tag');
           const features = string(raw[2], 'segment features');
