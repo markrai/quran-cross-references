@@ -188,6 +188,25 @@ under `BASE_PATH=/`, open `/quran/`.
 - Preserve strict lint, formatting, coverage, production artifact and
   desktop/phone tests; see `docs/RELATIONSHIP_EVIDENCE.md`.
 
+### Phase 2B.2: Verbatim Arabic repeated expressions
+
+- Tokenize the 6,236 verified Arabic ayahs without modifying Unicode,
+  vowels or Quranic marks. Retain word positions and source text offsets.
+- Detect 3–8 consecutive-word expressions in at least two distinct ayahs.
+  Keep repeated occurrences within one ayah but do not generate
+  cross-ayah sequences or pairwise relationship explosions.
+- Remove a shorter expression only if its complete set of occurrences is
+  covered by a longer identical repetition at matching offsets.
+- Store occurrence groups as independently verifiable
+  `quran-exact-expressions` evidence, with namespaced SHA-256 identities,
+  source SHA/license attribution and explicit `computed` origin.
+- Produce ignored `expressions.json` and `expression-profile.json` for
+  repeatable CPU/memory/output measurements. Keep computed matches out of
+  the offline PWA until a separate product-size review.
+- Validate corpus-wide source spans, tampering, byte reproducibility,
+  and Windows/Linux generation through CI, maintaining all existing
+  curated IDs and browser acceptance. See `docs/QURAN_PHASE_2B2.md`.
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

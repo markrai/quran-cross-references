@@ -27,7 +27,9 @@
     "data:quran": "node scripts/quran/build.ts",
     "assets:quran": "node scripts/quran/build-assets.ts",
     "pwa:build": "node scripts/quran/build-pwa.ts",
-    "bench:graph": "node scripts/quran/bench-graph.ts"
+    "bench:graph": "node scripts/quran/bench-graph.ts",
+    "data:expressions": "node scripts/quran/build-expressions.ts",
+    "bench:expressions": "npm run data:expressions"
   },
   "dependencies": {
     "react": "^19.3.0",

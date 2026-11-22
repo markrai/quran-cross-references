@@ -156,6 +156,9 @@ test.describe('Quran production readiness', () => {
         );
         return responses.every((response) => response !== undefined);
       });
+      await page.reload();
+      await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
+      await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated');
       const failures: string[] = [];
       page.on('pageerror', (error) => failures.push('Page error: ' + error.message));
       page.on('requestfailed', (request) => {

@@ -41,6 +41,26 @@ jobs:
           retention-days: 7
       - name: Validate pinned Quran datasets
         run: npm run data:quran
+      - name: Generate pinned exact-expression evidence and profile
+        run: npm run data:expressions
+      - name: Verify byte-identical expression regeneration
+        shell: bash
+        run: |
+          first="$(sha256sum data/quran/generated/expressions.json | cut -d' ' -f1)"
+          npm run data:expressions
+          second="$(sha256sum data/quran/generated/expressions.json | cut -d' ' -f1)"
+          if [ "$first" != "$second" ]; then
+            echo "::error::Exact-expression dataset changed between identical builds."
+            exit 1
+          fi
+      - name: Archive exact-expression corpus statistics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: quran-expression-profile
+          path: data/quran/generated/expression-profile.json
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Record full-corpus SVG layout benchmark
         run: npm run bench:graph
 
@@ -58,6 +78,8 @@ jobs:
         run: npm run lint
       - name: Validate pinned Quran sources on Windows
         run: npm run data:quran
+      - name: Generate exact-expression evidence on Windows
+        run: npm run data:expressions
       - name: Test Quran source integrity, importers and graph
         run: npx vitest run scripts/quran/pinned-source.test.ts scripts/quran/datasets.test.ts scripts/quran/graph.test.ts scripts/quran/raw-ignore.test.ts src/core/quran/relationship-evidence.test.ts
       - name: Confirm Quran datasets were published
@@ -86,6 +108,10 @@ jobs:
           test -s dist/data/quran/relationships.json
           test -s dist/data/quran/evidence.json
           test -s dist/data/quran/manifest.json
+          if test -e dist/data/quran/expressions.json; then
+            echo '::error::Experimental computed expressions must not ship in the offline PWA.'
+            exit 1
+          fi
           test -s dist/manifest.webmanifest
           test -s dist/icons/icon-192.png
           test -s dist/icons/icon-512.png
