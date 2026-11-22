@@ -250,8 +250,9 @@ export function QuranApp() {
             ))}
           </div>
           <div className={styles.toolbarFields}>
-            <label className={styles.field}>
-              <span>Evidence type</span>
+            {location.view !== 'analytics' && (
+              <label className={styles.field}>
+                <span>Evidence type</span>
               <select
                 aria-label="Evidence type"
                 value={location.evidence}
@@ -271,7 +272,8 @@ export function QuranApp() {
                 <option value="curated">Curated similar passages</option>
                 <option value="exact">Computed exact Arabic phrases</option>
               </select>
-            </label>
+              </label>
+            )}
             <label className={styles.field}>
               <span>Surah</span>
               <select

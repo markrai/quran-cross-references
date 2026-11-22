@@ -72,7 +72,7 @@ export function QuranAnalytics({
         </div>
       </header>
 
-      <div className={styles.analyticsKpis} aria-label="Corpus summary">
+      <div className={styles.analyticsKpis} role="group" aria-label="Corpus summary">
         <div className={styles.analyticsKpi}>
           <strong>{format(report.totals.ayahs)}</strong>
           <span>Canonical ayahs</span>
