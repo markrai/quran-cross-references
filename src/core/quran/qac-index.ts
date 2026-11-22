@@ -176,7 +176,7 @@ export class QacMorphologyIndex {
     const converted: QacWordAnalysis[][] = [];
     const verseRows: readonly unknown[] = ayahs;
     for (const [ayah, rawWords] of verseRows.entries()) {
-      const words: readonly unknown[] = Array.isArray(rawWords) ? rawWords as unknown[] : [];
+      const words: readonly unknown[] = Array.isArray(rawWords) ? (rawWords as unknown[]) : [];
       if (!Array.isArray(words) || words.length < 1 || words.length > 300) {
         invalid('A QAC ayah has missing or implausible word positions.');
       }
