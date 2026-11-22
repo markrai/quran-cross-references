@@ -39,7 +39,7 @@ describe('Quran offline release shell', () => {
     expect(source).toContain('quran-cross-references-shell-revision-1');
     expect(source).toContain('cache.addAll');
     expect(source).toContain("request.mode === 'navigate'");
-    expect(source).toContain("new URL('index.html', scope)");
+    expect(source).toContain("alias ? 'quran/index.html' : 'index.html'");
     expect(source).toContain('url.origin !== root.origin');
     expect(source).toContain('self.clients.claim()');
     expect(source).not.toContain('bible-cross-references');
