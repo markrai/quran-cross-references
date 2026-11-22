@@ -48,6 +48,7 @@ describe('Quran graph layout and focused passages', () => {
     const spanning = second;
     expect(arcVisibleInViewport(spanning, { x: 450, width: 100 })).toBe(true);
     expect(arcVisibleInViewport(first, { x: 900, width: 100 })).toBe(false);
+    expect(arcVisibleInViewport(first, { x: -100, width: 100 })).toBe(false);
     expect(arcVisibleInViewport(arcs[0]!, { x: 0, width: 1200 })).toBe(true);
   });
 });
