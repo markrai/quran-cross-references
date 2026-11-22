@@ -24,12 +24,10 @@ export type ReferenceParseResult =
 export function parseReference(
   input: string,
   versification: QuranVersification = CANONICAL_QURAN,
-  _names?: unknown,
 ): ReferenceParseResult {
   const text = input.trim();
   let surah: number | undefined;
   let ayah: number | undefined;
-  let nameQuery = '';
 
   let match = /^(\d{1,3})\s*:\s*(\d{1,3})$/i.exec(text);
   if (match) {
@@ -43,7 +41,7 @@ export function parseReference(
     } else {
       match = /^(?:surah\s+)?(.+?)\s+(\d{1,3})$/iu.exec(text);
       if (match) {
-        nameQuery = match[1] ?? '';
+        const nameQuery = match[1] ?? '';
         surah = NAME_LOOKUP.get(normalize(nameQuery));
         ayah = Number(match[2]);
         if (surah === undefined) return { ok: false, error: { kind: 'unknown-surah', query: nameQuery } };

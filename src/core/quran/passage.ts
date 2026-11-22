@@ -26,7 +26,7 @@ export function isSamePassage(a: Passage | null, b: Passage | null): boolean {
     : a.surah === b.surah;
 }
 
-export function formatPassage(passage: Passage, versification: QuranVersification, _names?: unknown): string {
+export function formatPassage(passage: Passage, versification: QuranVersification): string {
   return passage.kind === 'ayah'
     ? formatReference(versification.refAt(passage.ayah))
     : `Surah ${String(passage.surah)}`;
