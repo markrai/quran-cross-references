@@ -64,6 +64,36 @@ jobs:
       - name: Record full-corpus SVG layout benchmark
         run: npm run bench:graph
 
+
+  normalize-expressions-once:
+    name: One-time format Phase 2B.2 source
+    if: github.event_name == 'pull_request' && github.head_ref == 'feat/quran-phase-2b2-exact-arabic-expressions' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run format
+      - name: Commit normalized source and tests
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u
+          git restore --staged .github/workflows/ci.yml
+          if ! git diff --cached --quiet; then
+            git commit -m "style(quran): format Phase 2B.2 evidence and tests"
+            git push origin "HEAD:${{ github.head_ref }}"
+          fi
+
+
   quran-windows:
     name: Quran source integrity (Windows)
     runs-on: windows-latest
