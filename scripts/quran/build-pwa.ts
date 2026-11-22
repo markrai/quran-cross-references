@@ -13,6 +13,7 @@ for (const required of [
   'quran/index.html',
   'data/quran/text.json',
   'data/quran/relationships.json',
+  'data/quran/evidence.json',
   'data/quran/manifest.json',
   'manifest.webmanifest',
   'icons/icon-192.png',
