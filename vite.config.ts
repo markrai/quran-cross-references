@@ -31,7 +31,10 @@ export default defineConfig(({ command, isPreview = false }) => ({
     chunkSizeWarningLimit: 600,
     rolldownOptions: {
       input: Object.fromEntries(
-        Object.entries(PAGES).map(([name, { entry }]) => [name, resolve(ROOT_DIR, entry)]),
+        [
+          ...Object.entries(PAGES).map(([name, { entry }]) => [name, resolve(ROOT_DIR, entry)]),
+          ['quran', resolve(ROOT_DIR, 'quran/index.html')],
+        ],
       ),
       output: {
         // Named vendor chunks: cacheable across pages and readable in the build report.
