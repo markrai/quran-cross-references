@@ -43,9 +43,7 @@ export async function loadQuranExpressions(
   if (!Array.isArray(pins)) {
     throw new Error('The source registry is missing.');
   }
-  const sourceValue: unknown = pins.find(
-    (pin: unknown) => object(pin)['id'] === 'tanzil-uthmani',
-  );
+  const sourceValue: unknown = pins.find((pin: unknown) => object(pin)['id'] === 'tanzil-uthmani');
   const pin = object(sourceValue);
   const fields = [
     'id',

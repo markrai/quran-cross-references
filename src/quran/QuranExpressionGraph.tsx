@@ -46,17 +46,12 @@ export function QuranExpressionGraph({
   if (!anchor) return null;
   const targets = [
     ...new Set(
-      expression.occurrences
-        .filter((site) => site.ayah !== anchor.ayah)
-        .map((site) => site.ayah),
+      expression.occurrences.filter((site) => site.ayah !== anchor.ayah).map((site) => site.ayah),
     ),
   ];
   const pageCount = Math.max(1, Math.ceil(targets.length / GRAPH_PAGE_SIZE));
   const currentPage = Math.min(page, pageCount - 1);
-  const display = targets.slice(
-    currentPage * GRAPH_PAGE_SIZE,
-    (currentPage + 1) * GRAPH_PAGE_SIZE,
-  );
+  const display = targets.slice(currentPage * GRAPH_PAGE_SIZE, (currentPage + 1) * GRAPH_PAGE_SIZE);
   const x1 = graphXOfAyah(anchor.ayah, CANONICAL_QURAN.ayahCount);
   const zoom = GRAPH_WIDTH / viewport.width;
 
@@ -97,8 +92,8 @@ export function QuranExpressionGraph({
         <div>
           <h2>Exact phrase occurrence graph</h2>
           <p>
-            Each curve joins the current source ayah to one other ayah with the identical
-            Arabic phrase. No pairwise mesh or relevance ranking is inferred.
+            Each curve joins the current source ayah to one other ayah with the identical Arabic
+            phrase. No pairwise mesh or relevance ranking is inferred.
           </p>
         </div>
         <strong>{String(targets.length)} other ayahs</strong>
@@ -254,9 +249,9 @@ export function QuranExpressionGraph({
       </div>
       <p className={styles.graphNote}>
         Showing {String(currentPage * GRAPH_PAGE_SIZE + 1)}–
-        {String(currentPage * GRAPH_PAGE_SIZE + display.length)} of{' '}
-        {String(targets.length)} distinct target ayahs · anchor{' '}
-        {formatAyahId(CANONICAL_QURAN.refAt(anchor.ayah))}. Select any curve to read that ayah.
+        {String(currentPage * GRAPH_PAGE_SIZE + display.length)} of {String(targets.length)}{' '}
+        distinct target ayahs · anchor {formatAyahId(CANONICAL_QURAN.refAt(anchor.ayah))}. Select
+        any curve to read that ayah.
       </p>
     </section>
   );

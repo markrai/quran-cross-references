@@ -112,5 +112,4 @@ describe('Quran-first canonical route', () => {
       expect(location.selectedExpression).toBeNull();
     }
   });
-
 });

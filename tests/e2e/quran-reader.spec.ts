@@ -411,7 +411,6 @@ test.describe('Quran Phase 2A graph exploration', () => {
   });
 });
 
-
 test.describe('Quran Phase 2B.3 computed expression exploration', () => {
   test('loads exact evidence only on demand without adding it to the offline installation cache', async ({
     page,
@@ -431,9 +430,7 @@ test.describe('Quran Phase 2B.3 computed expression exploration', () => {
     const expressionIsPrecached = await page.evaluate(async () => {
       const registration = await navigator.serviceWorker.ready;
       const names = await caches.keys();
-      const name = names.find((candidate) =>
-        candidate.startsWith('quran-cross-references-shell-'),
-      );
+      const name = names.find((candidate) => candidate.startsWith('quran-cross-references-shell-'));
       if (!name) throw new Error('Quran PWA cache missing.');
       const cache = await caches.open(name);
       return (

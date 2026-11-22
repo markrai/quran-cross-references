@@ -66,10 +66,7 @@ export class QuranExpressionIndex {
         throw new Error('Expression source does not match the pinned Tanzil source.');
       }
     }
-    if (
-      expectedSource.id !== 'tanzil-uthmani' ||
-      !/^[a-f0-9]{64}$/.test(expectedSource.sha256)
-    ) {
+    if (expectedSource.id !== 'tanzil-uthmani' || !/^[a-f0-9]{64}$/.test(expectedSource.sha256)) {
       throw new Error('The expected Arabic source pin is invalid.');
     }
     if (arabic.length !== CANONICAL_QURAN.ayahCount) {
@@ -91,10 +88,7 @@ export class QuranExpressionIndex {
       throw new Error('Expression statistics do not match the Arabic corpus.');
     }
 
-    const postings: QuranExpressionMatch[][] = Array.from(
-      { length: arabic.length },
-      () => [],
-    );
+    const postings: QuranExpressionMatch[][] = Array.from({ length: arabic.length }, () => []);
     const expressions: QuranPublishedExpression[] = [];
     const ids = new Map<string, QuranPublishedExpression>();
     let occurrenceCount = 0;

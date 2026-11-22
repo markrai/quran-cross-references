@@ -83,20 +83,21 @@ export function QuranExpressions({
       <div className={styles.expressionColumns}>
         <div className={styles.expressionColumn}>
           <h3>
-            At {formatAyahId(CANONICAL_QURAN.refAt(ayahIndex))} ·{' '}
-            {String(unique.length)} phrases
+            At {formatAyahId(CANONICAL_QURAN.refAt(ayahIndex))} · {String(unique.length)} phrases
           </h3>
           {unique.length === 0 ? (
             <p className={styles.empty}>
-              No repeated 3–8-word expression from this dataset starts in the selected ayah.
-              Try another reference, or follow an existing selected phrase.
+              No repeated 3–8-word expression from this dataset starts in the selected ayah. Try
+              another reference, or follow an existing selected phrase.
             </p>
           ) : (
             <div className={styles.expressionButtons}>
               {visiblePhrases.map(phraseButton)}
               {additionalPhrases.length > 0 && (
                 <details className={styles.expressionMore}>
-                  <summary>Show {String(additionalPhrases.length)} more phrases in this ayah</summary>
+                  <summary>
+                    Show {String(additionalPhrases.length)} more phrases in this ayah
+                  </summary>
                   <div className={styles.expressionButtons}>
                     {additionalPhrases.map(phraseButton)}
                   </div>
@@ -118,8 +119,7 @@ export function QuranExpressions({
               </p>
               <p className={styles.expressionStats}>
                 {String(selected.occurrences.length)} recorded spans in{' '}
-                {String(new Set(selected.occurrences.map((site) => site.ayah)).size)} distinct
-                ayahs
+                {String(new Set(selected.occurrences.map((site) => site.ayah)).size)} distinct ayahs
               </p>
               <div className={styles.expressionLocations}>
                 {visibleOccurrences.map((site) => occurrenceButton(site.ayah, site.start))}

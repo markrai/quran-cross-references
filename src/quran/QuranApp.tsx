@@ -314,20 +314,20 @@ export function QuranApp() {
             {location.evidence === 'curated' && (
               <label className={styles.field}>
                 <span>Relationships</span>
-              <select
-                aria-label="Relationship scope"
-                value={location.scope}
-                onChange={(event) => {
-                  const scope = event.target.value;
-                  if (scope === 'all' || scope === 'same-surah' || scope === 'cross-surah') {
-                    navigate({ ...location, scope, selectedLink: null });
-                  }
-                }}
-              >
-                <option value="all">All curated links</option>
-                <option value="same-surah">Within one surah</option>
-                <option value="cross-surah">Across surahs</option>
-              </select>
+                <select
+                  aria-label="Relationship scope"
+                  value={location.scope}
+                  onChange={(event) => {
+                    const scope = event.target.value;
+                    if (scope === 'all' || scope === 'same-surah' || scope === 'cross-surah') {
+                      navigate({ ...location, scope, selectedLink: null });
+                    }
+                  }}
+                >
+                  <option value="all">All curated links</option>
+                  <option value="same-surah">Within one surah</option>
+                  <option value="cross-surah">Across surahs</option>
+                </select>
               </label>
             )}
             {location.view === 'threads' && location.evidence === 'curated' && (
