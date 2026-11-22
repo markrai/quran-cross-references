@@ -117,9 +117,9 @@ describe('QuranRelationshipIndex', () => {
         links: [{ source: { start: 0, end: 0 }, target: { start: 0, end: 0 }, contextAfter: -1 }],
       }),
     ).toThrow('contextAfter');
-    expect(() => new QuranRelationshipIndex({ ...DATA, links: [...DATA.links, DATA.links[0]] })).toThrow(
-      'duplicates',
-    );
+    expect(() =>
+      new QuranRelationshipIndex({ ...DATA, links: [...DATA.links, DATA.links[0]] }),
+    ).toThrow('duplicates');
   });
 
   it('supports empty datasets without inventing relationships', () => {
