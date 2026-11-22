@@ -4,10 +4,7 @@ import { QuranRelationshipIndex } from '../core/quran/relationship-index.ts';
 import { QuranApp } from './QuranApp.tsx';
 import { loadQuranReaderData, type QuranReaderData } from './model.ts';
 
-vi.mock('./model.ts', async (importOriginal) => {
-  const original = await importOriginal<typeof import('./model.ts')>();
-  return { ...original, loadQuranReaderData: vi.fn() };
-});
+vi.mock('./model.ts', () => ({ loadQuranReaderData: vi.fn() }));
 
 const data: QuranReaderData = {
   text: {
