@@ -94,6 +94,45 @@ describe('Quran-first reader', () => {
     expect(screen.getByText(/No relationships in this dataset/)).toBeTruthy();
   });
 
+  it('selects a passage range, stores the selected relationship in the URL, and restores history', async () => {
+    render(<QuranApp />);
+    await screen.findByRole('heading', { name: /Al-Baqarah.*2:1/ });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Graph focus end ayah' }), {
+      target: { value: '3' },
+    });
+    expect(window.location.search).toContain('end=2%3A3');
+    expect(screen.getByText(/Focused passage: Al-Baqarah 2:1–3/)).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Al-Baqarah 2:1 to Al-Baqarah 2:255',
+    }));
+    expect(window.location.search).toContain('link=0');
+    expect(screen.getByRole('heading', { name: 'Selected relationship' })).toBeTruthy();
+
+    window.history.replaceState(null, '', '/?ref=2%3A1&end=2%3A4&link=1');
+    fireEvent(window, new PopStateEvent('popstate'));
+    await waitFor(() => {
+      expect(screen.getByRole('combobox', { name: 'Graph focus end ayah' })).toHaveProperty(
+        'value',
+        '4',
+      );
+    });
+    expect(screen.getByRole('heading', { name: 'Selected relationship' })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next ayah' }));
+    expect(window.location.search).toContain('ref=2%3A2');
+    expect(window.location.search).not.toContain('end=');
+    expect(window.location.search).not.toContain('link=');
+  });
+
+  it('ignores malformed and out-of-range relationship selections', async () => {
+    window.history.replaceState(null, '', '/?ref=2%3A1&link=999999999');
+    render(<QuranApp />);
+    await screen.findByRole('heading', { name: /Al-Baqarah.*2:1/ });
+    expect(screen.queryByRole('heading', { name: 'Selected relationship' })).toBeNull();
+    expect(screen.getByText(/visible links/)).toBeTruthy();
+  });
+
   it('offers a retry if the dataset load fails', async () => {
     vi.mocked(loadQuranReaderData)
       .mockRejectedValueOnce(new Error('Dataset unavailable'))
