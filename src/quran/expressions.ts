@@ -64,9 +64,6 @@ export async function loadQuranExpressions(
   if (bytes.byteLength > MAX_EXPRESSION_BYTES) {
     throw new Error('Exact expression evidence exceeds the approved 4 MiB transfer budget.');
   }
-  if (!globalThis.crypto?.subtle) {
-    throw new Error('A secure browser context is required to verify expression evidence.');
-  }
   const computed = await globalThis.crypto.subtle.digest('SHA-256', bytes);
   const actual = Array.from(new Uint8Array(computed), (byte) =>
     byte.toString(16).padStart(2, '0'),
