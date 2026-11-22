@@ -222,7 +222,8 @@ test.describe('Quran Phase 2A graph exploration', () => {
 
     const arc = page.locator('[data-graph-interactive][aria-pressed]').first();
     await expect(arc).toBeVisible();
-    await arc.click();
+    await arc.focus();
+    await arc.press('Enter');
     await expect(page).toHaveURL(/link=\d+/);
     await expect(page.getByRole('heading', { name: 'Selected relationship' })).toBeVisible();
     const selectedURL = page.url();
