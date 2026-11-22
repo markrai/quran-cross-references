@@ -53,7 +53,7 @@ export function graphXOfAyah(index: number, ayahCount: number): number {
 }
 
 export function graphAyahAtWorldX(worldX: number, ayahCount: number): number {
-  const raw = Math.floor(((worldX - GRAPH_AXIS_LEFT) / GRAPH_AXIS_WIDTH) * ayahCount);
+  const raw = Math.floor(((worldX - GRAPH_AXIS_LEFT) / GRAPH_AXIS_WIDTH) * ayahCount + 1e-9);
   return clamp(raw, 0, ayahCount - 1);
 }
 
@@ -63,6 +63,6 @@ export function graphWorldXAtClientX(
   rectLeft: number,
   rectWidth: number,
 ): number {
-  const ratio = clamp((clientX - rectLeft) / rectWidth, 0, 1);
+  const ratio = rectWidth > 0 ? clamp((clientX - rectLeft) / rectWidth, 0, 1) : 0.5;
   return viewport.x + viewport.width * ratio;
 }
