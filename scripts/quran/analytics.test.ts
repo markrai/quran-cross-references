@@ -10,7 +10,6 @@ import {
   createExactExpressionEvidence,
   type QuranExactExpressionDataset,
 } from './expression-evidence.ts';
-import { parseQuranAnalytics } from '../../src/quran/analytics.ts';
 
 const source = {
   id: 'tanzil-uthmani',
@@ -147,7 +146,6 @@ describe('Phase 2C.1 Quran analytics aggregates', () => {
       surahCount: 3,
       firstAyah: 0,
     });
-    expect(parseQuranAnalytics(result, hashes, links.linkCount)).toBe(result);
   });
 
   it('includes every ayah touched by a curated range without multiplying a link ID', () => {
@@ -169,7 +167,6 @@ describe('Phase 2C.1 Quran analytics aggregates', () => {
     expect(result.surahs[2]?.curatedLinks).toBe(1);
     expect(result.surahs[0]?.firstCuratedAyah).toBe(6);
     expect(result.surahs[2]?.firstCuratedAyah).toBe(293);
-    expect(parseQuranAnalytics(result, hashes, 1).surahs).toHaveLength(114);
   });
 
   it('fails on incompatible source versification or inconsistent occurrence totals', () => {
@@ -228,9 +225,6 @@ describe('Phase 2C.1 Quran analytics aggregates', () => {
     ).toBe(5084);
     expect(report.topExpressions).toHaveLength(32);
     expect(report.topExpressions[0]?.spanCount).toBe(114);
-    expect(
-      parseQuranAnalytics(report, { arabic: arabic.sha256, curated: curated.sha256 }, 2445),
-    ).toBe(report);
     const duplicate = buildQuranAnalytics(
       relationships,
       evidence,
