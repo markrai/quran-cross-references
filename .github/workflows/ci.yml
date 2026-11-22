@@ -85,7 +85,7 @@ jobs:
       - name: Confirm Quran datasets were published
         shell: pwsh
         run: |
-          foreach ($file in @("public/quran-only/data/quran/text.json", "public/quran-only/data/quran/relationships.json", "public/quran-only/data/quran/evidence.json", "public/quran-only/data/quran/manifest.json")) {
+          foreach ($file in @("public/quran-only/data/quran/text.json", "public/quran-only/data/quran/relationships.json", "public/quran-only/data/quran/evidence.json", "public/quran-only/data/quran/expressions.json", "public/quran-only/data/quran/manifest.json")) {
             if (-not (Test-Path $file)) { throw "Missing Quran dataset: $file" }
           }
 
@@ -108,10 +108,7 @@ jobs:
           test -s dist/data/quran/relationships.json
           test -s dist/data/quran/evidence.json
           test -s dist/data/quran/manifest.json
-          if test -e dist/data/quran/expressions.json; then
-            echo '::error::Experimental computed expressions must not ship in the offline PWA.'
-            exit 1
-          fi
+          test -s dist/data/quran/expressions.json
           test -s dist/manifest.webmanifest
           test -s dist/icons/icon-192.png
           test -s dist/icons/icon-512.png
@@ -121,6 +118,10 @@ jobs:
           grep -q 'Quran Cross-References' dist/index.html
           grep -q 'og:image' dist/index.html
           grep -q 'quran-cross-references-shell-' dist/sw.js
+          if grep -q 'data/quran/expressions.json' dist/sw.js; then
+            echo '::error::On-demand exact expressions must not enter the PWA install precache.'
+            exit 1
+          fi
           if test -e dist/data/translations || test -e dist/data/cross-references || test -e dist/data/words || test -e dist/threads; then
             echo '::error::Legacy Bible app or datasets leaked into the Quran release.'
             exit 1
