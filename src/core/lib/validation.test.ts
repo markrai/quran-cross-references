@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   expectArrayOf,
   expectInteger,
+  expectNullableString,
+  expectString,
+  expectArray,
   expectIntegerArray,
   expectOneOf,
   expectRecord,
@@ -37,4 +40,22 @@ describe('validation', () => {
       'level: expected one of "a", "b", got "c"',
     );
   });
+
+  it('validates nullable and ordinary strings with precise type diagnostics', () => {
+    expect(expectString('text', 'name')).toBe('text');
+    expect(expectNullableString(null, 'name')).toBeNull();
+    expect(expectNullableString('text', 'name')).toBe('text');
+    expect(() => expectString(4, 'name')).toThrow(
+      'name: expected a string, got number',
+    );
+    expect(() => expectNullableString([], 'name')).toThrow(
+      'name: expected a string, got array',
+    );
+    expect(expectArray(['a'], 'values')).toEqual(['a']);
+    expect(() => expectArray('a', 'values')).toThrow(
+      'values: expected an array, got string',
+    );
+    expect(expectStringArray(['a', 'b'], 'strings')).toEqual(['a', 'b']);
+  });
+
 });
