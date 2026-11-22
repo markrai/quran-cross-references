@@ -108,7 +108,9 @@ export function QuranMorphology({
             <input
               aria-label="Search morphology term"
               value={search}
-              onChange={(event) => { setSearch(event.target.value); }}
+              onChange={(event) => {
+                setSearch(event.target.value);
+              }}
               placeholder={grouping === 'root' ? 'رحم or rHm' : 'Arabic or Buckwalter'}
             />
           </label>
@@ -136,7 +138,9 @@ export function QuranMorphology({
                   type="button"
                   aria-label={'Inspect annotated word ' + String(position + 1)}
                   aria-pressed={selectedWord === position + 1}
-                  onClick={() => { selectWord(position); }}
+                  onClick={() => {
+                    selectWord(position);
+                  }}
                 >
                   <span lang="ar" dir="rtl" className={styles.qacArabic}>
                     {word.form || '…'}
@@ -228,7 +232,9 @@ export function QuranMorphology({
                 <button
                   type="button"
                   disabled={currentPage === 0}
-                  onClick={() => { setPagination({ key: pageKey, page: currentPage - 1 }); }}
+                  onClick={() => {
+                    setPagination({ key: pageKey, page: currentPage - 1 });
+                  }}
                 >
                   Previous occurrences
                 </button>
@@ -238,7 +244,9 @@ export function QuranMorphology({
                 <button
                   type="button"
                   disabled={currentPage + 1 >= count}
-                  onClick={() => { setPagination({ key: pageKey, page: currentPage + 1 }); }}
+                  onClick={() => {
+                    setPagination({ key: pageKey, page: currentPage + 1 });
+                  }}
                 >
                   Next occurrences
                 </button>
