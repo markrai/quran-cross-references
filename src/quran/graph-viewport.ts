@@ -43,6 +43,24 @@ export function panGraphViewport(viewport: GraphViewport, delta: number): GraphV
   return constrainGraphViewport({ x: normalized.x + delta, width: normalized.width });
 }
 
+export function dragGraphViewport(
+  viewport: GraphViewport,
+  deltaPixels: number,
+  graphWidthPixels: number,
+): GraphViewport {
+  const normalized = constrainGraphViewport(viewport);
+  if (
+    !Number.isFinite(deltaPixels) ||
+    !Number.isFinite(graphWidthPixels) ||
+    graphWidthPixels <= 0 ||
+    deltaPixels === 0
+  ) {
+    return normalized;
+  }
+  const next = normalized.width === GRAPH_WIDTH ? zoomGraphViewport(normalized, 1.8) : normalized;
+  return panGraphViewport(next, (-deltaPixels / graphWidthPixels) * next.width);
+}
+
 export function centerGraphViewport(viewport: GraphViewport, worldX: number): GraphViewport {
   const normalized = constrainGraphViewport(viewport);
   return constrainGraphViewport({ x: worldX - normalized.width / 2, width: normalized.width });
