@@ -1,12 +1,12 @@
 # Quran Cross-References: phased adoption
 
-## Merge boundary: Phase 1A, foundation only
+## Merge boundary: Quran foundation and graph adapter, no UI cutover
 
 This repository is currently a fork of Bible Cross-References. The original application
 remains the working default while the Quran implementation is introduced in isolated,
 reviewable phases.
 
-Phase 1A deliberately **does not** replace the existing app shell, routes, dataset
+Phases 1A and 1B deliberately **do not** replace the existing app shell, routes, dataset
 registry, WebGL renderer, PWA cache or translation picker. Switching those piecemeal
 would break the working application.
 
@@ -29,6 +29,28 @@ The importer preserves source and target ayah ranges as well as upstream `ctx`
 values. It does not fabricate relevance votes, theological assertions or links.
 The generated text has separate source and license entries for Arabic and English.
 
+### Phase 1B: range-aware Quran graph adapter
+
+- `QuranRelationshipIndex` validates the generated `quran-similar-passages` schema,
+  numbering scheme, range bounds, metadata and duplicate relationships before indexing.
+- Bidirectional per-ayah CSR postings index **every member** of both source and target
+  ranges, including ranges spanning surah boundaries. Single-ayah queries preserve the
+  stable source link order; range queries deduplicate links by ID.
+- Quran-specific filters select same-surah, cross-surah, and selected-surah links.
+  Same-surah means **both ranges are wholly inside the same surah**, not merely that
+  their first ayahs match. A selected-surah filter includes a link when either range
+  intersects any selected surah.
+- Passage adapters return outgoing/incoming connections once per link per direction,
+  retaining the full opposite endpoint and clipping the local endpoint to the selection.
+- Arc adapters emit midpoint coordinates, stable link IDs, and preserved upstream
+  `contextAfter` metadata. No relevance votes, rankings or theological
+  assertions are inferred. They do not yet feed the existing Bible WebGL renderer.
+- Unit tests cover validity, boundaries, collisions, cross-surah ranges, stable
+  ordering, and the complete 2,445-link imported Mutashabihat source.
+
+Run `npm run check` and `npm run data:quran` for acceptance. The checked-in scripture sources
+also use explicit LF checkout rules to preserve their reviewed SHA-256 values on Windows.
+
 ### Licensing and provenance
 
 See `data/quran/sources.json` for each exact source URL, SHA-256 digest, attribution,
@@ -41,13 +63,11 @@ dedicated CC0 and is not a complete scholarly cross-reference set.
 
 ### Next merges
 
-1. **Phase 1B: Quran graph adapter.** Build a range-aware bidirectional index,
-   Quran-specific filters, and unit-tested adapters. Keep the original app live.
-2. **Phase 1C: Quran reader and visualization.** Introduce the Quran text and
+1. **Phase 1C: Quran reader and visualization.** Introduce the Quran text and
    arc/Threads experience as an independently navigable route, with appropriate
    Arabic RTL and English LTR display. Remove old Bible APIs from Quran-specific
    components instead of renaming their parameters.
-3. **Phase 1D: Product cutover.** Replace metadata, link previews, PWA assets,
+2. **Phase 1D: Product cutover.** Replace metadata, link previews, PWA assets,
    help text, and all Bible-specific UI; validate mobile, offline, accessibility
    and end-to-end flows before replacing the default landing page.
 
