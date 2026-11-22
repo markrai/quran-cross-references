@@ -17,15 +17,16 @@ describe('exact Arabic expressions against the pinned 6,236-ayah corpus', () => 
     const english = readFileSync('data/raw/en.pickthall.txt', 'utf8');
     const text = importQuranText(arabicBytes.toString('utf8'), english);
     const evidence = createExactExpressionEvidence(text.arabic, source);
-    expect(evidence.statistics.ayahCount).toBe(6236);
-    expect(evidence.statistics.tokenCount).toBeGreaterThan(6236);
-    expect(evidence.statistics.emittedExpressions).toBeGreaterThan(0);
-    expect(evidence.statistics.emittedOccurrences).toBeGreaterThan(
-      evidence.statistics.emittedExpressions,
-    );
-    expect(evidence.statistics.candidateOccurrences).toBeGreaterThan(
-      evidence.statistics.repeatedCandidates,
-    );
+    expect(evidence.statistics).toEqual({
+      ayahCount: 6236,
+      tokenCount: 82459,
+      candidateOccurrences: 337357,
+      repeatedCandidates: 15894,
+      redundantCandidates: 10810,
+      emittedExpressions: 5084,
+      emittedOccurrences: 16924,
+      mostFrequentExpression: 114,
+    });
     expect(new Set(evidence.expressions.map((item) => item.id)).size).toBe(
       evidence.expressions.length,
     );
