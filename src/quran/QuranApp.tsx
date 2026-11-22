@@ -12,6 +12,9 @@ import { loadQuranAnalytics } from './analytics.ts';
 import type { QuranAnalyticsDataset } from '../core/quran/analytics-types.ts';
 import { QuranExpressionGraph } from './QuranExpressionGraph.tsx';
 import { QuranExpressions } from './QuranExpressions.tsx';
+import { QuranMorphology } from './QuranMorphology.tsx';
+import { loadQuranMorphology } from './morphology.ts';
+import type { QuranMorphologyIndex } from '../core/quran/morphology-index.ts';
 import { QuranThreads } from './QuranThreads.tsx';
 import {
   DEFAULT_QURAN_LOCATION,
@@ -39,6 +42,11 @@ type TopologyLoadState =
   | { readonly status: 'idle' | 'loading' }
   | { readonly status: 'error'; readonly message: string }
   | { readonly status: 'ready'; readonly report: QuranTopologyDataset };
+
+type MorphologyLoadState =
+  | { readonly status: 'idle' | 'loading' }
+  | { readonly status: 'error'; readonly message: string }
+  | { readonly status: 'ready'; readonly index: QuranMorphologyIndex };
 
 type ExpressionLoadState =
   | { readonly status: 'idle' | 'loading' }
@@ -69,7 +77,7 @@ function useQuranLocation(): readonly [
 }
 
 function linkReference(location: QuranLocation, reference: AyahRef): QuranLocation {
-  return { ...location, reference, rangeEnd: null, selectedLink: null, selectedExpression: null };
+  return { ...location, reference, rangeEnd: null, selectedLink: null, selectedExpression: null, selectedMorphTerm: null };
 }
 
 export function QuranApp() {
@@ -87,6 +95,9 @@ export function QuranApp() {
   const [topologyState, setTopologyState] = useState<TopologyLoadState>({ status: 'idle' });
   const [topologyAttempt, setTopologyAttempt] = useState(0);
   const topologyCache = useRef<QuranTopologyDataset | null>(null);
+  const [morphologyState, setMorphologyState] = useState<MorphologyLoadState>({ status: 'idle' });
+  const [morphologyAttempt, setMorphologyAttempt] = useState(0);
+  const morphologyCache = useRef<QuranMorphologyIndex | null>(null);
 
   useEffect(() => {
     const update = () => {
@@ -215,6 +226,37 @@ export function QuranApp() {
     };
   }, [data, location.view, topologyAttempt]);
 
+  useEffect(() => {
+    if (
+      !data ||
+      location.view === 'analytics' ||
+      location.view === 'network' ||
+      location.evidence !== 'morphology'
+    ) return;
+    if (morphologyCache.current) {
+      setMorphologyState({ status: 'ready', index: morphologyCache.current });
+      return;
+    }
+    const controller = new AbortController();
+    setMorphologyState({ status: 'loading' });
+    void loadQuranMorphology(controller.signal)
+      .then((index) => {
+        if (controller.signal.aborted) return;
+        morphologyCache.current = index;
+        setMorphologyState({ status: 'ready', index });
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        setMorphologyState({
+          status: 'error',
+          message: error instanceof Error ? error.message : 'Unable to verify morphology.',
+        });
+      });
+    return () => {
+      controller.abort();
+    };
+  }, [data, location.view, location.evidence, morphologyAttempt]);
+
   const expressionIndex = expressionState.status === 'ready' ? expressionState.index : null;
   const candidate =
     data && location.selectedLink !== null && location.selectedLink < data.relationships.linkCount
@@ -290,6 +332,7 @@ export function QuranApp() {
                     view,
                     evidence: view === 'network' ? 'curated' : location.evidence,
                     selectedExpression: view === 'network' ? null : location.selectedExpression,
+                    selectedMorphTerm: view === 'network' ? null : location.selectedMorphTerm,
                     selectedLink: view === 'network' ? null : location.selectedLink,
                     rangeEnd: view === 'network' ? null : location.rangeEnd,
                   });
@@ -314,19 +357,22 @@ export function QuranApp() {
                   value={location.evidence}
                   onChange={(event) => {
                     const evidence = event.target.value;
-                    if (evidence === 'curated' || evidence === 'exact') {
+                    if (evidence === 'curated' || evidence === 'exact' || evidence === 'morphology') {
                       setExpressionState({ status: 'idle' });
                       navigate({
                         ...location,
                         evidence,
                         selectedLink: null,
                         selectedExpression: null,
+                        selectedMorphTerm: null,
+                        morphologyMode: 'lemma',
                       });
                     }
                   }}
                 >
                   <option value="curated">Curated similar passages</option>
                   <option value="exact">Computed exact Arabic phrases</option>
+                  <option value="morphology">Annotated lemmas and roots (MAQAM)</option>
                 </select>
               </label>
             )}
@@ -740,6 +786,58 @@ export function QuranApp() {
             )}
             {location.view !== 'analytics' &&
               location.view !== 'network' &&
+              location.evidence === 'morphology' && (
+                <>
+                  {(morphologyState.status === 'idle' ||
+                    morphologyState.status === 'loading') && (
+                    <p className={styles.loading} role="status">
+                      Loading and verifying MAQAM lemma/root annotations…
+                    </p>
+                  )}
+                  {morphologyState.status === 'error' && (
+                    <section className={styles.morphologyPanel} role="alert">
+                      <p className={styles.empty}>{morphologyState.message}</p>
+                      <button
+                        type="button"
+                        className={styles.goButton}
+                        onClick={() => {
+                          setMorphologyState({ status: 'loading' });
+                          setMorphologyAttempt((value) => value + 1);
+                        }}
+                      >
+                        Retry morphology
+                      </button>
+                    </section>
+                  )}
+                  {morphologyState.status === 'ready' && (
+                    <QuranMorphology
+                      index={morphologyState.index}
+                      ayahIndex={focusStart}
+                      mode={location.morphologyMode}
+                      selectedTerm={location.selectedMorphTerm}
+                      onSelect={(morphologyMode, selectedMorphTerm) => {
+                        navigate({
+                          ...location,
+                          morphologyMode,
+                          selectedMorphTerm,
+                          selectedExpression: null,
+                          selectedLink: null,
+                        });
+                      }}
+                      onNavigate={(ayah) => {
+                        navigate({
+                          ...location,
+                          reference: data.relationships.versification.refAt(ayah),
+                          rangeEnd: null,
+                          selectedLink: null,
+                        });
+                      }}
+                    />
+                  )}
+                </>
+              )}
+            {location.view !== 'analytics' &&
+              location.view !== 'network' &&
               location.evidence === 'exact' && (
                 <>
                   {(expressionState.status === 'idle' || expressionState.status === 'loading') && (
@@ -778,7 +876,7 @@ export function QuranApp() {
 
             {location.view !== 'analytics' &&
               location.view !== 'network' &&
-              (location.evidence === 'exact' ? (
+              (location.evidence === 'morphology' ? null : location.evidence === 'exact' ? (
                 location.view === 'arcs' ? (
                   selectedExpression && (
                     <QuranExpressionGraph
@@ -885,7 +983,9 @@ export function QuranApp() {
           <a href="https://github.com/Waqar144/Quran_Mutashabihat_Data">
             Waqar144 Mutashabihat Data
           </a>{' '}
-          (CC0).
+          (CC0). Annotated morphology:{' '}
+          <a href="https://github.com/CAMeL-Lab/MAQAM-Quranic-Corpus">MAQAM, CAMeL Lab</a>{' '}
+          (CC BY 4.0).
           <a href={import.meta.env.BASE_URL + 'data/quran/manifest.json'}>
             {' '}
             Verified dataset provenance
