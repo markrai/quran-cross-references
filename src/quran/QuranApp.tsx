@@ -66,7 +66,9 @@ export function QuranApp() {
           });
         }
       });
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+    };
   }, [attempt]);
 
   useEffect(() => {
