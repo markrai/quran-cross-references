@@ -21,7 +21,16 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npm run check
+      - name: Lint application, scripts and tests
+        run: npm run lint
+      - name: Check formatting
+        run: npm run format:check
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Enforce type coverage
+        run: npm run typecoverage
+      - name: Enforce unit-test coverage
+        run: npm run test:coverage
       - name: Validate pinned Quran datasets
         run: npm run data:quran
       - name: Record full-corpus SVG layout benchmark
@@ -37,6 +46,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - name: Lint application, scripts and tests on Windows
+        run: npm run lint
       - name: Validate pinned Quran sources on Windows
         run: npm run data:quran
       - name: Test Quran source integrity, importers and graph
