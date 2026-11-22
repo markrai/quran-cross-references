@@ -1166,3 +1166,326 @@
     font-size: 0.75rem;
   }
 }
+
+
+.topologyDashboard {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.topologyIntroActions,
+.topologyToolbar,
+.topologyPager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.topologyIntroActions {
+  margin-top: 1rem;
+}
+
+.topologyEvidenceLabel {
+  border: 1px solid var(--color-border);
+  background: var(--color-accent-soft);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.topologyToolbar {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.8rem;
+  background: var(--color-surface);
+}
+
+.topologyToolbar .field {
+  min-width: min(100%, 11rem);
+}
+
+.topologyColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.8fr);
+  gap: 1.15rem;
+  align-items: start;
+}
+
+.topologyPanel {
+  min-width: 0;
+  padding-bottom: 0.85rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  background: var(--color-surface);
+}
+
+.topologySide {
+  min-width: 0;
+  display: grid;
+  gap: 1.15rem;
+}
+
+.topologyPanel > .goButton {
+  margin: 1rem 1.2rem 0.4rem;
+}
+
+.topologyDiagram {
+  display: block;
+  width: 100%;
+  max-height: 34rem;
+  min-height: 16rem;
+  overflow: visible;
+  padding: 0.75rem 0.9rem;
+}
+
+.topologyFirstLine {
+  stroke: #67c3af;
+  opacity: 0.65;
+  stroke-width: 1.7;
+}
+
+.topologySecondLine {
+  stroke: #d5a969;
+  opacity: 0.62;
+  stroke-width: 1.45;
+}
+
+.topologyArrow {
+  fill: #8fd9c6;
+}
+
+.topologyNode,
+.topologyOuterNode,
+.topologyCenter {
+  stroke-width: 2;
+  transition: fill 120ms ease;
+}
+
+.topologyNode {
+  fill: #2c5950;
+  stroke: #7fd6c4;
+}
+
+.topologyOuterNode {
+  fill: #635037;
+  stroke: #f1c27e;
+}
+
+.topologyCenter {
+  fill: #1b7464;
+  stroke: #acf9e2;
+}
+
+.topologyDiagram a {
+  cursor: pointer;
+  outline: none;
+}
+
+.topologyDiagram a:hover circle,
+.topologyDiagram a:focus-visible circle {
+  fill: #a06c38;
+  stroke: #ffe9ae;
+  stroke-width: 3;
+}
+
+.topologyNodeLabel {
+  fill: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: #18382f;
+  stroke-width: 2.5;
+}
+
+.topologyCaption {
+  padding: 0 1.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+.topologyPager {
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.topologyPager button {
+  min-height: 44px;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.topologyPager button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.topologyPager button:not(:disabled):hover {
+  border-color: var(--color-accent);
+}
+
+.topologyPartnerList,
+.topologyLinkList,
+.topologyRankings {
+  max-height: 26rem;
+  overflow-y: auto;
+  padding: 0 0.9rem 0.4rem;
+  scrollbar-gutter: stable;
+}
+
+.topologyPartnerList,
+.topologyLinkList {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.topologyPartnerList button,
+.topologyLinkList button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.25rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.55rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.topologyPartnerList button {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.topologyPartnerList button strong {
+  grid-column: 1;
+}
+
+.topologyPartnerList button small {
+  grid-column: 1;
+  color: var(--color-text-muted);
+}
+
+.topologyPartnerList button > span {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.topologyPartnerList button[aria-pressed='true'],
+.topologyPartnerList button:hover,
+.topologyLinkList button:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.topologyLinkList button span {
+  color: var(--color-accent);
+  font-size: 0.78rem;
+}
+
+.topologyLinkList button strong {
+  font-size: 0.93rem;
+}
+
+.topologyLinkList button small {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+}
+
+.topologyRankings {
+  margin: 0;
+  list-style: none;
+  padding: 0;
+  max-height: 27rem;
+}
+
+.topologyRankings li {
+  border-top: 1px solid var(--color-border);
+}
+
+.topologyRankings button {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  padding: 0.7rem 1.15rem;
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.topologyRankings button:hover {
+  background: var(--color-accent-soft);
+}
+
+.topologyRankings button > span {
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  min-width: 2rem;
+}
+
+.topologyRankings button small {
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 72rem) {
+  .topologyColumns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 40rem) {
+  .topologyToolbar {
+    align-items: stretch;
+  }
+
+  .topologyToolbar .viewTabs {
+    width: 100%;
+  }
+
+  .topologyToolbar .tab,
+  .topologyToolbar .activeTab {
+    flex: 1;
+  }
+
+  .topologyToolbar .field {
+    flex: 1;
+    min-width: 7rem;
+  }
+
+  .topologyDiagram {
+    min-height: 12rem;
+    padding: 0.25rem;
+  }
+
+  .topologyPager {
+    gap: 0.3rem;
+  }
+
+  .topologyPager button {
+    padding: 0.4rem;
+    font-size: 0.75rem;
+  }
+}
