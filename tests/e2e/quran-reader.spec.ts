@@ -109,9 +109,26 @@ test.describe('Quran production readiness', () => {
     await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
     await page.waitForFunction(async () => {
       const registration = await navigator.serviceWorker.ready;
+      const controller = navigator.serviceWorker.controller;
+      if (controller?.state !== 'activated' || !controller.scriptURL.endsWith('/sw.js')) {
+        return false;
+      }
       const names = await caches.keys();
-      return registration.active?.state === 'activated' &&
-        names.some((name) => name.startsWith('quran-cross-references-shell-'));
+      const name = names.find((candidate) =>
+        candidate.startsWith('quran-cross-references-shell-'),
+      );
+      if (!name) return false;
+      const cache = await caches.open(name);
+      const required = [
+        'index.html',
+        'quran/index.html',
+        'data/quran/text.json',
+        'data/quran/relationships.json',
+      ];
+      const responses = await Promise.all(
+        required.map((path) => cache.match(new URL(path, registration.scope))),
+      );
+      return responses.every((response) => response !== undefined);
     });
     await context.setOffline(true);
     try {
@@ -180,17 +197,22 @@ test.describe('Quran Phase 2A graph exploration', () => {
     await page.getByRole('button', { name: 'Pan graph right' }).click();
     expect(await graph.getAttribute('viewBox')).not.toBe(zoomed);
 
+    await expect(graph.locator('[data-graph-pan-surface]')).toHaveCount(1);
     const box = await graph.boundingBox();
     expect(box).toBeTruthy();
     if (box) {
       const startX = box.x + box.width * 0.6;
-      const startY = box.y + box.height * 0.98;
+      const startY = box.y + box.height * 0.97;
       const beforeDrag = await graph.getAttribute('viewBox');
       await page.mouse.move(startX, startY);
       await page.mouse.down();
-      await page.mouse.move(startX - 90, startY, { steps: 6 });
-      await page.mouse.up();
-      expect(await graph.getAttribute('viewBox')).not.toBe(beforeDrag);
+      try {
+        await expect(graph).toHaveClass(/graphDragging/);
+        await page.mouse.move(startX + 90, startY, { steps: 6 });
+        await expect.poll(async () => graph.getAttribute('viewBox')).not.toBe(beforeDrag);
+      } finally {
+        await page.mouse.up();
+      }
     }
 
     await page.getByRole('button', { name: 'Reset graph view' }).click();
