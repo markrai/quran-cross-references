@@ -23,6 +23,8 @@ jobs:
       - run: npm run check
       - name: Validate pinned Quran datasets
         run: npm run data:quran
+      - name: Record full-corpus SVG layout benchmark
+        run: npm run bench:graph
 
   quran-windows:
     name: Quran source integrity (Windows)
