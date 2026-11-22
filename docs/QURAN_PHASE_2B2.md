@@ -111,11 +111,12 @@ expressions/occurrences, and the highest frequency. It writes:
 - `data/quran/generated/expression-profile.json`: output byte length,
   SHA-256, measured runtime, heap delta and detection statistics
 
-The generator fails if its output exceeds **64 MiB**; it never silently
-drops candidate evidence to meet the budget. The 64 MiB limit is a safety
-ceiling for this _internal_ first-stage audit, not permission to ship
-64 MiB into an offline PWA. Tune corpus policies only after reviewing
-the actual reported distribution and examples.
+The observed output is **1,772,921 UTF-8 bytes** (about **1.77 MB**) with
+SHA-256 `3c8f6e602abdfcf8c71713fef2c62183458928d6f5ad08c365612dac0bc55923`.
+The generator fails above **4 MiB** or **30 seconds**, rather than
+silently dropping evidence. Its observed Linux CI runtime was 0.78–0.88
+seconds. These generous internal safety limits do **not** authorize adding
+the experimental dataset to the offline PWA.
 
 The expression dataset is intentionally **not published** to
 `public/quran-only/`, `dist/` or the service-worker precache. No network
