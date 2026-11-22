@@ -43,16 +43,6 @@ jobs:
         run: npm run data:quran
       - name: Generate pinned exact-expression evidence and profile
         run: npm run data:expressions
-      - name: Verify byte-identical analytics regeneration
-        shell: bash
-        run: |
-          first="$(sha256sum data/quran/generated/analytics.json | cut -d' ' -f1)"
-          npm run data:quran
-          second="$(sha256sum data/quran/generated/analytics.json | cut -d' ' -f1)"
-          if [ "$first" != "$second" ]; then
-            echo "::error::Analytics dataset changed between identical builds."
-            exit 1
-          fi
       - name: Verify byte-identical expression regeneration
         shell: bash
         run: |
@@ -61,6 +51,16 @@ jobs:
           second="$(sha256sum data/quran/generated/expressions.json | cut -d' ' -f1)"
           if [ "$first" != "$second" ]; then
             echo "::error::Exact-expression dataset changed between identical builds."
+            exit 1
+          fi
+      - name: Verify byte-identical analytics regeneration
+        shell: bash
+        run: |
+          first="$(sha256sum data/quran/generated/analytics.json | cut -d' ' -f1)"
+          npm run data:quran
+          second="$(sha256sum data/quran/generated/analytics.json | cut -d' ' -f1)"
+          if [ "$first" != "$second" ]; then
+            echo "::error::Analytics dataset changed between identical builds."
             exit 1
           fi
       - name: Archive exact-expression corpus statistics
