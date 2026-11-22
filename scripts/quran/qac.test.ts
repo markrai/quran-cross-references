@@ -128,7 +128,12 @@ describe('QAC v0.4 original segment-level importer', () => {
     assertInvalid(changeFirstWord([['a', 'N', '']]));
     assertInvalid(changeFirstWord([['a', 'N', 'UNKNOWN|POS:N']]));
     assertInvalid(changeFirstWord([['a', 'N']]));
-    assertInvalid(changeFirstWord([['a', 'N', 'STEM|POS:N'], ['b', 'N', 'STEM|POS:N']]));
+    assertInvalid(
+      changeFirstWord([
+        ['a', 'N', 'STEM|POS:N'],
+        ['b', 'N', 'STEM|POS:N'],
+      ]),
+    );
     expect(() => new QacMorphologyIndex(dataset, { ...source, id: 'other' })).toThrow(
       'QAC v0.4 snapshot',
     );
