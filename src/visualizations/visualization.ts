@@ -1,5 +1,5 @@
 import type { JSXElementConstructor, ReactNode } from 'react';
-import type { Passage } from '../core/quran/passage.ts';
+import type { Passage } from '../core/bible/passage.ts';
 import type { MessageKey } from '../i18n/messages/types.ts';
 import type { IconComponent } from '../shared/ui/icons.tsx';
 import type { LinkFilter } from './shared/link-filter.ts';

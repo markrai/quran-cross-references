@@ -1,8 +1,8 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { ayahPassage, type Passage } from '../../../core/quran/passage.ts';
-import { CANONICAL_QURAN } from '../../../core/quran/quran-versification.ts';
+import { versePassage, type Passage } from '../../../core/bible/passage.ts';
+import { CANONICAL_VERSIFICATION } from '../../../core/bible/versification.ts';
 import { createTranslationFile, verseIndex } from '../../../test-utils/fixtures.ts';
 import { createVizData } from '../../../test-utils/viz-data.ts';
 import { getTranslationManifest } from '../../../translations/registry.ts';
@@ -28,7 +28,7 @@ const DATA = createVizData(
   ]),
 );
 
-function renderPanel(passage: Passage = ayahPassage(JOHN_3_16), props = {}) {
+function renderPanel(passage: Passage = versePassage(JOHN_3_16), props = {}) {
   const onSelect = vi.fn();
   const onClose = vi.fn();
   const result = render(
@@ -46,13 +46,13 @@ function renderPanel(passage: Passage = ayahPassage(JOHN_3_16), props = {}) {
 }
 
 describe('PassagePanel', () => {
-  it('names the passage, its surah and its genre', () => {
+  it('names the passage, its book and its genre', () => {
     renderPanel();
     expect(screen.getByRole('heading', { name: 'John 3:16' })).toBeDefined();
     expect(screen.getByText(/Gospels/)).toBeDefined();
   });
 
-  it("shows a ayah's text", () => {
+  it("shows a verse's text", () => {
     renderPanel();
     expect(screen.getByText('For God so loved the world…')).toBeDefined();
   });
@@ -70,7 +70,7 @@ describe('PassagePanel', () => {
     await userEvent.click(
       screen.getByText(/But God proves His love/).closest('button') as HTMLElement,
     );
-    expect(onSelect).toHaveBeenCalledWith(ayahPassage(ROM_5_8));
+    expect(onSelect).toHaveBeenCalledWith(versePassage(ROM_5_8));
   });
 
   it('closes', async () => {
@@ -79,31 +79,31 @@ describe('PassagePanel', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('steps to the next and previous ayah', async () => {
+  it('steps to the next and previous verse', async () => {
     const { onSelect } = renderPanel();
     await userEvent.click(screen.getByRole('button', { name: /Next/i }));
-    expect(onSelect).toHaveBeenCalledWith(ayahPassage(JOHN_3_17));
+    expect(onSelect).toHaveBeenCalledWith(versePassage(JOHN_3_17));
     await userEvent.click(screen.getByRole('button', { name: /Previous/i }));
-    expect(onSelect).toHaveBeenCalledWith(ayahPassage(verseIndex('John', 3, 15)));
+    expect(onSelect).toHaveBeenCalledWith(versePassage(verseIndex('John', 3, 15)));
   });
 
   it('says so when a passage has no links in a direction', () => {
-    renderPanel(ayahPassage(verseIndex('Rev', 22, 21)));
+    renderPanel(versePassage(verseIndex('Rev', 22, 21)));
     expect(screen.getAllByText('None').length).toBeGreaterThan(0);
   });
 
-  it('shows a surah as a list of its ayahs', () => {
-    renderPanel({ kind: 'surah', surah: 'John', surah: 3 });
+  it('shows a chapter as a list of its verses', () => {
+    renderPanel({ kind: 'chapter', book: 'John', chapter: 3 });
     expect(screen.getByRole('button', { name: /Verses/ })).toBeDefined();
     expect(screen.getByText('For God so loved the world…')).toBeDefined();
   });
 
-  it("opens a ayah from a surah's list", async () => {
-    const { onSelect } = renderPanel({ kind: 'surah', surah: 'John', surah: 3 });
+  it("opens a verse from a chapter's list", async () => {
+    const { onSelect } = renderPanel({ kind: 'chapter', book: 'John', chapter: 3 });
     await userEvent.click(
       screen.getByText('For God so loved the world…').closest('button') as HTMLElement,
     );
-    expect(onSelect).toHaveBeenCalledWith(ayahPassage(JOHN_3_16));
+    expect(onSelect).toHaveBeenCalledWith(versePassage(JOHN_3_16));
   });
 
   it('shows the genre breakdown of where a passage connects', () => {
@@ -112,7 +112,7 @@ describe('PassagePanel', () => {
   });
 
   it('shows actions the host gives it', () => {
-    renderPanel(ayahPassage(JOHN_3_16), {
+    renderPanel(versePassage(JOHN_3_16), {
       actions: <button type="button">Read in context</button>,
     });
     expect(screen.getByRole('button', { name: 'Read in context' })).toBeDefined();
@@ -120,19 +120,19 @@ describe('PassagePanel', () => {
 
   it('previews a connection when one is pointed at, and stops when it is not', async () => {
     const onPreview = vi.fn();
-    renderPanel(ayahPassage(JOHN_3_16), { onPreview });
+    renderPanel(versePassage(JOHN_3_16), { onPreview });
     const row = screen.getByText(/But God proves His love/).closest('[class*="quotable"]');
     await userEvent.hover(row as HTMLElement);
     await userEvent.unhover(row as HTMLElement);
     expect(onPreview).toHaveBeenCalledWith(null);
   });
 
-  it('notes a ayah the translation leaves out', () => {
+  it('notes a verse the translation leaves out', () => {
     const data = createVizData([], new Map([[verseIndex('Matt', 17, 21), '']]));
     render(
       <PassagePanel
         data={data}
-        passage={ayahPassage(verseIndex('Matt', 17, 21))}
+        passage={versePassage(verseIndex('Matt', 17, 21))}
         filter={DEFAULT_LINK_FILTER}
         onSelect={vi.fn()}
         onClose={vi.fn()}
@@ -143,7 +143,7 @@ describe('PassagePanel', () => {
   });
 
   describe('other translations, on bible.com', () => {
-    it('offers the ayah in the ESV, the NASB 1995 and the NLT, one click each', () => {
+    it('offers the verse in the ESV, the NASB 1995 and the NLT, one click each', () => {
       renderPanel();
       const group = screen.getByRole('group', { name: 'Read on bible.com' });
       const links = within(group).getAllByRole('link');
@@ -180,15 +180,15 @@ describe('PassagePanel', () => {
       expect(esv.getAttribute('title')).toBe('English Standard Version');
     });
 
-    it('offers a whole surah the same way', () => {
-      renderPanel({ kind: 'surah', surah: 'John', surah: 3 });
+    it('offers a whole chapter the same way', () => {
+      renderPanel({ kind: 'chapter', book: 'John', chapter: 3 });
       expect(screen.getByRole('link', { name: /NASB 1995/ }).getAttribute('href')).toBe(
         'https://www.bible.com/bible/100/JHN.3.NASB1995',
       );
     });
 
     it('sits under the actions the host gives, in the same row of ways to open the passage', () => {
-      renderPanel(ayahPassage(JOHN_3_16), {
+      renderPanel(versePassage(JOHN_3_16), {
         actions: <button type="button">Read in context</button>,
       });
       const host = screen.getByRole('button', { name: 'Read in context' });
@@ -202,20 +202,20 @@ describe('PassagePanel', () => {
         ...DATA,
         translation: new Translation(
           getTranslationManifest('blivre'),
-          CANONICAL_QURAN,
+          CANONICAL_VERSIFICATION,
           createTranslationFile(new Map([[JOHN_3_16, 'Porque Deus amou o mundo…']])),
         ),
       };
 
       it('offers nothing, rather than links in a language the reader may not read', () => {
-        renderPanel(ayahPassage(JOHN_3_16), { data: PORTUGUESE });
+        renderPanel(versePassage(JOHN_3_16), { data: PORTUGUESE });
         expect(screen.getByText('Porque Deus amou o mundo…')).toBeDefined();
         expect(screen.queryByRole('group', { name: 'Read on bible.com' })).toBeNull();
         expect(screen.queryByRole('link', { name: /bible\.com/ })).toBeNull();
       });
 
       it("still shows the host's own actions, on their own", () => {
-        renderPanel(ayahPassage(JOHN_3_16), {
+        renderPanel(versePassage(JOHN_3_16), {
           data: PORTUGUESE,
           actions: <button type="button">Read in context</button>,
         });

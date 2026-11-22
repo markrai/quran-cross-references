@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import type { AyahIndex } from '../../core/quran/ayah-ref.ts';
-import { CANONICAL_QURAN } from '../../core/quran/quran-versification.ts';
+import type { VerseIndex } from '../../core/bible/verse-ref.ts';
+import { CANONICAL_VERSIFICATION } from '../../core/bible/versification.ts';
 import type { CrossReferenceSourceId } from '../../core/datasets/ids.ts';
 import { CrossReferencesSection } from './components/CrossReferencesSection.tsx';
 import { DatasetsSection } from './components/DatasetsSection.tsx';
@@ -8,8 +8,8 @@ import { TextSearch } from './components/TextSearch.tsx';
 import { TranslationSection } from './components/TranslationSection.tsx';
 import { VerseInspector } from './components/VerseInspector.tsx';
 import type { DebugData } from './debug-data.ts';
-import { VerseNavigationContext } from './ayah-navigation.ts';
-import { readVerseFromUrl, writeVerseToUrl } from './ayah-url.ts';
+import { VerseNavigationContext } from './verse-navigation.ts';
+import { readVerseFromUrl, writeVerseToUrl } from './verse-url.ts';
 
 export const SECTION_IDS = {
   datasets: 'datasets',
@@ -22,8 +22,8 @@ export function crossReferencesSectionId(sourceId: CrossReferenceSourceId): stri
   return `cross-references-${sourceId}`;
 }
 
-const DEFAULT_VERSE: AyahIndex =
-  CANONICAL_QURAN.indexOf({ surah: 'John', surah: 3, ayah: 16 }) ?? 0;
+const DEFAULT_VERSE: VerseIndex =
+  CANONICAL_VERSIFICATION.indexOf({ book: 'John', chapter: 3, verse: 16 }) ?? 0;
 
 interface DebugDashboardProps {
   readonly data: DebugData;
@@ -33,9 +33,9 @@ export function DebugDashboard({ data }: DebugDashboardProps) {
   const { translation, crossReferences } = data;
   const [selectedVerse, setSelectedVerse] = useState(() => readVerseFromUrl() ?? DEFAULT_VERSE);
 
-  const selectVerse = useCallback((ayah: AyahIndex) => {
-    setSelectedVerse(ayah);
-    writeVerseToUrl(ayah);
+  const selectVerse = useCallback((verse: VerseIndex) => {
+    setSelectedVerse(verse);
+    writeVerseToUrl(verse);
     document
       .getElementById(SECTION_IDS.inspector)
       ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -58,7 +58,7 @@ export function DebugDashboard({ data }: DebugDashboardProps) {
       ))}
       <VerseInspector
         id={SECTION_IDS.inspector}
-        ayah={selectedVerse}
+        verse={selectedVerse}
         translation={translation.translation}
         datasets={datasets}
       />

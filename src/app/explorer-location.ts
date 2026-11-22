@@ -1,6 +1,6 @@
-import { GENRES } from '../core/quran/genres.ts';
-import { parsePassageId, toPassageId, type Passage } from '../core/quran/passage.ts';
-import type { QuranVersification } from '../core/quran/quran-versification.ts';
+import { GENRES } from '../core/bible/genres.ts';
+import { parsePassageOsisId, toPassageOsisId, type Passage } from '../core/bible/passage.ts';
+import type { Versification } from '../core/bible/versification.ts';
 import type { TranslationId } from '../core/datasets/ids.ts';
 import { DEFAULT_TRANSLATION_ID } from '../translations/registry.ts';
 import {
@@ -78,7 +78,7 @@ export function parseExplorerUrl<Id extends string>(
   url: URL,
   base: string,
   routes: readonly [ViewRoute<Id>, ...ViewRoute<Id>[]],
-  versification: QuranVersification,
+  versification: Versification,
   defaultTranslation: (locale: LocaleId) => TranslationId,
   defaultLocale: LocaleId,
 ): ExplorerLocation<Id> {
@@ -93,7 +93,7 @@ export function parseExplorerUrl<Id extends string>(
   const locale = pathLocale ?? localeFromParams(url.searchParams) ?? defaultLocale;
   return {
     view: route.id,
-    passage: id === null ? null : (parsePassageId(id, versification) ?? null),
+    passage: id === null ? null : (parsePassageOsisId(id, versification) ?? null),
     filter: parseFilter(url.searchParams),
     translation: translationFromParams(url.searchParams) ?? defaultTranslation(locale),
     locale,
@@ -135,7 +135,7 @@ export function explorerUrl(
     locale,
   }: Pick<ExplorerLocation<string>, 'passage' | 'filter' | 'translation' | 'locale'>,
   base: string,
-  versification: QuranVersification,
+  versification: Versification,
   /**
    * The translation the URL need not name, because a reader opening it would land on that one
    * anyway: their own standing choice. `null` names the translation whatever it is, which is what
@@ -151,7 +151,7 @@ export function explorerUrl(
   const localeSegment = localePathSegment(locale);
   const params = new URLSearchParams();
   if (passage !== null) {
-    params.set(PASSAGE_PARAM, toPassageId(passage, versification));
+    params.set(PASSAGE_PARAM, toPassageOsisId(passage, versification));
   }
   if (translation !== omitTranslation) {
     params.set(TRANSLATION_PARAM, translation);

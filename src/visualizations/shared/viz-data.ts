@@ -1,4 +1,4 @@
-import { CANONICAL_QURAN, type QuranVersification } from '../../core/quran/quran-versification.ts';
+import { CANONICAL_VERSIFICATION, type Versification } from '../../core/bible/versification.ts';
 import type { TranslationId } from '../../core/datasets/ids.ts';
 import {
   loadCrossReferences,
@@ -10,14 +10,14 @@ import { getTranslationManifest } from '../../translations/registry.ts';
 import type { Translation } from '../../translations/translation.ts';
 import { loadOriginalWords, type OriginalWordsDataset } from '../../words/load-original-words.ts';
 import { getWordSourceManifest } from '../../words/registry.ts';
-import { computeVerseGenres } from './ayah-genres.ts';
+import { computeVerseGenres } from './verse-genres.ts';
 import { vizCrossReferenceSource } from './viz-datasets.ts';
 
 /** What every visualization needs whichever translation is being read. */
 export interface VizCore {
-  readonly versification: QuranVersification;
+  readonly versification: Versification;
   readonly crossReferences: CrossReferenceDataset;
-  /** Genre ordinal of every ayah. */
+  /** Genre ordinal of every verse. */
   readonly verseGenres: Uint8Array;
 }
 
@@ -33,9 +33,9 @@ export interface VizData extends VizCore {
 export const vizCoreLoader = createCachedLoader(async (): Promise<VizCore> => {
   const { dataset } = await loadCrossReferences(vizCrossReferenceSource());
   return {
-    versification: CANONICAL_QURAN,
+    versification: CANONICAL_VERSIFICATION,
     crossReferences: dataset,
-    verseGenres: computeVerseGenres(CANONICAL_QURAN),
+    verseGenres: computeVerseGenres(CANONICAL_VERSIFICATION),
   };
 });
 
@@ -70,7 +70,7 @@ export function resetTranslations(): void {
 }
 
 /**
- * The words of the Hebrew and Greek. Nothing needs them until a reader opens a ayah and looks
+ * The words of the Hebrew and Greek. Nothing needs them until a reader opens a verse and looks
  * past its cross-references, so unlike the rest this one is fetched on first use rather than at
  * startup (see `OriginalWordsSection`).
  */
@@ -91,7 +91,7 @@ export function originalWordsIfLoaded(): OriginalWordsDataset | null {
   return loadedOriginalWords;
 }
 
-/** Forgets a failed download, so the next ayah opened tries again instead of giving up. */
+/** Forgets a failed download, so the next verse opened tries again instead of giving up. */
 export function resetOriginalWords(): void {
   originalWordsLoader.reset();
 }

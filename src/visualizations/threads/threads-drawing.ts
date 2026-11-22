@@ -1,16 +1,16 @@
-import { type SurahNumber } from '../../core/quran/surahs.ts';
-import type { AyahIndex } from '../../core/quran/ayah-ref.ts';
-import type { AyahIndexRange } from '../../core/quran/quran-versification.ts';
+import { type BookId } from '../../core/bible/books.ts';
+import type { VerseIndex } from '../../core/bible/verse-ref.ts';
+import type { VerseIndexRange } from '../../core/bible/versification.ts';
 import { elementAt } from '../../core/lib/array.ts';
 import type { Connection } from '../shared/connections.ts';
 import { GENRE_HEX } from '../shared/palette.ts';
 import { voteWeight } from '../shared/vote-weight.ts';
 import type { SpineLayout } from './spine-layout.ts';
-import type { SurahNames } from '../../i18n/surahs/types.ts';
+import type { BookNames } from '../../i18n/books/types.ts';
 
-/** Where a ayah of the reading pane sits, relative to the canvas top. */
+/** Where a verse of the reading pane sits, relative to the canvas top. */
 export interface VerseAnchor {
-  readonly ayah: AyahIndex;
+  readonly verse: VerseIndex;
   readonly y: number;
 }
 
@@ -22,16 +22,16 @@ export interface ThreadsDrawing {
   readonly compact: boolean;
   readonly spine: SpineLayout;
   readonly anchors: readonly VerseAnchor[];
-  readonly connectionsByVerse: ReadonlyMap<AyahIndex, readonly Connection[]>;
+  readonly connectionsByVerse: ReadonlyMap<VerseIndex, readonly Connection[]>;
   readonly verseGenres: Uint8Array;
-  /** Surah names in the reader's language: the spine is read, not only looked at. */
-  readonly names: SurahNames;
-  /** The surah being read ("you are here" on the spine). */
-  readonly surah: AyahIndexRange;
-  /** A hovered or selected ayah whose threads stand out. */
-  readonly emphasizedVerse: AyahIndex | null;
-  /** A hovered surah on the spine whose incoming threads stand out. */
-  readonly emphasizedBook: SurahNumber | null;
+  /** Book names in the reader's language: the spine is read, not only looked at. */
+  readonly names: BookNames;
+  /** The chapter being read ("you are here" on the spine). */
+  readonly chapter: VerseIndexRange;
+  /** A hovered or selected verse whose threads stand out. */
+  readonly emphasizedVerse: VerseIndex | null;
+  /** A hovered book on the spine whose incoming threads stand out. */
+  readonly emphasizedBook: BookId | null;
   /** A link pointed at in the details panel: it alone stands out. */
   readonly emphasizedLink: number | null;
 }
@@ -48,7 +48,7 @@ export function spineBar(drawing: Pick<ThreadsDrawing, 'gutterWidth' | 'compact'
   return { left: drawing.gutterWidth + 2, width: drawing.compact ? 6 : 8 };
 }
 
-/** Draws the threads from the visible ayahs to the spine, then the spine itself. */
+/** Draws the threads from the visible verses to the spine, then the spine itself. */
 export function drawThreads(context: CanvasRenderingContext2D, drawing: ThreadsDrawing): void {
   context.clearRect(0, 0, drawing.width, drawing.height);
   drawConnections(context, drawing);
@@ -64,7 +64,7 @@ function drawConnections(context: CanvasRenderingContext2D, drawing: ThreadsDraw
     emphasizedBook !== null &&
     spine.segments.some(
       (segment) =>
-        segment.surah === emphasizedBook &&
+        segment.book === emphasizedBook &&
         connection.otherStart >= segment.start &&
         connection.otherStart <= segment.end,
     );
@@ -77,11 +77,11 @@ function drawConnections(context: CanvasRenderingContext2D, drawing: ThreadsDraw
     emphasized: boolean;
   }[] = [];
   for (const anchor of drawing.anchors) {
-    for (const connection of drawing.connectionsByVerse.get(anchor.ayah) ?? []) {
+    for (const connection of drawing.connectionsByVerse.get(anchor.verse) ?? []) {
       const emphasized =
         emphasizedLink !== null
           ? connection.link.id === emphasizedLink
-          : anchor.ayah === emphasizedVerse || landsInBook(connection);
+          : anchor.verse === emphasizedVerse || landsInBook(connection);
       const weight = voteWeight(connection.link.votes);
       threads.push({
         y: anchor.y,
@@ -118,7 +118,7 @@ function drawConnections(context: CanvasRenderingContext2D, drawing: ThreadsDraw
 }
 
 function drawSpine(context: CanvasRenderingContext2D, drawing: ThreadsDrawing): void {
-  const { spine, compact, surah, emphasizedBook } = drawing;
+  const { spine, compact, chapter, emphasizedBook } = drawing;
   const bar = spineBar(drawing);
   const labelX = bar.left + bar.width + 5;
   context.font = LABEL_FONT;
@@ -134,11 +134,11 @@ function drawSpine(context: CanvasRenderingContext2D, drawing: ThreadsDrawing): 
 
   for (const segment of spine.segments) {
     const height = segment.bottom - segment.top;
-    const isHovered = segment.surah === emphasizedBook;
+    const isHovered = segment.book === emphasizedBook;
     if (height < (compact ? 12 : 10) && !isHovered) continue;
-    const localized = drawing.names[segment.surah];
+    const localized = drawing.names[segment.book];
     const room = drawing.width - labelX - 2;
-    const label = [localized.name, localized.abbreviation ?? segment.surah].find(
+    const label = [localized.name, localized.abbreviation ?? segment.book].find(
       (text) => context.measureText(text).width <= room,
     );
     if (label === undefined) continue;
@@ -146,9 +146,9 @@ function drawSpine(context: CanvasRenderingContext2D, drawing: ThreadsDrawing): 
     context.fillText(label, labelX, (segment.top + segment.bottom) / 2);
   }
 
-  // "You are here": a bracket around the current surah.
-  const top = spine.yOf(surah.start) - 2;
-  const bottom = Math.max(spine.yOf(surah.end) + 2, top + 4);
+  // "You are here": a bracket around the current chapter.
+  const top = spine.yOf(chapter.start) - 2;
+  const bottom = Math.max(spine.yOf(chapter.end) + 2, top + 4);
   context.fillStyle = TEXT;
   context.fillRect(bar.left - 3, top, 2, bottom - top);
   context.beginPath();

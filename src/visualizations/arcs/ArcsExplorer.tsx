@@ -18,7 +18,7 @@ import { ReferenceSearch } from '../shared/components/ReferenceSearch.tsx';
 import { VizPage } from '../shared/components/VizPage.tsx';
 import { DEFAULT_LINK_FILTER, selectLinks } from '../shared/link-filter.ts';
 import { summarizeLinks } from '../shared/link-summary.ts';
-import type { Passage } from '../../core/quran/passage.ts';
+import type { Passage } from '../../core/bible/passage.ts';
 import type { Connection } from '../shared/connections.ts';
 import type { VisualizationProps } from '../visualization.ts';
 import { ArcsStage } from './ArcsStage.tsx';

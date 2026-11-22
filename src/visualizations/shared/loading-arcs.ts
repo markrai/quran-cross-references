@@ -1,35 +1,35 @@
-import { SURAHS } from '../../core/quran/surahs.ts';
-import { getSurahGenre } from '../../core/quran/genres.ts';
-import type { QuranVersification } from '../../core/quran/quran-versification.ts';
+import { BOOKS } from '../../core/bible/books.ts';
+import { getBookGenre } from '../../core/bible/genres.ts';
+import type { Versification } from '../../core/bible/versification.ts';
 import { elementAt } from '../../core/lib/array.ts';
 
 /**
- * The model of the loading animation: arcs of light that grow from one ayah to another along the
+ * The model of the loading animation: arcs of light that grow from one verse to another along the
  * Bible's axis, land with a flash and leave a fading trace, so a dome of connections builds up
  * while the data loads. Positions are fractions of the axis: 0 is Genesis 1:1, 1 is Revelation 22:21.
  */
 
-/** One surah on the axis: where it starts, how much of the axis it takes, and its genre. */
+/** One book on the axis: where it starts, how much of the axis it takes, and its genre. */
 export interface BookSegment {
   readonly start: number;
   readonly width: number;
   readonly genre: number;
 }
 
-/** The 66 surahs in canonical order, each as wide as its share of the ayahs. */
-export function bookSegments(versification: QuranVersification): readonly BookSegment[] {
-  const last = versification.ayahCount;
-  return SURAHS.map((surah) => {
-    const range = versification.surahRange(surah.id);
+/** The 66 books in canonical order, each as wide as its share of the verses. */
+export function bookSegments(versification: Versification): readonly BookSegment[] {
+  const last = versification.verseCount;
+  return BOOKS.map((book) => {
+    const range = versification.bookRange(book.id);
     return {
       start: range.start / last,
       width: (range.end - range.start + 1) / last,
-      genre: getSurahGenre(surah.id).ordinal,
+      genre: getBookGenre(book.id).ordinal,
     };
   });
 }
 
-/** An arc of light from one ayah to another. */
+/** An arc of light from one verse to another. */
 export interface ArcFlight {
   readonly from: number;
   readonly to: number;
@@ -54,7 +54,7 @@ const clamp01 = (value: number) => Math.min(Math.max(value, 0), 1);
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
 
 /**
- * Launches an arc between two random ayahs. Short hops are likelier than long ones, as in the
+ * Launches an arc between two random verses. Short hops are likelier than long ones, as in the
  * cross-references themselves; longer arcs take longer to travel.
  */
 export function launchFlight(

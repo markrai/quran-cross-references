@@ -14,7 +14,7 @@ describe('computeArcLayout', () => {
     expect(tall.baseline + tall.maxArcHeight).toBeLessThanOrEqual(390);
   });
 
-  it('maps ayahs to pixels and back', () => {
+  it('maps verses to pixels and back', () => {
     const layout = computeArcLayout(1000, 600);
     const view = { start: 100, end: 1100 };
     expect(pixelsPerVerse(layout, view)).toBeCloseTo((layout.axisEnd - layout.axisStart) / 1000);

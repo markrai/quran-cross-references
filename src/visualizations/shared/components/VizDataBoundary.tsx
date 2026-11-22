@@ -1,5 +1,5 @@
 import { Suspense, use, type ReactNode } from 'react';
-import { CANONICAL_QURAN } from '../../../core/quran/quran-versification.ts';
+import { CANONICAL_VERSIFICATION } from '../../../core/bible/versification.ts';
 import { DatasetUnavailableError } from '../../../shared/lib/fetch-dataset.ts';
 import { useLocalization } from '../../../i18n/use-locale.tsx';
 import { ErrorBoundary } from '../../../shared/ui/ErrorBoundary.tsx';
@@ -59,7 +59,7 @@ export function VizDataBoundary({ children }: VizDataBoundaryProps) {
       <Suspense
         fallback={
           <LoadingArcs
-            label={t('loading.data')(n(CANONICAL_QURAN.ayahCount), n(LINK_COUNT))}
+            label={t('loading.data')(n(CANONICAL_VERSIFICATION.verseCount), n(LINK_COUNT))}
           />
         }
       >

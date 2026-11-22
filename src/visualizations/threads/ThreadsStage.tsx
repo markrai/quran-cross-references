@@ -1,20 +1,20 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
-import { type SurahNumber } from '../../core/quran/surahs.ts';
-import { getSurahGenre } from '../../core/quran/genres.ts';
+import { type BookId } from '../../core/bible/books.ts';
+import { getBookGenre } from '../../core/bible/genres.ts';
 import {
-  surahPassageOf,
+  chapterPassageOf,
   formatPassage,
-  ayahPassage,
+  versePassage,
   type Passage,
-} from '../../core/quran/passage.ts';
-import type { AyahIndex } from '../../core/quran/ayah-ref.ts';
+} from '../../core/bible/passage.ts';
+import type { VerseIndex } from '../../core/bible/verse-ref.ts';
 import { NextIcon, PreviousIcon, ShareVerseIcon } from '../../shared/ui/icons.tsx';
 import { collectConnections, type Connection } from '../shared/connections.ts';
 import type { LinkFilter } from '../shared/link-filter.ts';
 import { GENRE_COLORS } from '../shared/palette.ts';
 import { useElementSize } from '../shared/use-element-size.ts';
 import type { VizData } from '../shared/viz-data.ts';
-import { buildVerseShareRequest } from '../shared/ayah-share.ts';
+import { buildVerseShareRequest } from '../shared/verse-share.ts';
 import { openVerseShare } from '../shared/components/VerseShareDialog.tsx';
 import { FrameScheduler, MAX_PIXEL_RATIO } from '../shared/frames.ts';
 import { computeSpineLayout } from './spine-layout.ts';
@@ -26,22 +26,22 @@ export type ThreadDirection = 'outgoing' | 'incoming' | 'both';
 
 interface ThreadsStageProps {
   readonly data: VizData;
-  readonly surah: SurahNumber;
-  readonly surah: number;
-  readonly selectedVerse: AyahIndex | null;
+  readonly book: BookId;
+  readonly chapter: number;
+  readonly selectedVerse: VerseIndex | null;
   readonly filter: LinkFilter;
   readonly direction: ThreadDirection;
   /**
    * A connection pointed at in the details panel: its thread stands out, and its whole passage is
-   * marked where the surah holds it (the selected ayah keeps its own highlight).
+   * marked where the chapter holds it (the selected verse keeps its own highlight).
    */
   readonly preview: Connection | null;
   readonly onSelect: (passage: Passage | null) => void;
-  /** A ayah's address on the published site, for a card that is about to be sent. */
+  /** A verse's address on the published site, for a card that is about to be sent. */
   readonly shareUrl: (passage: Passage) => string;
 }
 
-/** Scroll distance after which the surah header condenses into a slim sticky bar. */
+/** Scroll distance after which the chapter header condenses into a slim sticky bar. */
 const CONDENSE_AFTER_PX = 72;
 
 /**
@@ -61,16 +61,16 @@ const SPINE_TOP = 16;
 const SPINE_BOTTOM_PADDING = 14;
 
 interface SpineHover {
-  readonly surah: SurahNumber;
+  readonly book: BookId;
   readonly y: number;
   readonly count: number;
 }
 
-/** A surah to read on the left; threads from each ayah to where its links land on the right. */
+/** A chapter to read on the left; threads from each verse to where its links land on the right. */
 export function ThreadsStage({
   data,
-  surah,
-  surah,
+  book,
+  chapter,
   selectedVerse,
   filter,
   direction,
@@ -79,20 +79,20 @@ export function ThreadsStage({
   shareUrl,
 }: ThreadsStageProps) {
   const localization = useLocalization();
-  const { t, n, surahs, genreName } = localization;
+  const { t, n, books, genreName } = localization;
   const { versification, translation, crossReferences, verseGenres } = data;
   const readingRef = useRef<HTMLDivElement>(null);
   const canvasHostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const verseElements = useRef(new Map<AyahIndex, HTMLElement>());
+  const verseElements = useRef(new Map<VerseIndex, HTMLElement>());
   const canvasSize = useElementSize(canvasHostRef);
   const chapterHeaderRef = useRef<HTMLElement>(null);
-  const [hoverVerse, setHoverVerse] = useState<AyahIndex | null>(null);
+  const [hoverVerse, setHoverVerse] = useState<VerseIndex | null>(null);
   const [condensed, setCondensed] = useState(false);
-  const [topVerse, setTopVerse] = useState<AyahIndex | null>(null);
+  const [topVerse, setTopVerse] = useState<VerseIndex | null>(null);
   const [spineHover, setSpineHover] = useState<SpineHover | null>(null);
 
-  const range = versification.chapterRange(surah, surah) ?? { start: 0, end: 0 };
+  const range = versification.chapterRange(book, chapter) ?? { start: 0, end: 0 };
   const { start, end } = range;
   const compact = canvasSize.width < 120;
   const gutterWidth = canvasSize.width - (compact ? SPINE_WIDTH.compact : SPINE_WIDTH.wide);
@@ -108,7 +108,7 @@ export function ThreadsStage({
       ...(direction === 'incoming' ? [] : connections.outgoing),
       ...(direction === 'outgoing' ? [] : connections.incoming),
     ];
-    const byVerse = new Map<AyahIndex, Connection[]>();
+    const byVerse = new Map<VerseIndex, Connection[]>();
     for (const connection of shown) {
       byVerse.set(connection.here, [...(byVerse.get(connection.here) ?? []), connection]);
     }
@@ -118,14 +118,14 @@ export function ThreadsStage({
   const spine = useMemo(
     () =>
       computeSpineLayout(versification, SPINE_TOP, canvasSize.height - SPINE_BOTTOM_PADDING, {
-        surah: compact ? 0.5 : 1,
+        book: compact ? 0.5 : 1,
         genre: compact ? 3 : 5,
       }),
     [versification, canvasSize.height, compact],
   );
 
   const emphasizedVerse = hoverVerse ?? selectedVerse;
-  const emphasizedBook = spineHover?.surah ?? null;
+  const emphasizedBook = spineHover?.book ?? null;
   // Only a thread that is drawn (the direction switch may hide it) can stand out alone.
   const emphasizedLink = useMemo(() => {
     const id = preview?.link.id;
@@ -152,19 +152,19 @@ export function ThreadsStage({
 
     const scheduler = new FrameScheduler(() => {
       const top = canvas.getBoundingClientRect().top;
-      // Verses scrolled under the sticky surah header send no threads.
+      // Verses scrolled under the sticky chapter header send no threads.
       const clipTop = (chapterHeaderRef.current?.getBoundingClientRect().bottom ?? top) - top;
       const anchors: VerseAnchor[] = [];
-      for (const [ayah, element] of verseElements.current) {
+      for (const [verse, element] of verseElements.current) {
         const rect = element.getBoundingClientRect();
-        // Threads leave from a ayah's first line, so long ayahs stay readable.
+        // Threads leave from a verse's first line, so long verses stay readable.
         const y = rect.top - top + Math.min(rect.height / 2, 15);
         if (y >= clipTop && y <= canvasSize.height) {
-          anchors.push({ ayah, y });
+          anchors.push({ verse, y });
         }
       }
       drawThreads(context, {
-        names: surahs,
+        names: books,
         width: canvasSize.width,
         height: canvasSize.height,
         gutterWidth,
@@ -173,7 +173,7 @@ export function ThreadsStage({
         anchors,
         connectionsByVerse,
         verseGenres,
-        surah: { start, end },
+        chapter: { start, end },
         emphasizedVerse,
         emphasizedBook,
         emphasizedLink,
@@ -201,10 +201,10 @@ export function ThreadsStage({
     emphasizedBook,
     emphasizedLink,
     // The spine is lettered: a change of language repaints it.
-    surahs,
+    books,
   ]);
 
-  // Condense the surah header once the reader scrolls, and track the ayah at the top.
+  // Condense the chapter header once the reader scrolls, and track the verse at the top.
   useEffect(() => {
     const reading = readingRef.current;
     if (!reading) {
@@ -217,10 +217,10 @@ export function ThreadsStage({
       const headerBottom =
         chapterHeaderRef.current?.getBoundingClientRect().bottom ??
         reading.getBoundingClientRect().top;
-      let first: AyahIndex | null = null;
-      for (const [ayah, element] of verseElements.current) {
+      let first: VerseIndex | null = null;
+      for (const [verse, element] of verseElements.current) {
         if (element.getBoundingClientRect().bottom > headerBottom + 4) {
-          first = first === null ? ayah : Math.min(first, ayah);
+          first = first === null ? verse : Math.min(first, verse);
         }
       }
       setTopVerse(first);
@@ -236,7 +236,7 @@ export function ThreadsStage({
     };
   }, [start, end]);
 
-  // Keep the selected ayah in view when it changes (e.g. after following a connection).
+  // Keep the selected verse in view when it changes (e.g. after following a connection).
   useEffect(() => {
     const element = selectedVerse === null ? null : verseElements.current.get(selectedVerse);
     const reading = readingRef.current;
@@ -250,7 +250,7 @@ export function ThreadsStage({
     }
   }, [selectedVerse]);
 
-  const verseAtSpine = (event: MouseEvent<HTMLElement>): AyahIndex | null => {
+  const verseAtSpine = (event: MouseEvent<HTMLElement>): VerseIndex | null => {
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left;
     return x >= spineBar({ gutterWidth, compact }).left - 6
@@ -258,16 +258,16 @@ export function ThreadsStage({
       : null;
   };
 
-  const ayahs = Array.from({ length: end - start + 1 }, (_, offset) => start + offset);
-  const genre = getSurahGenre(surah);
-  const previousChapter = start > 0 ? surahPassageOf(start - 1, versification) : null;
+  const verses = Array.from({ length: end - start + 1 }, (_, offset) => start + offset);
+  const genre = getBookGenre(book);
+  const previousChapter = start > 0 ? chapterPassageOf(start - 1, versification) : null;
   const nextChapter =
-    end + 1 < versification.ayahCount ? surahPassageOf(end + 1, versification) : null;
+    end + 1 < versification.verseCount ? chapterPassageOf(end + 1, versification) : null;
 
   return (
     <div className={styles.stage}>
-      {/* Keyed by surah: a new surah is a new scroll container, so it starts at the top. */}
-      <div key={`${surah}.${surah}`} ref={readingRef} className={styles.reading}>
+      {/* Keyed by chapter: a new chapter is a new scroll container, so it starts at the top. */}
+      <div key={`${book}.${chapter}`} ref={readingRef} className={styles.reading}>
         <header ref={chapterHeaderRef} className={styles.chapterHeader} data-condensed={condensed}>
           <div className={styles.column}>
             <p className={styles.eyebrow}>
@@ -277,12 +277,12 @@ export function ThreadsStage({
             </p>
             <div className={styles.titleRow}>
               <h2 className={styles.title}>
-                {surahs[surah].name} {surah}
+                {books[book].name} {chapter}
                 {condensed && topVerse !== null && (
-                  <span className={styles.position}>:{versification.refAt(topVerse).ayah}</span>
+                  <span className={styles.position}>:{versification.refAt(topVerse).verse}</span>
                 )}
               </h2>
-              <nav className={styles.chapterNav} aria-label={t('threads.surahs')}>
+              <nav className={styles.chapterNav} aria-label={t('threads.chapters')}>
                 <button
                   type="button"
                   disabled={!previousChapter}
@@ -310,42 +310,42 @@ export function ThreadsStage({
           </div>
         </header>
         <div className={styles.column}>
-          <ol className={styles.ayahs}>
-            {ayahs.map((ayah, offset) => {
-              const text = translation.verseText(ayah);
-              const count = connectionsByVerse.get(ayah)?.length ?? 0;
+          <ol className={styles.verses}>
+            {verses.map((verse, offset) => {
+              const text = translation.verseText(verse);
+              const count = connectionsByVerse.get(verse)?.length ?? 0;
               return (
                 <li
-                  key={ayah}
+                  key={verse}
                   ref={(element) => {
                     const elements = verseElements.current;
-                    if (element) elements.set(ayah, element);
+                    if (element) elements.set(verse, element);
                     return () => {
-                      elements.delete(ayah);
+                      elements.delete(verse);
                     };
                   }}
-                  className={styles.ayah}
-                  data-selected={ayah === selectedVerse}
-                  data-linked={linked !== null && ayah >= linked.start && ayah <= linked.end}
+                  className={styles.verse}
+                  data-selected={verse === selectedVerse}
+                  data-linked={linked !== null && verse >= linked.start && verse <= linked.end}
                   onPointerEnter={(event) => {
-                    if (event.pointerType === 'mouse') setHoverVerse(ayah);
+                    if (event.pointerType === 'mouse') setHoverVerse(verse);
                   }}
                   onPointerLeave={() => {
                     setHoverVerse(null);
                   }}
                   onClick={() => {
                     onSelect(
-                      ayah === selectedVerse
-                        ? { kind: 'surah', surah, surah }
-                        : ayahPassage(ayah),
+                      verse === selectedVerse
+                        ? { kind: 'chapter', book, chapter }
+                        : versePassage(verse),
                     );
                   }}
                 >
                   <button
                     type="button"
                     className={styles.number}
-                    aria-label={t('threads.ayah')(n(offset + 1))}
-                    aria-pressed={ayah === selectedVerse}
+                    aria-label={t('threads.verse')(n(offset + 1))}
+                    aria-pressed={verse === selectedVerse}
                   >
                     {offset + 1}
                   </button>
@@ -356,24 +356,24 @@ export function ThreadsStage({
                     <span className={styles.count} title={t('arcs.connections')(n(count), count)}>
                       {count > 0 ? n(count) : ''}
                     </span>
-                    {/* A ayah this translation leaves out has nothing to put on a card. */}
+                    {/* A verse this translation leaves out has nothing to put on a card. */}
                     {text !== '' && (
                       <button
                         type="button"
                         className={styles.share}
-                        aria-label={t('share.ayah')(
-                          formatPassage(ayahPassage(ayah), versification, surahs),
+                        aria-label={t('share.verse')(
+                          formatPassage(versePassage(verse), versification, books),
                         )}
                         onClick={(event) => {
-                          // The row itself selects the ayah; sending it on is a different
+                          // The row itself selects the verse; sending it on is a different
                           // answer to the same tap, so it must not also move the reader.
                           event.stopPropagation();
                           openVerseShare(
                             buildVerseShareRequest({
                               data,
                               filter,
-                              ayah,
-                              url: shareUrl(ayahPassage(ayah)),
+                              verse,
+                              url: shareUrl(versePassage(verse)),
                               localization,
                             }),
                           );
@@ -393,27 +393,27 @@ export function ThreadsStage({
         ref={canvasHostRef}
         className={styles.canvasHost}
         onPointerMove={(event) => {
-          const ayah = verseAtSpine(event);
-          if (ayah === null) {
+          const verse = verseAtSpine(event);
+          if (verse === null) {
             setSpineHover(null);
             return;
           }
-          const target = versification.surahAt(ayah).id;
+          const target = versification.bookAt(verse).id;
           let count = 0;
           for (const list of connectionsByVerse.values()) {
             count += list.filter(
-              (connection) => versification.surahAt(connection.otherStart).id === target,
+              (connection) => versification.bookAt(connection.otherStart).id === target,
             ).length;
           }
           const rect = event.currentTarget.getBoundingClientRect();
-          setSpineHover({ surah: target, y: event.clientY - rect.top, count });
+          setSpineHover({ book: target, y: event.clientY - rect.top, count });
         }}
         onPointerLeave={() => {
           setSpineHover(null);
         }}
         onClick={(event) => {
-          const ayah = verseAtSpine(event);
-          if (ayah !== null) onSelect(surahPassageOf(ayah, versification));
+          const verse = verseAtSpine(event);
+          if (verse !== null) onSelect(chapterPassageOf(verse, versification));
         }}
       >
         <canvas
@@ -424,7 +424,7 @@ export function ThreadsStage({
         />
         {spineHover && (
           <div className={styles.tooltip} style={{ top: spineHover.y }}>
-            {surahs[spineHover.surah].name}{' '}
+            {books[spineHover.book].name}{' '}
             <span>· {t('threads.spineHover')(n(spineHover.count), spineHover.count)}</span>
           </div>
         )}

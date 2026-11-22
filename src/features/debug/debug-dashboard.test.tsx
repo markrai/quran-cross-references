@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { CANONICAL_QURAN } from '../../core/quran/quran-versification.ts';
+import { CANONICAL_VERSIFICATION } from '../../core/bible/versification.ts';
 import {
   createCrossReferenceDataset,
   createDebugData,
@@ -16,8 +16,8 @@ import { TextSearch } from './components/TextSearch.tsx';
 import { TranslationSection } from './components/TranslationSection.tsx';
 import { VerseInspector } from './components/VerseInspector.tsx';
 import { crossReferencesSectionId, DebugDashboard } from './DebugDashboard.tsx';
-import { VerseNavigationContext } from './ayah-navigation.ts';
-import { readVerseFromUrl, writeVerseToUrl } from './ayah-url.ts';
+import { VerseNavigationContext } from './verse-navigation.ts';
+import { readVerseFromUrl, writeVerseToUrl } from './verse-url.ts';
 
 const GEN_1_1 = verseIndex('Gen', 1, 1);
 const GEN_1_2 = verseIndex('Gen', 1, 2);
@@ -40,24 +40,24 @@ afterEach(() => {
   window.history.replaceState(null, '', '/');
 });
 
-describe('ayah-url', () => {
-  it('reads the ayah the address names', () => {
-    window.history.replaceState(null, '', '/debug/?ayah=John.3.16');
+describe('verse-url', () => {
+  it('reads the verse the address names', () => {
+    window.history.replaceState(null, '', '/debug/?verse=John.3.16');
     expect(readVerseFromUrl()).toBe(JOHN_3_16);
   });
 
-  it('has nothing to read when the address names no ayah', () => {
+  it('has nothing to read when the address names no verse', () => {
     expect(readVerseFromUrl()).toBeUndefined();
   });
 
   it('has nothing to read from an address it cannot parse', () => {
-    window.history.replaceState(null, '', '/debug/?ayah=Nope');
+    window.history.replaceState(null, '', '/debug/?verse=Nope');
     expect(readVerseFromUrl()).toBeUndefined();
   });
 
-  it('writes the ayah into the address without adding a history entry', () => {
+  it('writes the verse into the address without adding a history entry', () => {
     writeVerseToUrl(JOHN_3_16);
-    expect(window.location.search).toContain('ayah=John.3.16');
+    expect(window.location.search).toContain('verse=John.3.16');
   });
 });
 
@@ -76,24 +76,24 @@ describe('DatasetsSection', () => {
 });
 
 describe('TranslationSection', () => {
-  function renderSection(ayahs?: ReadonlyMap<number, string>) {
-    const { translation } = createDebugData([], ayahs).translation;
+  function renderSection(verses?: ReadonlyMap<number, string>) {
+    const { translation } = createDebugData([], verses).translation;
     withNavigation(<TranslationSection id="translation" translation={translation} />);
   }
 
-  it('counts the surahs, surahs and ayahs of the text', () => {
+  it('counts the books, chapters and verses of the text', () => {
     renderSection();
     expect(screen.getByText('Books')).toBeDefined();
     expect(screen.getByText('66')).toBeDefined();
     expect(screen.getByText('31,102')).toBeDefined();
   });
 
-  it('says the translation has no omitted ayahs when every ayah has text', () => {
+  it('says the translation has no omitted verses when every verse has text', () => {
     renderSection();
     expect(screen.getByText('None.')).toBeDefined();
   });
 
-  it('lists a ayah the translation leaves out', () => {
+  it('lists a verse the translation leaves out', () => {
     renderSection(new Map([[GEN_1_2, '']]));
     expect(screen.getByRole('button', { name: 'Genesis 1:2' })).toBeDefined();
   });
@@ -121,11 +121,11 @@ describe('TextSearch', () => {
     expect(screen.queryByRole('table')).toBeNull();
   });
 
-  it('finds the ayahs that contain the phrase, whatever their case', async () => {
+  it('finds the verses that contain the phrase, whatever their case', async () => {
     renderSearch();
     await userEvent.type(screen.getByRole('searchbox'), 'living water');
     await userEvent.click(screen.getByRole('button', { name: /Search/ }));
-    expect(screen.getByText(/2 ayahs contain/)).toBeDefined();
+    expect(screen.getByText(/2 verses contain/)).toBeDefined();
     expect(screen.getByRole('button', { name: 'Genesis 1:1' })).toBeDefined();
   });
 
@@ -133,18 +133,18 @@ describe('TextSearch', () => {
     renderSearch();
     await userEvent.type(screen.getByRole('searchbox'), 'zzzz');
     await userEvent.click(screen.getByRole('button', { name: /Search/ }));
-    expect(screen.getByText('No ayahs match.')).toBeDefined();
+    expect(screen.getByText('No verses match.')).toBeDefined();
   });
 });
 
 describe('VerseInspector', () => {
-  function renderInspector(ayah = GEN_1_1, withDatasets = true) {
+  function renderInspector(verse = GEN_1_1, withDatasets = true) {
     const data = createDebugData(LINKS, new Map([[GEN_1_3, '']]));
     const onSelect = vi.fn();
     withNavigation(
       <VerseInspector
         id="inspector"
-        ayah={ayah}
+        verse={verse}
         translation={data.translation.translation}
         datasets={withDatasets ? data.crossReferences.map(({ dataset }) => dataset) : []}
       />,
@@ -153,19 +153,19 @@ describe('VerseInspector', () => {
     return onSelect;
   }
 
-  it('shows the ayah, its text and where it sits in the canon', () => {
+  it('shows the verse, its text and where it sits in the canon', () => {
     renderInspector();
     expect(screen.getAllByText('Genesis 1:1').length).toBeGreaterThan(0);
     expect(screen.getByText('Gen.1.1')).toBeDefined();
   });
 
-  it('lists the links that leave the ayah and the ones that arrive', () => {
+  it('lists the links that leave the verse and the ones that arrive', () => {
     renderInspector();
     expect(screen.getByText(/Outgoing links: 2 of 2/)).toBeDefined();
     expect(screen.getByText(/Incoming links: 1 of 1/)).toBeDefined();
   });
 
-  it('marks how many more ayahs a range covers', () => {
+  it('marks how many more verses a range covers', () => {
     renderInspector();
     expect(screen.getByText(/\(\+1 more\)/)).toBeDefined();
   });
@@ -189,7 +189,7 @@ describe('VerseInspector', () => {
     expect(screen.getByText(/Outgoing links: 2 of 2/)).toBeDefined();
   });
 
-  it('opens the ayah a reference names', async () => {
+  it('opens the verse a reference names', async () => {
     const onSelect = renderInspector();
     const input = screen.getByLabelText('Bible reference');
     await userEvent.clear(input);
@@ -198,7 +198,7 @@ describe('VerseInspector', () => {
     expect(onSelect).toHaveBeenCalledWith(JOHN_3_16);
   });
 
-  it('opens the first ayah of a surah given without one', async () => {
+  it('opens the first verse of a chapter given without one', async () => {
     const onSelect = renderInspector();
     const input = screen.getByLabelText('Bible reference');
     await userEvent.clear(input);
@@ -217,7 +217,7 @@ describe('VerseInspector', () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 
-  it('refuses a ayah number the surah does not reach', async () => {
+  it('refuses a verse number the chapter does not reach', async () => {
     const onSelect = renderInspector();
     const input = screen.getByLabelText('Bible reference');
     await userEvent.clear(input);
@@ -227,7 +227,7 @@ describe('VerseInspector', () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 
-  it('steps to the ayah before and the ayah after', async () => {
+  it('steps to the verse before and the verse after', async () => {
     const onSelect = renderInspector(GEN_1_2);
     await userEvent.click(screen.getByRole('button', { name: /Previous/ }));
     expect(onSelect).toHaveBeenCalledWith(GEN_1_1);
@@ -235,14 +235,14 @@ describe('VerseInspector', () => {
     expect(onSelect).toHaveBeenCalledWith(GEN_1_3);
   });
 
-  it('cannot step back from the first ayah of the Bible, or on from the last', () => {
+  it('cannot step back from the first verse of the Bible, or on from the last', () => {
     renderInspector(GEN_1_1);
     expect(screen.getByRole('button', { name: /Previous/ })).toHaveProperty('disabled', true);
     expect(screen.getByRole('button', { name: /Next/ })).toHaveProperty('disabled', false);
   });
 
-  it('cannot step on from the last ayah of the Bible', () => {
-    renderInspector(CANONICAL_QURAN.ayahCount - 1, false);
+  it('cannot step on from the last verse of the Bible', () => {
+    renderInspector(CANONICAL_VERSIFICATION.verseCount - 1, false);
     expect(screen.getByRole('button', { name: /Next/ })).toHaveProperty('disabled', true);
   });
 });
@@ -257,13 +257,13 @@ describe('CrossReferencesSection', () => {
     return onSelect;
   }
 
-  it('counts the links and the ayahs they touch', () => {
+  it('counts the links and the verses they touch', () => {
     renderSection();
     expect(screen.getAllByText(/Cross-references ·/).length).toBeGreaterThan(0);
     expect(screen.getAllByText('3').length).toBeGreaterThan(0);
   });
 
-  it('shows the ayahs with the most links in each direction', () => {
+  it('shows the verses with the most links in each direction', () => {
     renderSection();
     expect(screen.getByText('Most outgoing links')).toBeDefined();
     expect(screen.getByText('Most incoming links')).toBeDefined();
@@ -274,7 +274,7 @@ describe('CrossReferencesSection', () => {
     expect(screen.getByText(/Links by testament/)).toBeDefined();
   });
 
-  it('lists the ayahs that no link touches', () => {
+  it('lists the verses that no link touches', () => {
     renderSection();
     // Genesis 1:1 to 1:3 are linked; the rest of the fixture's range is not.
     expect(
@@ -282,14 +282,14 @@ describe('CrossReferencesSection', () => {
     ).toBeDefined();
   });
 
-  it('opens a ayah from one of its tables', async () => {
+  it('opens a verse from one of its tables', async () => {
     const onSelect = renderSection();
     const table = screen.getByText('Most outgoing links').closest('table');
-    const [ayah] = within(table ?? document.body).getAllByRole('button');
-    if (!ayah) {
-      throw new Error('Expected a ayah link in the table.');
+    const [verse] = within(table ?? document.body).getAllByRole('button');
+    if (!verse) {
+      throw new Error('Expected a verse link in the table.');
     }
-    await userEvent.click(ayah);
+    await userEvent.click(verse);
     expect(onSelect).toHaveBeenCalled();
   });
 
@@ -309,23 +309,23 @@ describe('DebugDashboard', () => {
     render(<DebugDashboard data={createDebugData([], new Map(), createWholeBibleDataset())} />);
   }
 
-  it('opens on John 3:16, the ayah the app is best known by', () => {
+  it('opens on John 3:16, the verse the app is best known by', () => {
     renderDashboard();
     expect(screen.getAllByText('John 3:16').length).toBeGreaterThan(0);
   });
 
-  it('opens the ayah the address names instead', () => {
-    window.history.replaceState(null, '', '/debug/?ayah=Gen.1.1');
+  it('opens the verse the address names instead', () => {
+    window.history.replaceState(null, '', '/debug/?verse=Gen.1.1');
     renderDashboard();
     expect(screen.getAllByText('Genesis 1:1').length).toBeGreaterThan(0);
   });
 
-  it('moves the inspector to a ayah clicked anywhere on the page, and says so in the address', async () => {
+  it('moves the inspector to a verse clicked anywhere on the page, and says so in the address', async () => {
     renderDashboard();
     const [link] = screen.getAllByRole('button', { name: 'Genesis 1:1' });
     await userEvent.click(link ?? screen.getByRole('button', { name: /Inspect/ }));
     await waitFor(() => {
-      expect(window.location.search).toContain('ayah=Gen.1.1');
+      expect(window.location.search).toContain('verse=Gen.1.1');
     });
   });
 

@@ -1,12 +1,12 @@
-import { SURAHS, type Surah, type Testament } from '../../../core/quran/surahs.ts';
-import type { AyahIndex } from '../../../core/quran/ayah-ref.ts';
-import type { QuranVersification } from '../../../core/quran/quran-versification.ts';
+import { BOOKS, type Book, type Testament } from '../../../core/bible/books.ts';
+import type { VerseIndex } from '../../../core/bible/verse-ref.ts';
+import type { Versification } from '../../../core/bible/versification.ts';
 import { elementAt } from '../../../core/lib/array.ts';
 import type { CrossReferenceIndex } from '../../../cross-references/cross-reference-index.ts';
 import { topPositions } from './top-k.ts';
 
-export interface AyahCount {
-  readonly ayah: AyahIndex;
+export interface VerseCount {
+  readonly verse: VerseIndex;
   readonly count: number;
 }
 
@@ -30,11 +30,11 @@ export interface VoteStats {
 }
 
 export interface BookLinkStats {
-  readonly surah: Surah;
-  readonly ayahCount: number;
-  /** Links whose source ayah is in the surah. */
+  readonly book: Book;
+  readonly verseCount: number;
+  /** Links whose source verse is in the book. */
   readonly outgoing: number;
-  /** Links whose target starts in the surah. */
+  /** Links whose target starts in the book. */
   readonly incoming: number;
 }
 
@@ -43,28 +43,28 @@ export type TestamentFlow = Readonly<Record<Testament, Readonly<Record<Testament
 export interface CrossReferenceStats {
   readonly linkCount: number;
   /** Verses with at least one outgoing link. */
-  readonly sourceAyahCount: number;
+  readonly sourceVerseCount: number;
   /** Verses covered by at least one link target (ranges expanded). */
-  readonly targetAyahCount: number;
+  readonly targetVerseCount: number;
   /** Verses with neither outgoing nor incoming links. */
-  readonly unconnectedVerses: readonly AyahIndex[];
+  readonly unconnectedVerses: readonly VerseIndex[];
   readonly rangeLinkCount: number;
   readonly crossChapterRangeCount: number;
   readonly crossBookRangeCount: number;
-  /** Links whose target range contains their own source ayah. */
+  /** Links whose target range contains their own source verse. */
   readonly selfInclusiveLinkCount: number;
   readonly longestRangeLinkId: number | undefined;
-  /** Distinct unordered ayah pairs, taking the first ayah of each target range. */
+  /** Distinct unordered verse pairs, taking the first verse of each target range. */
   readonly distinctPairCount: number;
   /** Pairs linked in both directions (A → B and B → A). */
   readonly reciprocalPairCount: number;
   readonly votes: VoteStats;
   /** Link counts by source testament (rows) and target testament (columns). */
   readonly testamentFlow: TestamentFlow;
-  readonly topSources: readonly AyahCount[];
-  readonly topTargets: readonly AyahCount[];
+  readonly topSources: readonly VerseCount[];
+  readonly topTargets: readonly VerseCount[];
   readonly topVotedLinkIds: readonly number[];
-  readonly surahs: readonly BookLinkStats[];
+  readonly books: readonly BookLinkStats[];
 }
 
 const TOP_COUNT = 10;
@@ -114,13 +114,13 @@ function computeVoteStats(votes: ArrayLike<number>): VoteStats {
 
 export function computeCrossReferenceStats(
   index: CrossReferenceIndex,
-  versification: QuranVersification,
+  versification: Versification,
 ): CrossReferenceStats {
-  const { ayahCount, linkCount } = index;
-  const outgoingCounts = new Int32Array(ayahCount);
-  const incomingCounts = new Int32Array(ayahCount);
-  const bookOutgoing = new Int32Array(SURAHS.length);
-  const bookIncoming = new Int32Array(SURAHS.length);
+  const { verseCount, linkCount } = index;
+  const outgoingCounts = new Int32Array(verseCount);
+  const incomingCounts = new Int32Array(verseCount);
+  const bookOutgoing = new Int32Array(BOOKS.length);
+  const bookIncoming = new Int32Array(BOOKS.length);
   const flow: Record<Testament, Record<Testament, number>> = {
     OT: { OT: 0, NT: 0 },
     NT: { OT: 0, NT: 0 },
@@ -136,17 +136,17 @@ export function computeCrossReferenceStats(
 
   for (let id = 0; id < linkCount; id += 1) {
     const link = index.link(id);
-    const fromBook = versification.surahAt(link.from);
-    const targetBook = versification.surahAt(link.targetStart);
+    const fromBook = versification.bookAt(link.from);
+    const targetBook = versification.bookAt(link.targetStart);
 
     outgoingCounts[link.from] = elementAt(outgoingCounts, link.from) + 1;
-    for (let ayah = link.targetStart; ayah <= link.targetEnd; ayah += 1) {
-      incomingCounts[ayah] = elementAt(incomingCounts, ayah) + 1;
+    for (let verse = link.targetStart; verse <= link.targetEnd; verse += 1) {
+      incomingCounts[verse] = elementAt(incomingCounts, verse) + 1;
     }
     bookOutgoing[fromBook.ordinal] = elementAt(bookOutgoing, fromBook.ordinal) + 1;
     bookIncoming[targetBook.ordinal] = elementAt(bookIncoming, targetBook.ordinal) + 1;
     flow[fromBook.testament][targetBook.testament] += 1;
-    directedPairs.add(link.from * ayahCount + link.targetStart);
+    directedPairs.add(link.from * verseCount + link.targetStart);
 
     if (link.targetStart <= link.from && link.from <= link.targetEnd) {
       selfInclusiveLinkCount += 1;
@@ -156,9 +156,9 @@ export function computeCrossReferenceStats(
       rangeLinkCount += 1;
       const start = versification.refAt(link.targetStart);
       const end = versification.refAt(link.targetEnd);
-      if (start.surah !== end.surah) {
+      if (start.book !== end.book) {
         crossBookRangeCount += 1;
-      } else if (start.surah !== end.surah) {
+      } else if (start.chapter !== end.chapter) {
         crossChapterRangeCount += 1;
       }
       if (rangeLength > longestRangeLength) {
@@ -171,11 +171,11 @@ export function computeCrossReferenceStats(
   let distinctPairCount = 0;
   let reciprocalPairCount = 0;
   for (const key of directedPairs) {
-    const from = Math.floor(key / ayahCount);
-    const to = key % ayahCount;
-    const hasReverse = directedPairs.has(to * ayahCount + from);
+    const from = Math.floor(key / verseCount);
+    const to = key % verseCount;
+    const hasReverse = directedPairs.has(to * verseCount + from);
     // Count each unordered pair once: from its lower-numbered side when both directions exist
-    // (a ayah linked to a range starting at itself is its own reverse).
+    // (a verse linked to a range starting at itself is its own reverse).
     if (!hasReverse || from <= to) {
       distinctPairCount += 1;
     }
@@ -184,29 +184,29 @@ export function computeCrossReferenceStats(
     }
   }
 
-  const unconnectedVerses: AyahIndex[] = [];
-  let sourceAyahCount = 0;
-  let targetAyahCount = 0;
-  for (let ayah = 0; ayah < ayahCount; ayah += 1) {
-    const hasOutgoing = elementAt(outgoingCounts, ayah) > 0;
-    const hasIncoming = elementAt(incomingCounts, ayah) > 0;
-    sourceAyahCount += hasOutgoing ? 1 : 0;
-    targetAyahCount += hasIncoming ? 1 : 0;
+  const unconnectedVerses: VerseIndex[] = [];
+  let sourceVerseCount = 0;
+  let targetVerseCount = 0;
+  for (let verse = 0; verse < verseCount; verse += 1) {
+    const hasOutgoing = elementAt(outgoingCounts, verse) > 0;
+    const hasIncoming = elementAt(incomingCounts, verse) > 0;
+    sourceVerseCount += hasOutgoing ? 1 : 0;
+    targetVerseCount += hasIncoming ? 1 : 0;
     if (!hasOutgoing && !hasIncoming) {
-      unconnectedVerses.push(ayah);
+      unconnectedVerses.push(verse);
     }
   }
 
-  const toAyahCounts = (counts: Int32Array): AyahCount[] =>
-    topPositions(counts, TOP_COUNT).map((ayah) => ({
-      ayah,
-      count: elementAt(counts, ayah),
+  const toVerseCounts = (counts: Int32Array): VerseCount[] =>
+    topPositions(counts, TOP_COUNT).map((verse) => ({
+      verse,
+      count: elementAt(counts, verse),
     }));
 
   return {
     linkCount,
-    sourceAyahCount,
-    targetAyahCount,
+    sourceVerseCount,
+    targetVerseCount,
     unconnectedVerses,
     rangeLinkCount,
     crossChapterRangeCount,
@@ -217,16 +217,16 @@ export function computeCrossReferenceStats(
     reciprocalPairCount,
     votes: computeVoteStats(index.votes),
     testamentFlow: flow,
-    topSources: toAyahCounts(outgoingCounts),
-    topTargets: toAyahCounts(incomingCounts),
+    topSources: toVerseCounts(outgoingCounts),
+    topTargets: toVerseCounts(incomingCounts),
     topVotedLinkIds: topPositions(index.votes, TOP_COUNT),
-    surahs: SURAHS.map((surah) => {
-      const range = versification.surahRange(surah.id);
+    books: BOOKS.map((book) => {
+      const range = versification.bookRange(book.id);
       return {
-        surah,
-        ayahCount: range.end - range.start + 1,
-        outgoing: elementAt(bookOutgoing, surah.ordinal),
-        incoming: elementAt(bookIncoming, surah.ordinal),
+        book,
+        verseCount: range.end - range.start + 1,
+        outgoing: elementAt(bookOutgoing, book.ordinal),
+        incoming: elementAt(bookIncoming, book.ordinal),
       };
     }),
   };

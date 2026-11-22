@@ -30,7 +30,8 @@
     "data": "npm run data:fetch && npm run data:build",
     "data:fetch": "node scripts/data/fetch.ts",
     "data:build": "node scripts/data/build.ts",
-    "locale:new": "node scripts/locale/new.ts"
+    "locale:new": "node scripts/locale/new.ts",
+    "data:quran": "node scripts/quran/build.ts"
   },
   "dependencies": {
     "react": "^19.3.0",

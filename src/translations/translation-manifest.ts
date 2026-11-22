@@ -1,4 +1,4 @@
-import type { QuranVersificationId } from '../core/quran/quran-versification.ts';
+import type { VersificationId } from '../core/bible/versification.ts';
 import type { TranslationId } from '../core/datasets/ids.ts';
 import type { LicenseInfo } from '../core/datasets/metadata.ts';
 
@@ -14,7 +14,7 @@ export interface TranslationManifest {
   readonly language: string;
   readonly direction: 'ltr' | 'rtl';
   /** Verse numbering used by the translation's own text. */
-  readonly versification: QuranVersificationId;
+  readonly versification: VersificationId;
   readonly license: LicenseInfo;
   /** Credit line to display wherever the text is shown. */
   readonly attribution: string;

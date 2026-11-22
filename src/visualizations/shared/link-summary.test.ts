@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_QURAN } from '../../core/quran/quran-versification.ts';
+import { CANONICAL_VERSIFICATION } from '../../core/bible/versification.ts';
 import { CrossReferenceIndex } from '../../cross-references/cross-reference-index.ts';
 import { createCrossReferenceColumns, verseIndex } from '../../test-utils/fixtures.ts';
 import { summarizeLinks } from './link-summary.ts';
-import { computeVerseGenres } from './ayah-genres.ts';
+import { computeVerseGenres } from './verse-genres.ts';
 
 describe('summarizeLinks', () => {
-  it('counts shown links, connected ayahs and links across the testaments', () => {
+  it('counts shown links, connected verses and links across the testaments', () => {
     const gen = verseIndex('Gen', 1, 1);
     const ps = verseIndex('Ps', 23, 1);
     const john = verseIndex('John', 1, 1);
@@ -16,11 +16,11 @@ describe('summarizeLinks', () => {
         { from: gen, to: ps },
         { from: ps, to: gen },
       ]),
-      CANONICAL_QURAN.ayahCount,
+      CANONICAL_VERSIFICATION.verseCount,
     );
-    const summary = summarizeLinks(index, [0, 1], computeVerseGenres(CANONICAL_QURAN));
+    const summary = summarizeLinks(index, [0, 1], computeVerseGenres(CANONICAL_VERSIFICATION));
     expect(summary).toEqual({
-      ayahCount: 31102,
+      verseCount: 31102,
       shownLinks: 2,
       totalLinks: 3,
       connectedVerses: 5, // Gen 1:1, Ps 23:1 and John 1:1–3

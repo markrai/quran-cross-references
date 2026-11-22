@@ -1,4 +1,4 @@
-import type { QuranVersificationId } from '../quran/quran-versification.ts';
+import type { VersificationId } from '../bible/versification.ts';
 import {
   expectArrayOf,
   expectInteger,
@@ -43,7 +43,7 @@ export interface ImportNotice {
 interface DatasetFileBase<Format extends string> {
   readonly format: Format;
   readonly schemaVersion: typeof DATASET_SCHEMA_VERSION;
-  readonly versification: QuranVersificationId;
+  readonly versification: VersificationId;
   readonly provenance: DatasetProvenance;
   readonly notices: readonly ImportNotice[];
 }
@@ -63,10 +63,8 @@ export interface TranslationTextFile extends DatasetFileBase<'translation-text'>
    */
   readonly license?: LicenseInfo;
   readonly attribution?: string;
-  /** Verbatim Tanzil Uthmani text in canonical ayah order. */
-  readonly arabic: readonly string[];
-  /** Pickthall's English rendering in the same canonical order. */
-  readonly ayahs: readonly string[];
+  /** Verse texts in canonical order. An empty string marks a verse the translation omits. */
+  readonly verses: readonly string[];
 }
 
 /**
@@ -77,12 +75,9 @@ export interface TranslationTextFile extends DatasetFileBase<'translation-text'>
  */
 export interface CrossReferenceColumns {
   readonly offsets: readonly number[];
-  /** Inclusive end of the source range; the start is implied by CSR offsets. */
-  readonly sourceEnd: readonly number[];
   readonly targetStart: readonly number[];
   readonly targetEnd: readonly number[];
-  /** Upstream `ctx` value, or zero when none was supplied. */
-  readonly contextAfter: readonly number[];
+  readonly votes: readonly number[];
 }
 
 export interface CrossReferencesFile extends DatasetFileBase<'cross-references'> {
@@ -148,7 +143,7 @@ function parseNotice(value: unknown, path: string): ImportNotice {
 function parseFileBase<const Format extends string>(
   json: unknown,
   format: Format,
-  versification: QuranVersificationId,
+  versification: VersificationId,
 ): { record: Readonly<Record<string, unknown>>; base: DatasetFileBase<Format> } {
   const record = expectRecord(json, 'file');
   return {
@@ -171,7 +166,7 @@ function parseFileBase<const Format extends string>(
 /** What a dataset file must be, as declared by the manifest of the plugin that loads it. */
 export interface ExpectedDataset<Id extends string> {
   readonly id: Id;
-  readonly versification: QuranVersificationId;
+  readonly versification: VersificationId;
 }
 
 /**
@@ -208,8 +203,7 @@ export function parseTranslationTextFile(
     // Absent only in a file cached before these fields existed; present, it is still validated.
     ...(license === undefined ? {} : { license: expectLicense(license) }),
     ...(attribution === undefined ? {} : { attribution: expectString(attribution, 'attribution') }),
-    arabic: expectStringArray(record['arabic'], 'arabic'),
-    ayahs: expectStringArray(record['ayahs'], 'ayahs'),
+    verses: expectStringArray(record['verses'], 'verses'),
   };
 }
 
@@ -229,10 +223,9 @@ export function parseCrossReferencesFile(
     ...(attribution === undefined ? {} : { attribution: expectString(attribution, 'attribution') }),
     links: {
       offsets: expectIntegerArray(links['offsets'], 'links.offsets'),
-      sourceEnd: expectIntegerArray(links['sourceEnd'], 'links.sourceEnd'),
       targetStart: expectIntegerArray(links['targetStart'], 'links.targetStart'),
       targetEnd: expectIntegerArray(links['targetEnd'], 'links.targetEnd'),
-      contextAfter: expectIntegerArray(links['contextAfter'], 'links.contextAfter'),
+      votes: expectIntegerArray(links['votes'], 'links.votes'),
     },
   };
 }

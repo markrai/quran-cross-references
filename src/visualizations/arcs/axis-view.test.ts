@@ -47,7 +47,7 @@ describe('axis view', () => {
 
   /**
    * A NaN or an infinity that reached the window used to stay there for good: the arcs and the
-   * surah bar vanished, and the next hover crashed the view looking up ayah NaN. A step whose
+   * book bar vanished, and the next hover crashed the view looking up verse NaN. A step whose
    * arithmetic fails is dropped instead, and the window stays where it was.
    */
   describe('a step that cannot be worked out', () => {
@@ -56,7 +56,7 @@ describe('axis view', () => {
     it('does not zoom', () => {
       expect(zoomView(view, Number.NaN, 500, TOTAL)).toBe(view);
       expect(zoomView(view, 1.2, Number.NaN, TOTAL)).toBe(view);
-      // What a stage with no axis length gives: zero pixels per ayah, so an anchor at infinity.
+      // What a stage with no axis length gives: zero pixels per verse, so an anchor at infinity.
       expect(zoomView(view, 1.2, Number.NEGATIVE_INFINITY, TOTAL)).toBe(view);
       expect(zoomView(view, 1.2, Number.POSITIVE_INFINITY, TOTAL)).toBe(view);
     });

@@ -1,21 +1,31 @@
 import type { CrossReferenceSourceId } from '../core/datasets/ids.ts';
 import type { CrossReferenceSourceManifest } from './source-manifest.ts';
 
-const MUTASHABIHAT: CrossReferenceSourceManifest = {
-  id: 'mutashabihat',
-  name: 'Quran Mutashabihat Data',
-  description:
-    'Curated similar and repeated Quran passages for memorization; this is not an exhaustive scholarly cross-reference set.',
-  license: { name: 'CC0 1.0 Universal', url: 'https://creativecommons.org/publicdomain/zero/1.0/', publicDomain: true },
-  attribution:
-    'Similar-passage relationships: Quran Mutashabihat Data by Waqar144, based on work by Qari Idrees Al Asim and the maintainer, dedicated to the public domain under CC0 1.0.',
-  homepage: 'https://github.com/Waqar144/Quran_Mutashabihat_Data',
-  versification: 'hafs-kufan-6236',
-  enabledByDefault: true,
+const CROSS_REFERENCE_SOURCES: Readonly<
+  Record<CrossReferenceSourceId, CrossReferenceSourceManifest>
+> = {
+  openbible: {
+    id: 'openbible',
+    name: 'OpenBible.info Cross References',
+    description:
+      'About 345,000 cross-references, drawn mostly from the public-domain Treasury of ' +
+      'Scripture Knowledge and ranked by community votes.',
+    license: { name: 'CC BY 4.0', url: 'https://creativecommons.org/licenses/by/4.0/' },
+    attribution:
+      'Cross-reference data: OpenBible.info (CC BY 4.0), largely from the public-domain ' +
+      'Treasury of Scripture Knowledge. Modified: re-indexed to KJV verse numbering.',
+    homepage: 'https://www.openbible.info/labs/cross-references/',
+    versification: 'kjv',
+    enabledByDefault: true,
+  },
 };
 
-export const CROSS_REFERENCE_SOURCE_MANIFESTS: readonly CrossReferenceSourceManifest[] = [MUTASHABIHAT];
-export function getCrossReferenceSourceManifest(id: CrossReferenceSourceId): CrossReferenceSourceManifest {
-  if (id !== 'mutashabihat') throw new RangeError(`Unknown source: ${String(id)}`);
-  return MUTASHABIHAT;
+export const CROSS_REFERENCE_SOURCE_MANIFESTS: readonly CrossReferenceSourceManifest[] =
+  Object.values(CROSS_REFERENCE_SOURCES);
+
+/** The manifest for a cross-reference source, by id. */
+export function getCrossReferenceSourceManifest(
+  id: CrossReferenceSourceId,
+): CrossReferenceSourceManifest {
+  return CROSS_REFERENCE_SOURCES[id];
 }

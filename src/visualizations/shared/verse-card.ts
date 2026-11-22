@@ -5,13 +5,13 @@ import {
   genreBands,
   wrapText,
   type MeasureText,
-} from './ayah-card-layout.ts';
+} from './verse-card-layout.ts';
 
 /**
- * Paints a ayah as a picture worth sending to somebody.
+ * Paints a verse as a picture worth sending to somebody.
  *
- * The card is the focus layer of the arcs view with the ayah set above it: the same links the
- * app draws when that ayah is selected, over a baseline that stands for the whole Bible, in the
+ * The card is the focus layer of the arcs view with the verse set above it: the same links the
+ * app draws when that verse is selected, over a baseline that stands for the whole Bible, in the
  * same genre colors. That is the one thing on it that could not have come from any other Bible
  * app, and it is why the card is worth making rather than screenshotting.
  *
@@ -33,7 +33,7 @@ const RULE = '#232321';
 const SERIF = "'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif";
 const SANS = "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif";
 
-/** The type scale the ayah is set on, largest first. */
+/** The type scale the verse is set on, largest first. */
 const VERSE_SIZES = [76, 68, 60, 54, 48, 43, 39, 35] as const;
 const VERSE_LINE_HEIGHT = 1.34;
 
@@ -50,7 +50,7 @@ const CREDIT_LINE_HEIGHT = 1.4;
 const CREDIT_MAX_LINES = 5;
 const ARC_AREA_HEIGHT = 300;
 const BASELINE_WEIGHT = 5;
-/** Room under the line for the names of the surahs the arcs reach. */
+/** Room under the line for the names of the books the arcs reach. */
 const LANDMARK_BAND = 34;
 const LANDMARK_SIZE = 16;
 const LANDMARK_KEY_WIDTH = 13;
@@ -70,15 +70,15 @@ export interface VerseCardInput {
    */
   readonly localeTag: string;
   readonly text: string;
-  /** The ayah's own index, and where every link of its lands. */
-  readonly ayah: number;
+  /** The verse's own index, and where every link of its lands. */
+  readonly verse: number;
   readonly targets: readonly number[];
   readonly verseGenres: Uint8Array;
   readonly totalVerses: number;
   /** Genre colors, by ordinal, as the app draws them. */
   readonly genreHex: readonly string[];
   /**
-   * The surahs the arcs reach, named under the line at the point they sit on it.
+   * The books the arcs reach, named under the line at the point they sit on it.
    *
    * Each carries its genre so the name can be keyed to the color beside it: ten genre colors
    * are not distinguishable by eye alone, which is why `palette.ts` asks every visualization to
@@ -88,10 +88,10 @@ export interface VerseCardInput {
    */
   readonly landmarks: readonly {
     readonly label: string;
-    readonly ayah: number;
+    readonly verse: number;
     readonly genre: number;
   }[];
-  /** The first ayah of the New Testament, marked with a tick on the line. */
+  /** The first verse of the New Testament, marked with a tick on the line. */
   readonly testamentAt: number;
   /** "8 cross-references", already counted and pluralized in the reader's language. */
   readonly countLabel: string;
@@ -122,10 +122,10 @@ function drawMark(context: CanvasRenderingContext2D, x: number, y: number, size:
 }
 
 /**
- * The whole Bible as one line, this ayah marked on it, and every link leaving it.
+ * The whole Bible as one line, this verse marked on it, and every link leaving it.
  *
  * Arcs are painted before the baseline so that the line reads as solid where they meet it, and
- * the dot last of all, because it is the answer to "which ayah is this".
+ * the dot last of all, because it is the answer to "which verse is this".
  */
 function drawArcs(
   context: CanvasRenderingContext2D,
@@ -137,7 +137,7 @@ function drawArcs(
   const right = width - PADDING;
   const baselineY = top + ARC_AREA_HEIGHT;
   const { verseX, arcs } = arcsGeometry({
-    ayah: input.ayah,
+    verse: input.verse,
     targets: input.targets,
     verseGenres: input.verseGenres,
     totalVerses: input.totalVerses,
@@ -163,7 +163,7 @@ function drawArcs(
   }
   context.globalAlpha = 1;
 
-  // The baseline, in the genres of the surahs it runs through.
+  // The baseline, in the genres of the books it runs through.
   const span = right - left;
   context.lineWidth = BASELINE_WEIGHT;
   context.lineCap = 'butt';
@@ -198,7 +198,7 @@ function drawArcs(
 }
 
 /**
- * Names the surahs the arcs reach, under the point on the line where each one sits.
+ * Names the books the arcs reach, under the point on the line where each one sits.
  *
  * A name is dropped rather than overlapped: `axis-painter` does the same for the arcs view's own
  * axis, and a label that collides with its neighbour is worse than a label that is not there.
@@ -221,7 +221,7 @@ function drawLandmarks(
   let lastEnd = -Infinity;
   for (const landmark of input.landmarks) {
     const width = LANDMARK_KEY_WIDTH + 6 + context.measureText(landmark.label).width;
-    const centre = left + (span * landmark.ayah) / input.totalVerses;
+    const centre = left + (span * landmark.verse) / input.totalVerses;
     const start = Math.min(Math.max(centre - width / 2, left), right - width);
     if (start < lastEnd + LANDMARK_GAP) {
       continue;
@@ -240,14 +240,14 @@ function drawLandmarks(
  *
  * Separate from the canvas that hands back a PNG so that what the card *says* can be checked:
  * a test can give this a recording context and assert that the attribution, the count and the
- * ayah itself were actually painted. The licences make the attribution a condition of using
+ * verse itself were actually painted. The licences make the attribution a condition of using
  * these translations, which is not something to find out by looking.
  */
 export function paintVerseCard(context: CanvasRenderingContext2D, input: VerseCardInput): void {
   context.fillStyle = BACKGROUND;
   context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-  const accent = input.genreHex[elementAt(input.verseGenres, input.ayah)] ?? DIM;
+  const accent = input.genreHex[elementAt(input.verseGenres, input.verse)] ?? DIM;
 
   // The reference, in the genre's color: the one tie that makes six languages' cards a family.
   context.fillStyle = accent;
@@ -257,7 +257,7 @@ export function paintVerseCard(context: CanvasRenderingContext2D, input: VerseCa
   context.fillText(input.reference.toLocaleUpperCase(input.localeTag), PADDING, PADDING);
   context.letterSpacing = '0px';
 
-  // The ayah, as large as it will go on the scale.
+  // The verse, as large as it will go on the scale.
   const measure: MeasureText = (text, fontSize) => {
     context.font = `${String(fontSize)}px ${SERIF}`;
     return context.measureText(text).width;
@@ -265,7 +265,7 @@ export function paintVerseCard(context: CanvasRenderingContext2D, input: VerseCa
   const maxWidth = CARD_WIDTH - PADDING * 2;
   const textTop = PADDING + REFERENCE_SIZE + 54;
   // The credit is wrapped first, because how many lines it takes decides where everything above
-  // it can go. A translation with a long licence leaves the ayah less room, which is the right
+  // it can go. A translation with a long licence leaves the verse less room, which is the right
   // way round: the licence is not optional and the type scale is.
   const creditLines = wrapText(input.attribution, CREDIT_SIZE, maxWidth, (text, fontSize) => {
     context.font = `${String(fontSize)}px ${SANS}`;
@@ -285,8 +285,8 @@ export function paintVerseCard(context: CanvasRenderingContext2D, input: VerseCa
   });
   context.fillStyle = TEXT;
   context.font = `${String(fontSize)}px ${SERIF}`;
-  // Centred in the space it was given rather than hung from the top: most ayahs are two or
-  // three lines, and against a baseline anchored to the foot of the card a top-set short ayah
+  // Centred in the space it was given rather than hung from the top: most verses are two or
+  // three lines, and against a baseline anchored to the foot of the card a top-set short verse
   // leaves a hole in the middle that reads as a mistake.
   const textHeight = lines.length * fontSize * VERSE_LINE_HEIGHT;
   const firstLine = textTop + Math.max(0, (textRegion - textHeight) / 2);

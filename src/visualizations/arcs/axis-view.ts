@@ -1,5 +1,5 @@
 /**
- * The visible window of the ayah axis, in continuous ayah-index units: ayah `v` occupies
+ * The visible window of the verse axis, in continuous verse-index units: verse `v` occupies
  * `[v, v + 1)`. Zooming and panning always keep the window inside `[0, total]`.
  */
 export interface AxisView {
@@ -7,7 +7,7 @@ export interface AxisView {
   readonly end: number;
 }
 
-/** The narrowest window, in ayahs, so that single ayahs stay comfortably wide. */
+/** The narrowest window, in verses, so that single verses stay comfortably wide. */
 export const MIN_VIEW_SPAN = 24;
 
 export function fullView(total: number): AxisView {
@@ -25,8 +25,8 @@ export function clampView(view: AxisView, total: number, minSpan = MIN_VIEW_SPAN
  *
  * Every step below is arithmetic on pointer positions, wheel deltas and the stage's size, and a
  * NaN or an infinity anywhere in it used to become the window itself. Nothing ever recovered
- * from that: the arcs, the surah bar and its labels vanished, and the next hover took the whole
- * view down looking up ayah NaN. A Firefox reader reached it with the mouse wheel, by a route
+ * from that: the arcs, the book bar and its labels vanished, and the next hover took the whole
+ * view down looking up verse NaN. A Firefox reader reached it with the mouse wheel, by a route
  * that was never found, so the guard sits here, where every route ends: whatever went wrong, the
  * step is dropped and the window stays where it was.
  */
@@ -34,7 +34,7 @@ function finiteOr(next: AxisView, previous: AxisView): AxisView {
   return Number.isFinite(next.start) && Number.isFinite(next.end) ? next : previous;
 }
 
-/** Zooms by `factor` (> 1 zooms in) keeping the ayah at `anchor` under the pointer. */
+/** Zooms by `factor` (> 1 zooms in) keeping the verse at `anchor` under the pointer. */
 export function zoomView(view: AxisView, factor: number, anchor: number, total: number): AxisView {
   const span = view.end - view.start;
   const nextSpan = Math.min(Math.max(span / factor, MIN_VIEW_SPAN), total);

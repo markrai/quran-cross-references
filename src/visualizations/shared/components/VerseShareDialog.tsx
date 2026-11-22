@@ -9,9 +9,9 @@ import {
   ShareVerseIcon,
 } from '../../../shared/ui/icons.tsx';
 import { canCopy, copyQuote } from '../passage-quote.ts';
-import type { VerseCardInput } from '../ayah-card.ts';
-import { renderVerseCard } from '../ayah-card-image.ts';
-import type { VerseShareRequest } from '../ayah-share.ts';
+import type { VerseCardInput } from '../verse-card.ts';
+import { renderVerseCard } from '../verse-card-image.ts';
+import type { VerseShareRequest } from '../verse-share.ts';
 import styles from './VerseShareDialog.module.css';
 
 /**
@@ -21,7 +21,7 @@ import styles from './VerseShareDialog.module.css';
  */
 let show: ((request: VerseShareRequest) => void) | null = null;
 
-/** Opens the share dialog on a ayah. Does nothing if no dialog is mounted. */
+/** Opens the share dialog on a verse. Does nothing if no dialog is mounted. */
 export function openVerseShare(request: VerseShareRequest): void {
   show?.(request);
 }
@@ -31,7 +31,7 @@ export function openVerseShare(request: VerseShareRequest): void {
  * about. Fixed rather than from `useId`, because only ever one of these is mounted — the same
  * arrangement, and the same reasoning, as the install guide's own title.
  */
-const TITLE_ID = 'ayah-share-title';
+const TITLE_ID = 'verse-share-title';
 
 /** How long a button says it copied. */
 const COPIED_FEEDBACK_MS = 1600;
@@ -68,7 +68,7 @@ function SteadyLabel({
 }
 
 /**
- * A ayah as a picture, with the ways of sending it.
+ * A verse as a picture, with the ways of sending it.
  *
  * The card is drawn when the dialog opens rather than when Share is pressed: `navigator.share`
  * has to be called inside the gesture that asked for it, and a canvas awaited in between spends
@@ -118,7 +118,7 @@ export function VerseShareDialog({
   }, [request]);
 
   // One object URL at a time, released when the card is replaced or the dialog closes: a card is
-  // a megabyte of bitmap, and a reader who shares ten ayahs should not be holding ten of them.
+  // a megabyte of bitmap, and a reader who shares ten verses should not be holding ten of them.
   useEffect(() => {
     if (!request) {
       return undefined;

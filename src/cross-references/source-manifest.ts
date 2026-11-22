@@ -1,4 +1,4 @@
-import type { QuranVersificationId } from '../core/quran/quran-versification.ts';
+import type { VersificationId } from '../core/bible/versification.ts';
 import type { CrossReferenceSourceId } from '../core/datasets/ids.ts';
 import type { LicenseInfo } from '../core/datasets/metadata.ts';
 
@@ -11,7 +11,7 @@ export interface CrossReferenceSourceManifest {
   /** Credit line to display wherever the data is used. */
   readonly attribution: string;
   readonly homepage: string;
-  readonly versification: QuranVersificationId;
+  readonly versification: VersificationId;
   /** Whether the source's links are shown before the user changes any settings. */
   readonly enabledByDefault: boolean;
 }

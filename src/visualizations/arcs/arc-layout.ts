@@ -22,7 +22,7 @@ export interface ArcLayout {
 const EDGE_MARGIN = 16;
 /** Vertical layouts keep the top clear for the collapsed legend button. */
 const VERTICAL_TOP_MARGIN = 48;
-/** Room for the surah bar and labels: below the axis (horizontal) or left of it (vertical). */
+/** Room for the book bar and labels: below the axis (horizontal) or left of it (vertical). */
 const HORIZONTAL_LABEL_BAND = 58;
 const VERTICAL_LABEL_BAND = 64;
 
@@ -52,17 +52,17 @@ export function computeArcLayout(width: number, height: number): ArcLayout {
   };
 }
 
-/** Pixels per ayah at the current zoom. */
+/** Pixels per verse at the current zoom. */
 export function pixelsPerVerse(layout: ArcLayout, view: AxisView): number {
   return (layout.axisEnd - layout.axisStart) / (view.end - view.start);
 }
 
-/** Along-axis pixel position of a (continuous) ayah coordinate. */
-export function verseToAlong(layout: ArcLayout, view: AxisView, ayah: number): number {
-  return layout.axisStart + (ayah - view.start) * pixelsPerVerse(layout, view);
+/** Along-axis pixel position of a (continuous) verse coordinate. */
+export function verseToAlong(layout: ArcLayout, view: AxisView, verse: number): number {
+  return layout.axisStart + (verse - view.start) * pixelsPerVerse(layout, view);
 }
 
-/** Continuous ayah coordinate under an along-axis pixel position. */
+/** Continuous verse coordinate under an along-axis pixel position. */
 export function alongToVerse(layout: ArcLayout, view: AxisView, along: number): number {
   return view.start + (along - layout.axisStart) / pixelsPerVerse(layout, view);
 }

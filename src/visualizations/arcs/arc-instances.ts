@@ -5,7 +5,7 @@ import { voteWeight } from '../shared/vote-weight.ts';
 /** Per-arc GPU attributes, one entry per link. */
 export interface ArcInstances {
   readonly count: number;
-  /** Source and target positions on the axis, in continuous ayah units (centers). */
+  /** Source and target positions on the axis, in continuous verse units (centers). */
   readonly endpoints: Float32Array;
   /** Genre ordinals of the source and the target. */
   readonly genres: Float32Array;

@@ -21,7 +21,9 @@ type SurahDefinition = Omit<Surah, 'number' | 'ordinal'>;
  * The Quran's 114 surahs in canonical order, using the standard 6,236-ayah Hafs/Kufan count.
  * The basmalah is ayah 1 of Al-Fatihah and is not numbered separately in the other surahs.
  */
-const DEFINITIONS: readonly SurahDefinition[] = [
+type SurahTuple = readonly [name: string, arabicName: string, ayahCount: number, aliases: readonly string[]];
+
+const DEFINITIONS: readonly SurahDefinition[] = ([
   ['Al-Fatihah', 'الفاتحة', 7, ['fatiha', 'theopening']],
   ['Al-Baqarah', 'البقرة', 286, ['baqarah', 'thecow']],
   ['Ali Imran', 'آل عمران', 200, ['alimran', 'imran', 'familyofimran']],
@@ -136,7 +138,7 @@ const DEFINITIONS: readonly SurahDefinition[] = [
   ['Al-Ikhlas', 'الإخلاص', 4, ['ikhlas', 'sincerity']],
   ['Al-Falaq', 'الفلق', 5, ['falaq', 'daybreak']],
   ['An-Nas', 'الناس', 6, ['nas', 'mankind']],
-].map(([name, arabicName, ayahCount, aliases]) => ({ name, arabicName, ayahCount, aliases }));
+] as const satisfies readonly SurahTuple[]).map(([name, arabicName, ayahCount, aliases]) => ({ name, arabicName, ayahCount, aliases }));
 
 export const SURAHS: readonly Surah[] = DEFINITIONS.map((definition, ordinal) => ({
   ...definition,

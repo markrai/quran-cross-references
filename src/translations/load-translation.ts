@@ -1,4 +1,4 @@
-import { CANONICAL_QURAN } from '../core/quran/quran-versification.ts';
+import { CANONICAL_VERSIFICATION } from '../core/bible/versification.ts';
 import { parseTranslationTextFile } from '../core/datasets/formats.ts';
 import { translationDatasetPath } from '../core/datasets/paths.ts';
 import { loadDataset, type DatasetLoadReport } from '../shared/lib/fetch-dataset.ts';
@@ -16,9 +16,9 @@ export async function loadTranslation(manifest: TranslationManifest): Promise<Lo
     (json) => {
       const file = parseTranslationTextFile(json, {
         id: manifest.id,
-        versification: CANONICAL_QURAN.id,
+        versification: CANONICAL_VERSIFICATION.id,
       });
-      return new Translation(manifest, CANONICAL_QURAN, file);
+      return new Translation(manifest, CANONICAL_VERSIFICATION, file);
     },
   );
   return { translation, report };

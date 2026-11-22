@@ -1,7 +1,7 @@
-import { surahPassageOf, ayahPassage, type Passage } from '../../core/quran/passage.ts';
-import type { GenreId } from '../../core/quran/genres.ts';
-import type { AyahIndexRange, QuranVersification } from '../../core/quran/quran-versification.ts';
-import type { SurahNames } from '../../i18n/surahs/types.ts';
+import { chapterPassageOf, versePassage, type Passage } from '../../core/bible/passage.ts';
+import type { GenreId } from '../../core/bible/genres.ts';
+import type { VerseIndexRange, Versification } from '../../core/bible/versification.ts';
+import type { BookNames } from '../../i18n/books/types.ts';
 import { attachGestures, type GesturePoint, type PreviewInput } from '../shared/gestures.ts';
 import { animate, FrameScheduler, MAX_PIXEL_RATIO } from '../shared/frames.ts';
 import type { ArcInstances } from './arc-instances.ts';
@@ -37,7 +37,7 @@ export interface ArcPreview {
   /** The link's arc. */
   readonly links: ArcInstances;
   /** The passage it points to, marked on the axis as a whole. */
-  readonly passage: AyahIndexRange;
+  readonly passage: VerseIndexRange;
 }
 
 export interface ArcsControllerOptions {
@@ -45,16 +45,16 @@ export interface ArcsControllerOptions {
   readonly container: HTMLElement;
   readonly glCanvas: HTMLCanvasElement;
   readonly overlayCanvas: HTMLCanvasElement;
-  readonly versification: QuranVersification;
-  /** Surah and genre names for the axis; replaced when the reader changes language. */
-  readonly names: SurahNames;
+  readonly versification: Versification;
+  /** Book and genre names for the axis; replaced when the reader changes language. */
+  readonly names: BookNames;
   readonly genreNames: Readonly<Record<GenreId, string>>;
   readonly onHover: (hover: ArcHover | null) => void;
   readonly onSelect: (passage: Passage) => void;
   readonly onClear: () => void;
 }
 
-/** Below this many pixels per ayah, pointing picks whole surahs instead of single ayahs. */
+/** Below this many pixels per verse, pointing picks whole chapters instead of single verses. */
 const VERSE_PICK_PIXELS = 4;
 const KEYBOARD_PAN_SHARE = 0.15;
 const KEYBOARD_ZOOM = 1.6;
@@ -95,16 +95,16 @@ export class ArcsController {
   readonly #detachGestures: () => void;
   #layout: ArcLayout = computeArcLayout(0, 0);
   #view: AxisView;
-  #names: SurahNames;
+  #names: BookNames;
   #genreNames: Readonly<Record<GenreId, string>>;
-  #focus: AyahIndexRange | null = null;
-  #hover: AyahIndexRange | null = null;
+  #focus: VerseIndexRange | null = null;
+  #hover: VerseIndexRange | null = null;
   #linkPreview: ArcPreview | null = null;
   /** Where a finger previews, while it does; drives edge panning. */
   #touchPreview: GesturePoint | null = null;
   #edgePanFrame: number | null = null;
   #edgePanTime: number | null = null;
-  #linksOfRange: (range: AyahIndexRange) => ArcInstances | null = () => null;
+  #linksOfRange: (range: VerseIndexRange) => ArcInstances | null = () => null;
   #cancelAnimation: (() => void) | null = null;
   /** The intro that grows the first links from their sources; runs once, when they arrive. */
   #intro: 'pending' | 'running' | 'done' = 'pending';
@@ -121,7 +121,7 @@ export class ArcsController {
       throw new Error('Canvas 2D is not available.');
     }
     this.#overlay = overlay;
-    this.#view = fullView(options.versification.ayahCount);
+    this.#view = fullView(options.versification.verseCount);
     this.#names = options.names;
     this.#genreNames = options.genreNames;
     this.#scheduler = new FrameScheduler(() => {
@@ -176,22 +176,22 @@ export class ArcsController {
     this.#scheduler.request();
   }
 
-  /** How to find the (filtered) links of a ayah range, for focus and hover highlights. */
-  setLinkResolver(resolver: (range: AyahIndexRange) => ArcInstances | null): void {
+  /** How to find the (filtered) links of a verse range, for focus and hover highlights. */
+  setLinkResolver(resolver: (range: VerseIndexRange) => ArcInstances | null): void {
     this.#linksOfRange = resolver;
     this.#scene.setFocus(this.#focus && resolver(this.#focus));
     this.#scene.setHover(this.#hover && resolver(this.#hover));
     this.#scheduler.request();
   }
 
-  setFocus(range: AyahIndexRange | null): void {
+  setFocus(range: VerseIndexRange | null): void {
     const changed = range?.start !== this.#focus?.start || range?.end !== this.#focus?.end;
     this.#focus = range;
     this.#scene.setFocus(range && this.#linksOfRange(range));
     this.#scene.setDimmed(range !== null);
     if (range && changed) {
       this.#animateTo(
-        revealRange(this.#view, range.start, range.end + 1, this.#options.versification.ayahCount),
+        revealRange(this.#view, range.start, range.end + 1, this.#options.versification.verseCount),
       );
     }
     this.#scheduler.request();
@@ -205,7 +205,7 @@ export class ArcsController {
   }
 
   resetView(): void {
-    this.#animateTo(fullView(this.#options.versification.ayahCount));
+    this.#animateTo(fullView(this.#options.versification.verseCount));
   }
 
   dispose(): void {
@@ -219,7 +219,7 @@ export class ArcsController {
   }
 
   /**
-   * Every arc grows from its source ayah to its target while the glow fades in: the whole Bible's
+   * Every arc grows from its source verse to its target while the glow fades in: the whole Bible's
    * connections unfold at once, continuing the loading screen's arcs of light. Skipped for readers
    * who prefer reduced motion.
    */
@@ -241,7 +241,7 @@ export class ArcsController {
   }
 
   /** The axis is lettered, so a change of language repaints it. */
-  setNames(names: SurahNames, genreNames: Readonly<Record<GenreId, string>>): void {
+  setNames(names: BookNames, genreNames: Readonly<Record<GenreId, string>>): void {
     this.#names = names;
     this.#genreNames = genreNames;
     this.#draw();
@@ -281,24 +281,24 @@ export class ArcsController {
     if (along < this.#layout.axisStart || along > this.#layout.axisEnd) {
       return null;
     }
-    const ayah = Math.floor(alongToVerse(this.#layout, this.#view, along));
+    const verse = Math.floor(alongToVerse(this.#layout, this.#view, along));
     // NaN passes the bounds check above (every comparison with it is false) and survives the
-    // clamp below, so it is turned away here: a ayah that cannot be worked out is no ayah, not
-    // a lookup of ayah NaN.
-    if (!Number.isFinite(ayah)) {
+    // clamp below, so it is turned away here: a verse that cannot be worked out is no verse, not
+    // a lookup of verse NaN.
+    if (!Number.isFinite(verse)) {
       return null;
     }
-    return Math.min(Math.max(ayah, 0), this.#options.versification.ayahCount - 1);
+    return Math.min(Math.max(verse, 0), this.#options.versification.verseCount - 1);
   }
 
   #passageAt(point: GesturePoint): Passage | null {
-    const ayah = this.#verseAt(point);
-    if (ayah === null) {
+    const verse = this.#verseAt(point);
+    if (verse === null) {
       return null;
     }
     return pixelsPerVerse(this.#layout, this.#view) < VERSE_PICK_PIXELS
-      ? surahPassageOf(ayah, this.#options.versification)
-      : ayahPassage(ayah);
+      ? chapterPassageOf(verse, this.#options.versification)
+      : versePassage(verse);
   }
 
   #preview(point: GesturePoint, input: PreviewInput): void {
@@ -339,7 +339,7 @@ export class ArcsController {
       : point.x <= baseline + AXIS_STRIP_REACH_PX;
   }
 
-  /** Signed edge-panning speed for a finger at `point`: positive pans toward later ayahs. */
+  /** Signed edge-panning speed for a finger at `point`: positive pans toward later verses. */
   #edgePanSpeed(point: GesturePoint): number {
     const { axisStart, axisEnd } = this.#layout;
     const along = alongOfPoint(this.#layout, point);
@@ -384,7 +384,7 @@ export class ArcsController {
     this.#edgePanTime = null;
   }
 
-  #setHover(range: AyahIndexRange | null): void {
+  #setHover(range: VerseIndexRange | null): void {
     if (range?.start === this.#hover?.start && range?.end === this.#hover?.end) {
       return;
     }
@@ -393,31 +393,31 @@ export class ArcsController {
     this.#scheduler.request();
   }
 
-  #rangeOf(passage: Passage): AyahIndexRange {
-    if (passage.kind === 'ayah') {
-      return { start: passage.ayah, end: passage.ayah };
+  #rangeOf(passage: Passage): VerseIndexRange {
+    if (passage.kind === 'verse') {
+      return { start: passage.verse, end: passage.verse };
     }
-    const range = this.#options.versification.chapterRange(passage.surah, passage.surah);
+    const range = this.#options.versification.chapterRange(passage.book, passage.chapter);
     return range ?? { start: 0, end: 0 };
   }
 
   #panByPixels(deltaAlong: number): void {
     this.#cancelAnimation?.();
     const deltaVerses = -deltaAlong / pixelsPerVerse(this.#layout, this.#view);
-    this.#view = panView(this.#view, deltaVerses, this.#options.versification.ayahCount);
+    this.#view = panView(this.#view, deltaVerses, this.#options.versification.verseCount);
     this.#scheduler.request();
   }
 
   #zoomAt(factor: number, point: GesturePoint): void {
     this.#cancelAnimation?.();
     const anchor = alongToVerse(this.#layout, this.#view, alongOfPoint(this.#layout, point));
-    this.#view = zoomView(this.#view, factor, anchor, this.#options.versification.ayahCount);
+    this.#view = zoomView(this.#view, factor, anchor, this.#options.versification.verseCount);
     this.#scheduler.request();
   }
 
   #animateZoom(factor: number, point: GesturePoint): void {
     const anchor = alongToVerse(this.#layout, this.#view, alongOfPoint(this.#layout, point));
-    this.#animateTo(zoomView(this.#view, factor, anchor, this.#options.versification.ayahCount));
+    this.#animateTo(zoomView(this.#view, factor, anchor, this.#options.versification.verseCount));
   }
 
   #animateTo(target: AxisView): void {
@@ -430,7 +430,7 @@ export class ArcsController {
   }
 
   readonly #onKeyDown = (event: KeyboardEvent): void => {
-    const total = this.#options.versification.ayahCount;
+    const total = this.#options.versification.verseCount;
     const span = this.#view.end - this.#view.start;
     const center: GesturePoint = { x: this.#layout.width / 2, y: this.#layout.height / 2 };
     switch (event.key) {

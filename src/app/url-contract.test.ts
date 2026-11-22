@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { GENRES } from '../core/quran/genres.ts';
-import { toPassageId } from '../core/quran/passage.ts';
-import { KJV_VERSIFICATION as kjv } from '../core/quran/quran-versification.ts';
+import { GENRES } from '../core/bible/genres.ts';
+import { toPassageOsisId } from '../core/bible/passage.ts';
+import { KJV_VERSIFICATION as kjv } from '../core/bible/versification.ts';
 import { LOCALE_IDS, type LocaleId } from '../i18n/locale-id.ts';
 import { TRANSLATION_MANIFESTS, DEFAULT_TRANSLATION_ID } from '../translations/registry.ts';
 import { DEFAULT_LINK_FILTER, VOTE_THRESHOLDS } from '../visualizations/shared/link-filter.ts';
@@ -15,7 +15,7 @@ import {
 } from './explorer-location.ts';
 
 /**
- * The URL is this app's only saved state, and readers share it: a link to a ayah goes into a
+ * The URL is this app's only saved state, and readers share it: a link to a verse goes into a
  * message, a bookmark, a tweet, a sermon handout. Nobody can edit those once they are sent, so
  * the shapes below are a contract rather than a description.
  *
@@ -55,7 +55,7 @@ function read(url: string, base = BASE, preferredLocale: LocaleId = 'en'): UrlSt
   );
   return {
     view: location.view,
-    ref: location.passage === null ? null : toPassageId(location.passage, kjv),
+    ref: location.passage === null ? null : toPassageOsisId(location.passage, kjv),
     minVotes: location.filter.minVotes,
     hidden: [...location.filter.hiddenGenres].sort(),
     translation: location.translation,
@@ -84,7 +84,7 @@ const SAVED: readonly (readonly [string, Partial<UrlState>])[] = [
   ['/bible-cross-references/threads', { view: 'threads' }],
   ['/bible-cross-references/threads/index.html', { view: 'threads' }],
 
-  // A ayah and a surah — the two things a reader links to most.
+  // A verse and a chapter — the two things a reader links to most.
   ['/bible-cross-references/?ref=John.3.16', { ref: 'John.3.16' }],
   ['/bible-cross-references/?ref=Gen.1.1', { ref: 'Gen.1.1' }],
   ['/bible-cross-references/?ref=Isa.53', { ref: 'Isa.53' }],
@@ -319,7 +319,7 @@ describe('the URLs the app emits', () => {
   });
 
   it('names a passage', () => {
-    const passage = { kind: 'surah', surah: 'Isa', surah: 53 } as const;
+    const passage = { kind: 'chapter', book: 'Isa', chapter: 53 } as const;
     expect(explorerUrl(HOME, place({ passage }), BASE, kjv)).toBe(`${BASE}?ref=Isa.53`);
   });
 
@@ -353,7 +353,7 @@ describe('the URLs the app emits', () => {
   });
 
   it('keeps the whole state in the order readers have in their bookmarks', () => {
-    const passage = { kind: 'surah', surah: 'Isa', surah: 53 } as const;
+    const passage = { kind: 'chapter', book: 'Isa', chapter: 53 } as const;
     expect(
       explorerUrl(
         ROUTES[1],
@@ -395,7 +395,7 @@ describe('an old link upgrades itself', () => {
     expect(upgrade(`${BASE}?lang=pt&ref=John.3.16&utm_source=whatsapp`)).toBe(
       `${BASE}pt/?ref=John.3.16&utm_source=whatsapp`,
     );
-    expect(upgrade(`${BASE}?lang=pt&ref=John.3.16#ayah`)).toBe(`${BASE}pt/?ref=John.3.16#ayah`);
+    expect(upgrade(`${BASE}?lang=pt&ref=John.3.16#verse`)).toBe(`${BASE}pt/?ref=John.3.16#verse`);
     expect(upgrade(`${BASE}threads/?lang=pt&votes=10&hide=law,acts`)).toBe(
       `${BASE}pt/threads/?votes=10&hide=law,acts`,
     );
@@ -445,7 +445,7 @@ describe('an old link upgrades itself', () => {
 
 describe('an explicit language survives the app rebuilding the address', () => {
   it("does not quietly revert to the reader's own language", () => {
-    // A Portuguese reader opens an English link and clicks one ayah. Before `plainLocaleFor`,
+    // A Portuguese reader opens an English link and clicks one verse. Before `plainLocaleFor`,
     // `lang=en` was dropped here and the next read filled the gap from their own preference, so
     // the interface turned Portuguese under them.
     const link = `${BASE}?lang=en&ref=John.3.16`;
@@ -499,7 +499,7 @@ describe('a hostile URL cannot reach the page', () => {
 
   it.each([
     ['a long run of letters', 'a'.repeat(50_000)],
-    // The shape that actually backtracks. The surah group is `[letters…]*?` followed by `\\s*`,
+    // The shape that actually backtracks. The book group is `[letters…]*?` followed by `\\s*`,
     // and both can match a space, so a run of them is quadratic: measured at ~270ms for 20k and
     // ~2s for 50k against the pattern directly. `?ref=` is read by the OSIS parser rather than
     // this one, and the search box is capped — but the cap is the only thing standing here, so

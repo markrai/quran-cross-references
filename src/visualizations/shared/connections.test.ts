@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_QURAN } from '../../core/quran/quran-versification.ts';
+import { CANONICAL_VERSIFICATION } from '../../core/bible/versification.ts';
 import { CrossReferenceIndex } from '../../cross-references/cross-reference-index.ts';
 import { createCrossReferenceColumns, verseIndex } from '../../test-utils/fixtures.ts';
 import { collectConnections, connectionLinkIds, groupByBook, landingNote } from './connections.ts';
 import { createLinkFilter } from './link-filter.ts';
-import { computeVerseGenres } from './ayah-genres.ts';
+import { computeVerseGenres } from './verse-genres.ts';
 
-const verseGenres = computeVerseGenres(CANONICAL_QURAN);
+const verseGenres = computeVerseGenres(CANONICAL_VERSIFICATION);
 const JOHN_3_16 = verseIndex('John', 3, 16);
 const JOHN_3_17 = verseIndex('John', 3, 17);
 const ROM_5_8 = verseIndex('Rom', 5, 8);
@@ -22,11 +22,11 @@ const index = new CrossReferenceIndex(
     { from: GEN_22_2, to: JOHN_3_16, toEnd: JOHN_3_17, votes: 7 },
     { from: ROM_5_8, to: JOHN_3_16, votes: -2 },
   ]),
-  CANONICAL_QURAN.ayahCount,
+  CANONICAL_VERSIFICATION.verseCount,
 );
 
 describe('collectConnections', () => {
-  it('lists outgoing and incoming links of a ayah, sorted by the other end', () => {
+  it('lists outgoing and incoming links of a verse, sorted by the other end', () => {
     const result = collectConnections(
       index,
       { start: JOHN_3_16, end: JOHN_3_16 },
@@ -37,7 +37,7 @@ describe('collectConnections', () => {
     expect(result.incoming.map((c) => c.otherStart)).toEqual([GEN_22_2, ROM_5_8]);
   });
 
-  it('counts a link into a range spanning several ayahs of the passage once', () => {
+  it('counts a link into a range spanning several verses of the passage once', () => {
     const passage = { start: JOHN_3_16, end: JOHN_3_17 };
     const all = collectConnections(index, passage, createLinkFilter(-Infinity), verseGenres);
     expect(all.outgoing).toHaveLength(3);
@@ -56,33 +56,33 @@ describe('landingNote', () => {
   );
   const [intoRange, intoVerse] = incoming;
 
-  it('names the whole passage a link points to, which the ayah is only part of', () => {
-    expect(intoRange && landingNote(intoRange, CANONICAL_QURAN, false)).toEqual({
+  it('names the whole passage a link points to, which the verse is only part of', () => {
+    expect(intoRange && landingNote(intoRange, CANONICAL_VERSIFICATION, false)).toEqual({
       kind: 'range',
       start: JOHN_3_16,
       end: JOHN_3_17,
     });
   });
 
-  it('adds nothing to a link between single ayahs', () => {
-    expect(intoVerse && landingNote(intoVerse, CANONICAL_QURAN, false)).toBeNull();
+  it('adds nothing to a link between single verses', () => {
+    expect(intoVerse && landingNote(intoVerse, CANONICAL_VERSIFICATION, false)).toBeNull();
   });
 
-  it("names the surah's ayah where each other link starts or lands", () => {
+  it("names the chapter's verse where each other link starts or lands", () => {
     const [fromVerse] = outgoing;
-    expect(intoVerse && landingNote(intoVerse, CANONICAL_QURAN, true)).toEqual({
-      kind: 'to-ayah',
-      ayah: 16,
+    expect(intoVerse && landingNote(intoVerse, CANONICAL_VERSIFICATION, true)).toEqual({
+      kind: 'to-verse',
+      verse: 16,
     });
-    expect(fromVerse && landingNote(fromVerse, CANONICAL_QURAN, true)).toEqual({
-      kind: 'from-ayah',
-      ayah: 16,
+    expect(fromVerse && landingNote(fromVerse, CANONICAL_VERSIFICATION, true)).toEqual({
+      kind: 'from-verse',
+      verse: 16,
     });
   });
 });
 
 describe('groupByBook', () => {
-  it('groups consecutive connections by the surah of the other end', () => {
+  it('groups consecutive connections by the book of the other end', () => {
     const { outgoing } = collectConnections(
       index,
       { start: JOHN_3_16, end: JOHN_3_17 },
@@ -90,8 +90,8 @@ describe('groupByBook', () => {
       verseGenres,
     );
     expect(
-      groupByBook(outgoing, CANONICAL_QURAN).map((group) => [
-        group.surah,
+      groupByBook(outgoing, CANONICAL_VERSIFICATION).map((group) => [
+        group.book,
         group.connections.length,
       ]),
     ).toEqual([
@@ -108,7 +108,7 @@ describe('connectionLinkIds', () => {
         { from: JOHN_3_16, to: ROM_5_8, votes: 10 },
         { from: ROM_5_8, to: JOHN_3_16, votes: 10 },
       ]),
-      CANONICAL_QURAN.ayahCount,
+      CANONICAL_VERSIFICATION.verseCount,
     );
     const connections = collectConnections(
       index,
@@ -124,7 +124,7 @@ describe('connectionLinkIds', () => {
   it('has nothing to name for a passage with no links', () => {
     const index = new CrossReferenceIndex(
       createCrossReferenceColumns([]),
-      CANONICAL_QURAN.ayahCount,
+      CANONICAL_VERSIFICATION.verseCount,
     );
     const connections = collectConnections(
       index,

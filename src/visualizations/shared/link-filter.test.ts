@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_QURAN } from '../../core/quran/quran-versification.ts';
+import { CANONICAL_VERSIFICATION } from '../../core/bible/versification.ts';
 import { CrossReferenceIndex } from '../../cross-references/cross-reference-index.ts';
 import { createCrossReferenceColumns, verseIndex } from '../../test-utils/fixtures.ts';
 import { createLinkFilter, isDefaultFilter, selectLinks } from './link-filter.ts';
-import { computeVerseGenres } from './ayah-genres.ts';
+import { computeVerseGenres } from './verse-genres.ts';
 
-const verseGenres = computeVerseGenres(CANONICAL_QURAN);
+const verseGenres = computeVerseGenres(CANONICAL_VERSIFICATION);
 const GEN = verseIndex('Gen', 1, 1);
 const PS = verseIndex('Ps', 23, 1);
 const JOHN = verseIndex('John', 1, 1);
@@ -16,7 +16,7 @@ const index = new CrossReferenceIndex(
     { from: GEN, to: PS, votes: -3 },
     { from: PS, to: JOHN, votes: 4 },
   ]),
-  CANONICAL_QURAN.ayahCount,
+  CANONICAL_VERSIFICATION.verseCount,
 );
 
 describe('selectLinks', () => {

@@ -1,7 +1,11 @@
-import type { CrossReferencesFile, TranslationTextFile } from '../../../src/core/datasets/formats.ts';
+import type {
+  CrossReferencesFile,
+  OriginalWordsFile,
+  TranslationTextFile,
+} from '../../../src/core/datasets/formats.ts';
 import { sha256Hex } from './files.ts';
 
-export type DatasetFile = TranslationTextFile | CrossReferencesFile;
+export type DatasetFile = TranslationTextFile | CrossReferencesFile | OriginalWordsFile;
 
 /**
  * What a generated dataset contains, in numbers small enough to read in a diff.
@@ -36,31 +40,24 @@ function shapeOf(dataset: DatasetFile): Readonly<Record<string, number>> {
   switch (dataset.format) {
     case 'translation-text':
       return {
-        ayahs: dataset.ayahs.length,
-        arabicCharacters: dataset.arabic.reduce((total, ayah) => total + ayah.length, 0),
-        englishCharacters: dataset.ayahs.reduce((total, ayah) => total + ayah.length, 0),
-        emptyArabic: dataset.arabic.filter((ayah) => ayah === '').length,
-        emptyEnglish: dataset.ayahs.filter((ayah) => ayah === '').length,
+        verses: dataset.verses.length,
+        empty: dataset.verses.filter((verse) => verse === '').length,
+        characters: dataset.verses.reduce((total, verse) => total + verse.length, 0),
+        supplied: dataset.verses.filter((verse) => verse.includes('[')).length,
+        digits: dataset.verses.filter((verse) => /\d/.test(verse)).length,
       };
     case 'cross-references':
       return {
-        links: dataset.links.targetStart.length,
+        links: dataset.links.votes.length,
         sourceRows: dataset.sourceRowCount,
-        rangeSources: dataset.links.sourceEnd.filter((end, index) => end > sourceAt(dataset.links.offsets, index)).length,
-        rangeTargets: dataset.links.targetEnd.filter((end, index) => end > (dataset.links.targetStart[index] ?? end)).length,
+      };
+    case 'original-words':
+      return {
+        words: dataset.words.strongs.length,
+        verseEntries: dataset.words.verses.length,
+        maxVerses: dataset.maxVerses,
       };
   }
-}
-
-function sourceAt(offsets: readonly number[], linkId: number): number {
-  let low = 0;
-  let high = offsets.length - 1;
-  while (low + 1 < high) {
-    const middle = (low + high) >>> 1;
-    if ((offsets[middle] ?? 0) <= linkId) low = middle;
-    else high = middle;
-  }
-  return low;
 }
 
 export function fingerprintDataset(dataset: DatasetFile, json: string): DatasetFingerprint {

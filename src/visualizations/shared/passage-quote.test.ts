@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_QURAN } from '../../core/quran/quran-versification.ts';
+import { CANONICAL_VERSIFICATION } from '../../core/bible/versification.ts';
 import { verseIndex, createTranslationFile } from '../../test-utils/fixtures.ts';
 import { getTranslationManifest } from '../../translations/registry.ts';
 import { Translation } from '../../translations/translation.ts';
 import { quotePassage } from './passage-quote.ts';
-import { enBooks } from '../../i18n/surahs/en.ts';
+import { enBooks } from '../../i18n/books/en.ts';
 
 const GEN_1_31 = verseIndex('Gen', 1, 31);
 const GEN_2_1 = verseIndex('Gen', 2, 1);
@@ -14,7 +14,7 @@ const URL = 'https://example.org/site/?ref=Gen.1.31';
 
 const translation = new Translation(
   getTranslationManifest('bsb'),
-  CANONICAL_QURAN,
+  CANONICAL_VERSIFICATION,
   createTranslationFile(
     new Map([
       [GEN_1_31, 'And God looked upon all that He had made, and indeed, it was very good.'],
@@ -27,7 +27,7 @@ const translation = new Translation(
 const quote = (start: number, end: number) =>
   quotePassage({
     translation,
-    versification: CANONICAL_QURAN,
+    versification: CANONICAL_VERSIFICATION,
     names: enBooks,
     start,
     end,
@@ -35,14 +35,14 @@ const quote = (start: number, end: number) =>
   });
 
 describe('quotePassage', () => {
-  it('quotes a ayah with its reference, translation and link', () => {
+  it('quotes a verse with its reference, translation and link', () => {
     expect(quote(GEN_1_31, GEN_1_31).text).toBe(
       'And God looked upon all that He had made, and indeed, it was very good.\n' +
         `— Genesis 1:31 (BSB) ${URL}`,
     );
   });
 
-  it('numbers the ayahs of a passage, with the surah where it changes', () => {
+  it('numbers the verses of a passage, with the chapter where it changes', () => {
     const { text } = quote(GEN_1_31, GEN_2_2);
     expect(text).toMatch(/^³¹And God looked .* ²:¹Thus the heavens .* ²:²And by the seventh day/);
     expect(text).toContain(`— Genesis 1:31–2:2 (BSB) ${URL}`);
@@ -55,7 +55,7 @@ describe('quotePassage', () => {
     expect(html).toContain(`<p>— <a href="${URL}">Genesis 1:31–2:1</a> (BSB)</p>`);
   });
 
-  it('leaves out ayahs the translation omits', () => {
+  it('leaves out verses the translation omits', () => {
     const { text } = quote(MATT_17_21 - 1, MATT_17_21 + 1);
     expect(text).not.toMatch(/²¹/);
     expect(text).toMatch(/²⁰.* ²²/);

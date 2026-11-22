@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { QuranVersification } from '../core/quran/quran-versification.ts';
+import type { Versification } from '../core/bible/versification.ts';
 import type { TranslationId } from '../core/datasets/ids.ts';
 import type { LocaleId } from '../i18n/locale-id.ts';
 import {
@@ -24,7 +24,7 @@ export interface NavigateOptions {
  */
 export function useExplorerLocation<Id extends string>(
   routes: readonly [ViewRoute<Id>, ...ViewRoute<Id>[]],
-  versification: QuranVersification,
+  versification: Versification,
   defaultTranslation: (locale: LocaleId) => TranslationId,
   defaultLocale: LocaleId,
 ): readonly [

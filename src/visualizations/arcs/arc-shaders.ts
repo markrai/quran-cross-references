@@ -11,7 +11,7 @@ const COMMON = /* glsl */ `
   precision highp float;
 
   uniform vec2 u_viewport;   // stage size, CSS px
-  uniform vec2 u_view;       // visible window: start, end (ayah units)
+  uniform vec2 u_view;       // visible window: start, end (verse units)
   uniform vec2 u_axis;       // along-axis pixel range of the window
   uniform float u_baseline;  // across-axis pixel coordinate of the axis
   uniform float u_maxHeight; // tallest arc, px
@@ -21,8 +21,8 @@ const COMMON = /* glsl */ `
 
   const float PI = 3.14159265;
 
-  float alongOf(float ayah) {
-    return u_axis.x + (ayah - u_view.x) / (u_view.y - u_view.x) * (u_axis.y - u_axis.x);
+  float alongOf(float verse) {
+    return u_axis.x + (verse - u_view.x) / (u_view.y - u_view.x) * (u_axis.y - u_axis.x);
   }
 
   // Arc point at angle theta (0 at a, PI at b) in local (along, height) coordinates.

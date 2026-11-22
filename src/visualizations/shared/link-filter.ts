@@ -1,5 +1,5 @@
-import { GENRES, type GenreId } from '../../core/quran/genres.ts';
-import type { AyahIndex } from '../../core/quran/ayah-ref.ts';
+import { GENRES, type GenreId } from '../../core/bible/genres.ts';
+import type { VerseIndex } from '../../core/bible/verse-ref.ts';
 import { elementAt } from '../../core/lib/array.ts';
 import type { CrossReferenceIndex } from '../../cross-references/cross-reference-index.ts';
 
@@ -43,13 +43,13 @@ export function describeThreshold(minVotes: number): ThresholdDescription {
 }
 
 /**
- * Compiles a filter into a fast predicate over links. `verseGenres` maps every ayah to its genre
+ * Compiles a filter into a fast predicate over links. `verseGenres` maps every verse to its genre
  * ordinal (see `computeVerseGenres`).
  */
 export function compileLinkFilter(
   filter: LinkFilter,
   verseGenres: Uint8Array,
-): (from: AyahIndex, to: AyahIndex, votes: number) => boolean {
+): (from: VerseIndex, to: VerseIndex, votes: number) => boolean {
   const hidden = new Uint8Array(GENRES.length);
   for (const genre of GENRES) {
     hidden[genre.ordinal] = filter.hiddenGenres.has(genre.id) ? 1 : 0;

@@ -2,7 +2,7 @@ import { formatAyahId, type AyahRef } from './ayah-ref.ts';
 import { CANONICAL_QURAN, type QuranVersification } from './quran-versification.ts';
 import { SURAHS, getSurah } from './surahs.ts';
 
-const normalize = (value: string) => value.toLocaleLowerCase('en').normalize('NFKD').replace(/[^a-z0-9]/g, '');
+const normalize = (value: string) => value.toLocaleLowerCase('en').normalize('NFKD').replace(/\p{M}/gu, '').replace(/[^\p{L}\p{N}]/gu, '');
 
 const NAME_LOOKUP = new Map<string, number>();
 for (const surah of SURAHS) {

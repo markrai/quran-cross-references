@@ -7,7 +7,7 @@ import styles from './PassagePanel.module.css';
 /**
  * One band of the details panel.
  *
- * The panel is a long scroll of ayahs that all look alike, and its sections used to be marked
+ * The panel is a long scroll of verses that all look alike, and its sections used to be marked
  * only by a line of small capitals — easy to scroll past without noticing that "References" has
  * become "Referenced by". So each heading is a band that stays at the top of the panel while its
  * own section is on screen: whatever is being read, the thing above it says what it is.

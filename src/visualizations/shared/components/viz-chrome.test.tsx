@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { GENRES } from '../../../core/quran/genres.ts';
+import { GENRES } from '../../../core/bible/genres.ts';
 import { SiteFooter } from '../../../shared/ui/SiteFooter.tsx';
 import { getTranslationManifest, TRANSLATION_MANIFESTS } from '../../../translations/registry.ts';
 import { createLinkFilter, DEFAULT_LINK_FILTER } from '../link-filter.ts';
@@ -16,7 +16,7 @@ import { groupByLanguage, TranslationMenu } from './TranslationMenu.tsx';
 const BSB = getTranslationManifest('bsb');
 
 const SUMMARY = {
-  ayahCount: 31_102,
+  verseCount: 31_102,
   shownLinks: 120_000,
   totalLinks: 344_799,
   connectedVerses: 20_000,
@@ -290,10 +290,10 @@ describe('LinkStats', () => {
 
   it('offers a hint for a mouse and one for a touch screen', () => {
     render(
-      <LinkStats summary={SUMMARY} hint={{ pointer: 'Hover a ayah', touch: 'Tap a ayah' }} />,
+      <LinkStats summary={SUMMARY} hint={{ pointer: 'Hover a verse', touch: 'Tap a verse' }} />,
     );
-    expect(screen.getByText('Hover a ayah')).toBeDefined();
-    expect(screen.getByText('Tap a ayah')).toBeDefined();
+    expect(screen.getByText('Hover a verse')).toBeDefined();
+    expect(screen.getByText('Tap a verse')).toBeDefined();
   });
 });
 

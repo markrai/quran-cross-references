@@ -1,10 +1,10 @@
 import { createContext, useContext } from 'react';
-import type { AyahIndex } from '../../core/quran/ayah-ref.ts';
+import type { VerseIndex } from '../../core/bible/verse-ref.ts';
 
-/** Lets any ayah link on the debug page open that ayah in the inspector. */
-export const VerseNavigationContext = createContext<((ayah: AyahIndex) => void) | null>(null);
+/** Lets any verse link on the debug page open that verse in the inspector. */
+export const VerseNavigationContext = createContext<((verse: VerseIndex) => void) | null>(null);
 
-export function useSelectVerse(): (ayah: AyahIndex) => void {
+export function useSelectVerse(): (verse: VerseIndex) => void {
   const selectVerse = useContext(VerseNavigationContext);
   if (!selectVerse) {
     throw new Error('useSelectVerse must be used inside VerseNavigationContext.');

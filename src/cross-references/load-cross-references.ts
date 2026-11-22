@@ -1,4 +1,4 @@
-import { CANONICAL_QURAN } from '../core/quran/quran-versification.ts';
+import { CANONICAL_VERSIFICATION } from '../core/bible/versification.ts';
 import {
   parseCrossReferencesFile,
   type DatasetProvenance,
@@ -31,14 +31,14 @@ export async function loadCrossReferences(
     (json): CrossReferenceDataset => {
       const file = parseCrossReferencesFile(json, {
         id: manifest.id,
-        versification: CANONICAL_QURAN.id,
+        versification: CANONICAL_VERSIFICATION.id,
       });
       return {
         manifest,
         provenance: file.provenance,
         notices: file.notices,
         sourceRowCount: file.sourceRowCount,
-        index: new CrossReferenceIndex(file.links, CANONICAL_QURAN.ayahCount),
+        index: new CrossReferenceIndex(file.links, CANONICAL_VERSIFICATION.verseCount),
       };
     },
   );

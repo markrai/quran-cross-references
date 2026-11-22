@@ -1,7 +1,7 @@
-import { formatAyahIndexRange } from '../../core/quran/reference.ts';
-import type { AyahIndex } from '../../core/quran/ayah-ref.ts';
-import type { SurahNames } from '../../i18n/surahs/types.ts';
-import type { QuranVersification } from '../../core/quran/quran-versification.ts';
+import { formatVerseIndexRange } from '../../core/bible/reference-format.ts';
+import type { VerseIndex } from '../../core/bible/verse-ref.ts';
+import type { BookNames } from '../../i18n/books/types.ts';
+import type { Versification } from '../../core/bible/versification.ts';
 import type { Translation } from '../../translations/translation.ts';
 
 /** A quoted passage: plain text for anywhere, and HTML that rich editors keep as a quote. */
@@ -25,12 +25,12 @@ function escapeHtml(text: string): string {
 }
 
 /**
- * A ayah or passage, quoted in full with its reference, translation and a link, e.g.
+ * A verse or passage, quoted in full with its reference, translation and a link, e.g.
  *
  *     ¹Now when men began… ²the sons of God saw…
  *     — Genesis 6:1–2 (BSB) https://trekhleb.dev/bible-cross-references/?ref=Gen.6.1
  *
- * A passage's ayahs are numbered (with the surah too where it changes). Verses a translation
+ * A passage's verses are numbered (with the chapter too where it changes). Verses a translation
  * omits are left out.
  */
 export function quotePassage({
@@ -42,32 +42,32 @@ export function quotePassage({
   url,
 }: {
   readonly translation: Translation;
-  readonly versification: QuranVersification;
-  readonly names: SurahNames;
-  readonly start: AyahIndex;
-  readonly end: AyahIndex;
+  readonly versification: Versification;
+  readonly names: BookNames;
+  readonly start: VerseIndex;
+  readonly end: VerseIndex;
   readonly url: string;
 }): PassageQuote {
   const first = versification.refAt(start);
-  const ayahs: { readonly mark: string | null; readonly text: string }[] = [];
-  for (let ayah = start; ayah <= end; ayah += 1) {
-    const text = translation.verseText(ayah);
+  const verses: { readonly mark: string | null; readonly text: string }[] = [];
+  for (let verse = start; verse <= end; verse += 1) {
+    const text = translation.verseText(verse);
     if (text === '') {
       continue;
     }
-    const ref = versification.refAt(ayah);
+    const ref = versification.refAt(verse);
     const mark =
       start === end
         ? null
-        : ref.surah === first.surah && ref.surah === first.surah
-          ? String(ref.ayah)
-          : `${String(ref.surah)}:${String(ref.ayah)}`;
-    ayahs.push({ mark, text });
+        : ref.book === first.book && ref.chapter === first.chapter
+          ? String(ref.verse)
+          : `${String(ref.chapter)}:${String(ref.verse)}`;
+    verses.push({ mark, text });
   }
-  const reference = formatAyahIndexRange(versification, names, start, end);
+  const reference = formatVerseIndexRange(versification, names, start, end);
   const { abbreviation } = translation.manifest;
-  const text = ayahs.map(({ mark, text }) => (mark ? superscript(mark) : '') + text).join(' ');
-  const html = ayahs
+  const text = verses.map(({ mark, text }) => (mark ? superscript(mark) : '') + text).join(' ');
+  const html = verses
     .map(({ mark, text }) => (mark ? `<sup>${mark}</sup>` : '') + escapeHtml(text))
     .join(' ');
   return {

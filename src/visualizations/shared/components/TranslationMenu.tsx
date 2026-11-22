@@ -77,7 +77,7 @@ export function groupByLanguage(
 }
 
 /**
- * Chooses the translation the ayahs are shown in, and the language the app speaks.
+ * Chooses the translation the verses are shown in, and the language the app speaks.
  *
  * Both live behind one button because the header has no room for a sixth, and because the
  * common case needs neither: a reader whose browser asks for Portuguese arrives with a

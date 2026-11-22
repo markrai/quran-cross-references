@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GENRES } from '../../core/quran/genres.ts';
+import { GENRES } from '../../core/bible/genres.ts';
 import { GENRE_COLORS, GENRE_HEX, GENRE_RGB, hexToRgb, VIZ_SURFACE } from './palette.ts';
 
 describe('hexToRgb', () => {

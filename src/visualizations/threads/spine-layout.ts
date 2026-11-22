@@ -1,63 +1,63 @@
-import { SURAHS, type SurahNumber } from '../../core/quran/surahs.ts';
-import { getSurahGenre } from '../../core/quran/genres.ts';
-import type { AyahIndex } from '../../core/quran/ayah-ref.ts';
-import type { QuranVersification } from '../../core/quran/quran-versification.ts';
+import { BOOKS, type BookId } from '../../core/bible/books.ts';
+import { getBookGenre } from '../../core/bible/genres.ts';
+import type { VerseIndex } from '../../core/bible/verse-ref.ts';
+import type { Versification } from '../../core/bible/versification.ts';
 
-/** One surah's stretch of the spine. */
+/** One book's stretch of the spine. */
 export interface SpineSegment {
-  readonly surah: SurahNumber;
+  readonly book: BookId;
   readonly genreOrdinal: number;
-  readonly start: AyahIndex;
-  readonly end: AyahIndex;
+  readonly start: VerseIndex;
+  readonly end: VerseIndex;
   readonly top: number;
   readonly bottom: number;
 }
 
 /**
- * The whole Bible as a vertical bar: surahs stacked in canonical order, each as tall as its
- * number of ayahs, with small gaps between surahs and larger ones between genres.
+ * The whole Bible as a vertical bar: books stacked in canonical order, each as tall as its
+ * number of verses, with small gaps between books and larger ones between genres.
  */
 export interface SpineLayout {
   readonly segments: readonly SpineSegment[];
-  /** Vertical position of a ayah's center. */
-  readonly yOf: (ayah: AyahIndex) => number;
-  /** The ayah at a vertical position, or `null` outside the surahs. */
-  readonly verseAt: (y: number) => AyahIndex | null;
+  /** Vertical position of a verse's center. */
+  readonly yOf: (verse: VerseIndex) => number;
+  /** The verse at a vertical position, or `null` outside the books. */
+  readonly verseAt: (y: number) => VerseIndex | null;
 }
 
 export interface SpineGaps {
-  readonly surah: number;
+  readonly book: number;
   readonly genre: number;
 }
 
 export function computeSpineLayout(
-  versification: QuranVersification,
+  versification: Versification,
   top: number,
   bottom: number,
   gaps: SpineGaps,
 ): SpineLayout {
   let genreBreaks = 0;
-  SURAHS.forEach((surah, index) => {
-    const previous = SURAHS[index - 1];
-    if (previous && getSurahGenre(previous.id).ordinal !== getSurahGenre(surah.id).ordinal) {
+  BOOKS.forEach((book, index) => {
+    const previous = BOOKS[index - 1];
+    if (previous && getBookGenre(previous.id).ordinal !== getBookGenre(book.id).ordinal) {
       genreBreaks += 1;
     }
   });
-  const gapTotal = (SURAHS.length - 1 - genreBreaks) * gaps.surah + genreBreaks * gaps.genre;
-  const pixelsPerVerse = Math.max(bottom - top - gapTotal, 0) / versification.ayahCount;
+  const gapTotal = (BOOKS.length - 1 - genreBreaks) * gaps.book + genreBreaks * gaps.genre;
+  const pixelsPerVerse = Math.max(bottom - top - gapTotal, 0) / versification.verseCount;
 
   const segments: SpineSegment[] = [];
   let y = top;
-  SURAHS.forEach((surah, index) => {
-    const previous = SURAHS[index - 1];
-    const genreOrdinal = getSurahGenre(surah.id).ordinal;
+  BOOKS.forEach((book, index) => {
+    const previous = BOOKS[index - 1];
+    const genreOrdinal = getBookGenre(book.id).ordinal;
     if (previous) {
-      y += getSurahGenre(previous.id).ordinal === genreOrdinal ? gaps.surah : gaps.genre;
+      y += getBookGenre(previous.id).ordinal === genreOrdinal ? gaps.book : gaps.genre;
     }
-    const range = versification.surahRange(surah.id);
+    const range = versification.bookRange(book.id);
     const height = (range.end - range.start + 1) * pixelsPerVerse;
     segments.push({
-      surah: surah.id,
+      book: book.id,
       genreOrdinal,
       start: range.start,
       end: range.end,
@@ -67,14 +67,14 @@ export function computeSpineLayout(
     y += height;
   });
 
-  const segmentOf = (ayah: AyahIndex) =>
-    segments.find((segment) => ayah >= segment.start && ayah <= segment.end);
+  const segmentOf = (verse: VerseIndex) =>
+    segments.find((segment) => verse >= segment.start && verse <= segment.end);
 
   return {
     segments,
-    yOf: (ayah) => {
-      const segment = segmentOf(ayah);
-      return segment ? segment.top + (ayah - segment.start + 0.5) * pixelsPerVerse : top;
+    yOf: (verse) => {
+      const segment = segmentOf(verse);
+      return segment ? segment.top + (verse - segment.start + 0.5) * pixelsPerVerse : top;
     },
     verseAt: (position) => {
       const segment = segments.find(
