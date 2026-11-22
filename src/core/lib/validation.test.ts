@@ -45,17 +45,10 @@ describe('validation', () => {
     expect(expectString('text', 'name')).toBe('text');
     expect(expectNullableString(null, 'name')).toBeNull();
     expect(expectNullableString('text', 'name')).toBe('text');
-    expect(() => expectString(4, 'name')).toThrow(
-      'name: expected a string, got number',
-    );
-    expect(() => expectNullableString([], 'name')).toThrow(
-      'name: expected a string, got array',
-    );
+    expect(() => expectString(4, 'name')).toThrow('name: expected a string, got number');
+    expect(() => expectNullableString([], 'name')).toThrow('name: expected a string, got array');
     expect(expectArray(['a'], 'values')).toEqual(['a']);
-    expect(() => expectArray('a', 'values')).toThrow(
-      'values: expected an array, got string',
-    );
+    expect(() => expectArray('a', 'values')).toThrow('values: expected an array, got string');
     expect(expectStringArray(['a', 'b'], 'strings')).toEqual(['a', 'b']);
   });
-
 });

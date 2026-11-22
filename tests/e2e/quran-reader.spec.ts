@@ -107,43 +107,47 @@ test.describe('Quran production readiness', () => {
     );
   });
 
-  test('loads Arabic, English and related passages after losing network access', async ({ page }) => {
+  test('loads Arabic, English and related passages after losing network access', async ({
+    page,
+  }) => {
     const site = await serveQuranBuild();
     try {
       await page.goto(site.url + '?ref=2%3A255');
-    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
-    await page.waitForFunction(async () => {
-      const registration = await navigator.serviceWorker.ready;
-      const controller = navigator.serviceWorker.controller;
-      if (controller?.state !== 'activated' || !controller.scriptURL.endsWith('/sw.js')) {
-        return false;
-      }
-      const names = await caches.keys();
-      const name = names.find((candidate) => candidate.startsWith('quran-cross-references-shell-'));
-      if (!name) return false;
-      const cache = await caches.open(name);
-      const required = [
-        '',
-        'index.html',
-        'quran/',
-        'quran/index.html',
-        'data/quran/text.json',
-        'data/quran/relationships.json',
-      ];
-      const responses = await Promise.all(
-        required.map((path) => cache.match(new URL(path, registration.scope))),
-      );
-      return responses.every((response) => response !== undefined);
-    });
-    const failures: string[] = [];
-    page.on('pageerror', (error) => failures.push('Page error: ' + error.message));
-    page.on('requestfailed', (request) => {
-      failures.push(
-        'Failed request: ' + request.url() + ' ' + (request.failure()?.errorText ?? ''),
-      );
-    });
-    await site.stop();
-    const probe = await page.evaluate(async () => {
+      await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
+      await page.waitForFunction(async () => {
+        const registration = await navigator.serviceWorker.ready;
+        const controller = navigator.serviceWorker.controller;
+        if (controller?.state !== 'activated' || !controller.scriptURL.endsWith('/sw.js')) {
+          return false;
+        }
+        const names = await caches.keys();
+        const name = names.find((candidate) =>
+          candidate.startsWith('quran-cross-references-shell-'),
+        );
+        if (!name) return false;
+        const cache = await caches.open(name);
+        const required = [
+          '',
+          'index.html',
+          'quran/',
+          'quran/index.html',
+          'data/quran/text.json',
+          'data/quran/relationships.json',
+        ];
+        const responses = await Promise.all(
+          required.map((path) => cache.match(new URL(path, registration.scope))),
+        );
+        return responses.every((response) => response !== undefined);
+      });
+      const failures: string[] = [];
+      page.on('pageerror', (error) => failures.push('Page error: ' + error.message));
+      page.on('requestfailed', (request) => {
+        failures.push(
+          'Failed request: ' + request.url() + ' ' + (request.failure()?.errorText ?? ''),
+        );
+      });
+      await site.stop();
+      const probe = await page.evaluate(async () => {
         const scope = (await navigator.serviceWorker.ready).scope;
         const paths = ['', 'quran/', 'data/quran/text.json', 'data/quran/relationships.json'];
         return Promise.all(

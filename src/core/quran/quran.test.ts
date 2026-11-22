@@ -117,11 +117,10 @@ describe('Quran foundations', () => {
     expect(formatPassage(ayah, QURAN_VERSIFICATION)).toBe('Al-Baqarah 2:255');
     expect(formatPassage(surah, QURAN_VERSIFICATION)).toBe('Surah 2');
     expect(passageFromReference({ surah: 2, ayah: 255 }, QURAN_VERSIFICATION)).toEqual(ayah);
-    expect(() =>
-      passageFromReference({ surah: 2, ayah: 287 }, QURAN_VERSIFICATION),
-    ).toThrow(RangeError);
+    expect(() => passageFromReference({ surah: 2, ayah: 287 }, QURAN_VERSIFICATION)).toThrow(
+      RangeError,
+    );
     expect(QURAN_VERSIFICATION.surahAt(261).name).toBe('Al-Baqarah');
     expect(() => QURAN_VERSIFICATION.surahAt(-1)).toThrow(RangeError);
   });
-
 });
