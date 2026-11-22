@@ -120,7 +120,9 @@ test.describe('Quran production readiness', () => {
       if (!name) return false;
       const cache = await caches.open(name);
       const required = [
+        '',
         'index.html',
+        'quran/',
         'quran/index.html',
         'data/quran/text.json',
         'data/quran/relationships.json',
@@ -130,10 +132,47 @@ test.describe('Quran production readiness', () => {
       );
       return responses.every((response) => response !== undefined);
     });
+    const failures: string[] = [];
+    page.on('pageerror', (error) => failures.push('Page error: ' + error.message));
+    page.on('requestfailed', (request) => {
+      failures.push('Failed request: ' + request.url() + ' ' + (request.failure()?.errorText ?? ''));
+    });
     await context.setOffline(true);
     try {
-      await page.reload();
-      await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
+      const probe = await page.evaluate(async () => {
+        const scope = (await navigator.serviceWorker.ready).scope;
+        const paths = ['', 'quran/', 'data/quran/text.json', 'data/quran/relationships.json'];
+        return Promise.all(paths.map(async (path) => {
+          try {
+            const response = await fetch(new URL(path, scope));
+            return { path, status: response.status };
+          } catch (error: unknown) {
+            return { path, status: -1, error: String(error) };
+          }
+        }));
+      });
+      expect(probe).toEqual([
+        { path: '', status: 200 },
+        { path: 'quran/', status: 200 },
+        { path: 'data/quran/text.json', status: 200 },
+        { path: 'data/quran/relationships.json', status: 200 },
+      ]);
+      const reloadResponse = await page.reload();
+      expect(reloadResponse?.status()).toBe(200);
+      try {
+        await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
+      } catch (error: unknown) {
+        await test.info().attach('offline-reload-diagnostics.json', {
+          contentType: 'application/json',
+          body: Buffer.from(JSON.stringify({
+            url: page.url(),
+            body: await page.locator('body').innerText().catch(() => 'unavailable'),
+            failures,
+            probe,
+          }, null, 2)),
+        });
+        throw error;
+      }
       await expect(page.locator('[aria-label="Selected ayah"] [lang="ar"]')).toBeVisible();
       await expect(page.locator('[aria-label="Selected ayah"] [lang="en"]')).toBeVisible();
       await page.goto('quran/?ref=114%3A6&view=threads');
