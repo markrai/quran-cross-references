@@ -207,6 +207,16 @@ under `BASE_PATH=/`, open `/quran/`.
   and Windows/Linux generation through CI, maintaining all existing
   curated IDs and browser acceptance. See `docs/QURAN_PHASE_2B2.md`.
 
+### Phase 2B.3: On-demand exact phrase browser
+
+- Generate and publish the complete pinned 5,084-expression dataset separately from the 2,445 curated relationships.
+- Verify published SHA-256, Tanzil source metadata, schema and every Arabic word span in the client before constructing per-ayah postings.
+- Select computed evidence explicitly; browse phrase occurrences, navigate their source ayahs and share stable IDs without repurposing curated link numbers.
+- Render at most 32 distinct target arcs per graph page, without all-to-all edge expansion; keep all source spans accessible.
+- Do not add the optional 1.77 MB artifact to the initial curated download or the PWA offline installation cache.
+
+See [Phase 2B.3](QURAN_PHASE_2B3.md). The separate real-device and rights release gates still apply.
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows
