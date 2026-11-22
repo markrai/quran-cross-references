@@ -1,3 +1,4 @@
+import { elementAt } from '../lib/array.ts';
 import type { AyahIndex } from './ayah-ref.ts';
 import { CANONICAL_QURAN, type AyahIndexRange, type QuranVersification } from './quran-versification.ts';
 
@@ -84,19 +85,19 @@ function buildPostings(
   for (const link of links) {
     const range = link[endpoint];
     for (let ayah = range.start; ayah <= range.end; ayah += 1) {
-      offsets[ayah + 1] = offsets[ayah + 1]! + 1;
+      offsets[ayah + 1] = elementAt(offsets, ayah + 1) + 1;
     }
   }
   for (let ayah = 1; ayah <= ayahCount; ayah += 1) {
-    offsets[ayah] = offsets[ayah]! + offsets[ayah - 1]!;
+    offsets[ayah] = elementAt(offsets, ayah) + elementAt(offsets, ayah - 1);
   }
 
   const cursors = offsets.slice(0, ayahCount);
-  const ids = new Int32Array(offsets[ayahCount]!);
+  const ids = new Int32Array(elementAt(offsets, ayahCount));
   for (const link of links) {
     const range = link[endpoint];
     for (let ayah = range.start; ayah <= range.end; ayah += 1) {
-      const cursor = cursors[ayah]!;
+      const cursor = elementAt(cursors, ayah);
       ids[cursor] = link.id;
       cursors[ayah] = cursor + 1;
     }
@@ -126,7 +127,7 @@ export class QuranRelationshipIndex {
     if (!Number.isInteger(id) || id < 0 || id >= this.linkCount) {
       throw new RangeError('Invalid Quran relationship ID: ' + String(id));
     }
-    return this.#links[id]!;
+    return elementAt(this.#links, id);
   }
 
   outgoing(ayah: AyahIndex): readonly QuranRelationship[] {
@@ -169,13 +170,13 @@ export class QuranRelationshipIndex {
 
   #countAt(postings: PostingList, ayah: number): number {
     this.#validateAyah(ayah);
-    return postings.offsets[ayah + 1]! - postings.offsets[ayah]!;
+    return postings.elementAt(offsets, ayah + 1) - postings.elementAt(offsets, ayah);
   }
 
   #atAyah(postings: PostingList, ayah: number): readonly QuranRelationship[] {
     this.#validateAyah(ayah);
-    const start = postings.offsets[ayah]!;
-    const end = postings.offsets[ayah + 1]!;
+    const start = postings.elementAt(offsets, ayah);
+    const end = postings.elementAt(offsets, ayah + 1);
     return Array.from(postings.ids.subarray(start, end), (id) => this.link(id));
   }
 
@@ -184,10 +185,10 @@ export class QuranRelationshipIndex {
     const seen = new Uint8Array(this.linkCount);
     const ids: number[] = [];
     for (let ayah = range.start; ayah <= range.end; ayah += 1) {
-      const start = postings.offsets[ayah]!;
-      const end = postings.offsets[ayah + 1]!;
+      const start = postings.elementAt(offsets, ayah);
+      const end = postings.elementAt(offsets, ayah + 1);
       for (let position = start; position < end; position += 1) {
-        const id = postings.ids[position]!;
+        const id = elementAt(postings.ids, position);
         if (seen[id] === 0) {
           seen[id] = 1;
           ids.push(id);
