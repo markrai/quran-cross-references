@@ -118,7 +118,7 @@ export function QuranTopology({
     currentAyahPage === ayahPage
       ? neighborhood
       : curatedNeighborhood(relationships, focus, direction, depth, currentAyahPage);
-  const firstNodes = [...new Set(shownNeighborhood.first.map((edge) => edge.neighbor))];
+  const firstNodes = [...new Set(shownNeighborhood.first.map((edge) => edge.neighbor))].filter((node) => node !== focus);
   const secondNodes = [
     ...new Set(shownNeighborhood.second.map((edge) => edge.neighbor)),
   ].filter((node) => node !== focus && !firstNodes.includes(node));
@@ -529,7 +529,6 @@ export function QuranTopology({
                     onClick={() => {
                       setAyahPage(0);
                       onFocusAyah(row.ayah);
-                      onMode('ayah');
                     }}
                     aria-label={'Explore ranked connected ayah ' + label(row.ayah)}
                   >

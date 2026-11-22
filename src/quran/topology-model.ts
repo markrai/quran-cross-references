@@ -78,7 +78,7 @@ export function buildQuranTopology(
   index: QuranRelationshipIndex,
   sourceSha256: string,
 ): QuranTopologyDataset {
-  if (index.ayahCount !== CANONICAL_QURAN.ayahCount || index.versification.id !== CANONICAL_QURAN.id) {
+  if (index.ayahCount !== CANONICAL_QURAN.ayahCount) {
     throw new Error('Curated graph topology requires the canonical Quran versification.');
   }
   if (!/^[a-f0-9]{64}$/.test(sourceSha256)) {
