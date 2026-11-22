@@ -12,6 +12,7 @@ import {
 } from './expression-evidence.ts';
 import { importMutashabihat, importQuranText } from './datasets.ts';
 import { buildQuranAnalytics } from './analytics.ts';
+import { importMaqamMorphology, type QuranMorphologySource } from './morphology.ts';
 import { buildQuranTopology } from '../../src/quran/topology-model.ts';
 import { verifyPinnedQuranSource } from './pinned-source.ts';
 
@@ -114,6 +115,9 @@ const analytics = buildQuranAnalytics(
 );
 writeDataset('analytics.json', analytics);
 writeDataset('topology.json', buildQuranTopology(relationshipIndex, curatedPin.sha256));
+const maqamPin = pins.find((pin) => pin.id === 'maqam-2026');
+if (!maqamPin) throw new Error('Missing pinned MAQAM morphology source.');
+writeDataset('morphology.json', importMaqamMorphology(readPinned('maqam-2026'), maqamPin as QuranMorphologySource, tanzilNotice));
 writeDataset('manifest.json', {
   format: 'quran-foundation-manifest',
   schemaVersion: 1,
