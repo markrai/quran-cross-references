@@ -8,7 +8,7 @@ graph without changing the Quran numbering, source text or curated relationships
 - Use **+**, **−**, arrow buttons and **Reset** to zoom or pan. Zoom is bounded
   between the whole Quran (1×) and 12×, with the pointer position preserved
   when zooming using Ctrl/Cmd + wheel.
-- Drag an empty region inside the plot to pan on mouse or touch devices.
+- Drag the labeled handle below the plot or an empty region inside it to pan on mouse or touch devices.
   Vertical page scrolling remains available outside the plot.
 - Click a relationship curve or focus it and press Enter/Space to inspect both
   cited passage ranges. The selected link ID is saved as `link=N` in the URL.
