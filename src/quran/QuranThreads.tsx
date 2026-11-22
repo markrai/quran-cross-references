@@ -57,7 +57,9 @@ export function QuranThreads({ data, reference, scope, direction, onNavigate }: 
                   type="button"
                   aria-current={active ? 'true' : undefined}
                   className={styles.ayahButton}
-                  onClick={() => onNavigate({ surah: reference.surah, ayah })}
+                  onClick={() => {
+                    onNavigate({ surah: reference.surah, ayah });
+                  }}
                 >
                   <span className={styles.ayahNumber}>{reference.surah}:{ayah}</span>
                   <span lang="ar" dir="rtl" className={styles.arabic}>{text.arabic[position]}</span>
@@ -87,7 +89,7 @@ export function QuranThreads({ data, reference, scope, direction, onNavigate }: 
                 return (
                   <path
                     key={connection.direction + String(connection.link.id)}
-                    d={'M 24 125 C 155 125 165 ' + y + ' 296 ' + y}
+                    d={`M 24 125 C 155 125 165 ${y} 296 ${y}`}
                     fill="none"
                     stroke={outgoing ? '#64c4b1' : '#d7ac7c'}
                     strokeWidth="1.6"
@@ -103,7 +105,9 @@ export function QuranThreads({ data, reference, scope, direction, onNavigate }: 
                 const otherRef = index.versification.refAt(connection.other.start);
                 return (
                   <li key={connection.direction + String(connection.link.id)}>
-                    <button type="button" className={styles.connectionButton} onClick={() => onNavigate(otherRef)}>
+                    <button type="button" className={styles.connectionButton} onClick={() => {
+                        onNavigate(otherRef);
+                      }}>
                       <span className={styles.connectionHeading}>
                         <span>{connection.direction === 'outgoing' ? 'Outgoing' : 'Incoming'}</span>
                         <strong>{connectionLabel(connection, data)}</strong>
