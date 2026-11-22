@@ -267,6 +267,44 @@ test.describe('Quran production readiness', () => {
 });
 
 test.describe('Quran Phase 2A graph exploration', () => {
+  test('dragging immediately from the full-Quran overview zooms and pans', async ({ page }) => {
+    await page.goto('./?ref=2%3A1');
+    const graph = page.getByRole('group', { name: 'Relationships along the 6,236-ayah Quran' });
+    const handle = page.getByRole('group', { name: 'Drag graph horizontally' });
+    await expect(graph).toHaveAttribute('viewBox', '0 0 1200 400');
+    await expect(handle).toContainText('Drag here to zoom and pan the graph');
+    await handle.scrollIntoViewIfNeeded();
+    const box = await handle.boundingBox();
+    expect(box).toBeTruthy();
+    if (!box) return;
+    const startX = box.x + box.width / 2;
+    const startY = box.y + box.height / 2;
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    try {
+      await page.mouse.move(startX - 2, startY);
+      await expect(graph).toHaveAttribute('viewBox', '0 0 1200 400');
+      await page.mouse.move(startX - 120, startY, { steps: 8 });
+      await expect
+        .poll(async () => {
+          const value = await graph.getAttribute('viewBox');
+          return Number(value?.split(' ')[2] ?? '1200');
+        })
+        .toBeLessThan(1200);
+      const viewBox = await graph.getAttribute('viewBox');
+      const [x, , width] = (viewBox ?? '').split(' ').map(Number);
+      expect(x).toBeGreaterThan(0);
+      expect(width).toBeLessThan(1200);
+      await expect(handle).toHaveAttribute('data-dragging', 'true');
+    } finally {
+      await page.mouse.up();
+    }
+    await expect(handle).toContainText('Drag here to pan the graph');
+    await expect(handle).toHaveAttribute('data-dragging', 'false');
+    await page.getByRole('button', { name: 'Reset graph view' }).click();
+    await expect(graph).toHaveAttribute('viewBox', '0 0 1200 400');
+  });
+
   test('zooms, pans and restores the full Quran viewport', async ({ page }) => {
     await page.goto('./?ref=2%3A1');
     await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeVisible();

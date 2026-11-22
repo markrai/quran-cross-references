@@ -10,6 +10,7 @@ import { arcTouchesRange, arcVisibleInViewport, buildQuranGraphPaths } from './g
 import {
   centerGraphViewport,
   DEFAULT_GRAPH_VIEWPORT,
+  dragGraphViewport,
   GRAPH_AXIS_LEFT,
   GRAPH_AXIS_WIDTH,
   GRAPH_AXIS_Y,
@@ -35,7 +36,9 @@ interface QuranArcsProps {
 
 interface ActiveDrag {
   readonly pointerId: number;
+  readonly startX: number;
   lastX: number;
+  moved: boolean;
 }
 
 export function QuranArcs({
@@ -118,18 +121,26 @@ export function QuranArcs({
     ) {
       return;
     }
-    drag.current = { pointerId: event.pointerId, lastX: event.clientX };
+    drag.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      lastX: event.clientX,
+      moved: false,
+    };
     setDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
   const onPointerMove = (event: PointerEvent<SVGSVGElement | HTMLDivElement>) => {
-    if (drag.current?.pointerId !== event.pointerId) return;
+    const active = drag.current;
+    if (active?.pointerId !== event.pointerId) return;
     const width = graphRef.current?.getBoundingClientRect().width ?? 0;
-    if (width <= 0) return;
-    const difference = event.clientX - drag.current.lastX;
-    drag.current.lastX = event.clientX;
-    setViewport((current) => panGraphViewport(current, (-difference / width) * current.width));
+    if (width <= 0 || !Number.isFinite(event.clientX)) return;
+    if (!active.moved && Math.abs(event.clientX - active.startX) < 6) return;
+    const difference = event.clientX - active.lastX;
+    active.lastX = event.clientX;
+    active.moved = true;
+    setViewport((current) => dragGraphViewport(current, difference, width));
   };
 
   const endDrag = (event: PointerEvent<SVGSVGElement | HTMLDivElement>) => {
@@ -227,8 +238,9 @@ export function QuranArcs({
         </label>
       </div>
       <p id="quran-graph-help" className={styles.graphHelp}>
-        Drag the handle below the graph or open space to pan; Ctrl or Cmd + wheel to zoom. Click the
-        horizontal axis to choose an ayah. Use its arrow keys to move one ayah at a time.
+        Drag the handle below the graph or open space to navigate. At 1×, dragging zooms in first;
+        once zoomed, it pans. Ctrl or Cmd + wheel also zooms. Click the horizontal axis to choose an
+        ayah. Use its arrow keys to move one ayah at a time.
       </p>
       <div className={styles.graphScroll}>
         <svg
@@ -378,7 +390,8 @@ export function QuranArcs({
         onPointerCancel={endDrag}
         onLostPointerCapture={endDrag}
       >
-        <span aria-hidden="true">↔</span> Drag here to pan the graph
+        <span aria-hidden="true">↔</span>{' '}
+        {zoom <= 1 ? 'Drag here to zoom and pan the graph' : 'Drag here to pan the graph'}
       </div>
       <div className={styles.graphSummary}>
         <p>

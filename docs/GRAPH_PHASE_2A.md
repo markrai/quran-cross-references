@@ -8,8 +8,11 @@ graph without changing the Quran numbering, source text or curated relationships
 - Use **+**, **−**, arrow buttons and **Reset** to zoom or pan. Zoom is bounded
   between the whole Quran (1×) and 12×, with the pointer position preserved
   when zooming using Ctrl/Cmd + wheel.
-- Drag the labeled handle below the plot or an empty region inside it to pan on mouse or touch devices.
-  Vertical page scrolling remains available outside the plot.
+- Drag the labeled handle below the plot or an empty region inside it to navigate
+  using mouse or touch. At the initial 1× full-Quran overview, the first drag
+  automatically zooms to 1.8× and pans in the drag direction. Once zoomed,
+  further drags pan without changing zoom. A click or a movement under 6px
+  does not zoom. Vertical page scrolling remains available outside the plot.
 - Click a relationship curve or focus it and press Enter/Space to inspect both
   cited passage ranges. The selected link ID is saved as `link=N` in the URL.
 - Click the Quran axis to select an ayah. Focus the axis and press left/right
