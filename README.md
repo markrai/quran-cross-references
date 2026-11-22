@@ -59,4 +59,4 @@ The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pi
 
 The Quran implementation was adapted from the open-source Bible Cross-References project by [Oleksii Trekhleb](https://github.com/trekhleb/bible-cross-references). The inherited portions remain covered by the original MIT license; removed legacy code remains accessible in Git history.
 
-See [docs/QURAN_PHASES.md](docs/QURAN_PHASES.md) for the migration roadmap and outstanding work.
+**Pull request checks:** GitHub Actions must be enabled for this fork and the full Linux/Windows browser checks required before merge. See [CI setup and merge gates](docs/CI_GATES.md). Production artifacts are tested automatically, including offline reload and graph drag; a failed or flaky test blocks the CI job once required status checks are configured.\n\nSee [docs/QURAN_PHASES.md](docs/QURAN_PHASES.md) for the migration roadmap and outstanding work.
