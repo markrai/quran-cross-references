@@ -1,0 +1,15 @@
+name: Probe MAQAM Pinned Source
+on:
+  push:
+    branches: [feat/quran-phase-2b4-morphology]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify upstream snapshot properties
+        shell: bash
+        run: |
+          curl --fail --location --retry 3 "https://raw.githubusercontent.com/CAMeL-Lab/MAQAM-Quranic-Corpus/2e52c1354a901e998a311c94f43d14c99f467f6f/data/MAQAM%20Dataset.csv" -o source.csv
+          sha256sum source.csv
+          wc -lc source.csv
+          head -c 900 source.csv
