@@ -1,14 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import { chapterPassageOf, versePassage, type Passage } from '../../../core/bible/passage.ts';
-import { CANONICAL_VERSIFICATION } from '../../../core/bible/versification.ts';
+import { surahPassageOf, ayahPassage, type Passage } from '../../../core/quran/passage.ts';
+import { CANONICAL_QURAN } from '../../../core/quran/quran-versification.ts';
 import { verseIndex } from '../../../test-utils/fixtures.ts';
 import { createVizData } from '../../../test-utils/viz-data.ts';
 import { DEFAULT_LINK_FILTER } from '../link-filter.ts';
 import { canCopy, copyQuote, quotePassage } from '../passage-quote.ts';
 import { PassagePanel } from './PassagePanel.tsx';
-import { enBooks } from '../../../i18n/books/en.ts';
+import { enBooks } from '../../../i18n/surahs/en.ts';
 
 const JOHN_3_16 = verseIndex('John', 3, 16);
 const JOHN_3_17 = verseIndex('John', 3, 17);
@@ -19,7 +19,7 @@ const DATA = createVizData(
   [{ from: JOHN_3_16, to: ROM_5_8, toEnd: ROM_5_9, votes: 50 }],
   new Map([
     [JOHN_3_16, 'For God so loved the world…'],
-    // Left out by this translation, as a handful of verses are in several of the real ones.
+    // Left out by this translation, as a handful of ayahs are in several of the real ones.
     [JOHN_3_17, ''],
     [ROM_5_8, 'But God proves His love…'],
     [ROM_5_9, 'Therefore, since we have now been justified…'],
@@ -101,7 +101,7 @@ describe('copyQuote', () => {
 });
 
 describe('the copy button', () => {
-  function renderPanel(passage: Passage = versePassage(JOHN_3_16)) {
+  function renderPanel(passage: Passage = ayahPassage(JOHN_3_16)) {
     render(
       <PassagePanel
         data={DATA}
@@ -126,19 +126,19 @@ describe('the copy button', () => {
   });
 
   /**
-   * The verse being read offers to be sent rather than copied: its words are a tap further in,
+   * The ayah being read offers to be sent rather than copied: its words are a tap further in,
    * inside the share sheet, beside the picture. The connections keep their own copy buttons,
    * because a reference is a thing you quote rather than a thing you send as a picture.
    */
-  it('is not on the verse itself, which offers to be shared instead', () => {
+  it('is not on the ayah itself, which offers to be shared instead', () => {
     renderPanel();
     expect(screen.queryByRole('button', { name: /Copy John 3:16/ })).toBeNull();
     expect(screen.getByRole('button', { name: 'Share John 3:16' })).toBeTruthy();
   });
 
-  /** A card of a verse the translation leaves out would be a picture of nothing. */
-  it('offers no card for a verse this translation omits', () => {
-    renderPanel(versePassage(JOHN_3_17));
+  /** A card of a ayah the translation leaves out would be a picture of nothing. */
+  it('offers no card for a ayah this translation omits', () => {
+    renderPanel(ayahPassage(JOHN_3_17));
     expect(screen.queryByRole('button', { name: /^Share / })).toBeNull();
   });
 
@@ -180,8 +180,8 @@ describe('the copy button', () => {
     });
   });
 
-  it('copies a chapter\u2019s links rather than the chapter itself', async () => {
-    renderPanel(chapterPassageOf(JOHN_3_16, CANONICAL_VERSIFICATION));
+  it('copies a surah\u2019s links rather than the surah itself', async () => {
+    renderPanel(surahPassageOf(JOHN_3_16, CANONICAL_QURAN));
     expect(screen.queryByRole('button', { name: /Copy John 3 with a link/ })).toBeNull();
     await userEvent.click(screen.getByRole('button', { name: /Copy Romans 5:8–9 with a link/ }));
     await waitFor(() => {
@@ -193,10 +193,10 @@ describe('the copy button', () => {
 });
 
 describe('quotePassage', () => {
-  const versification = CANONICAL_VERSIFICATION;
+  const versification = CANONICAL_QURAN;
   const { translation } = DATA;
 
-  it('quotes one verse without a verse number', () => {
+  it('quotes one ayah without a ayah number', () => {
     const quote = quotePassage({
       translation,
       versification,
@@ -209,7 +209,7 @@ describe('quotePassage', () => {
     expect(quote.html).toContain('<blockquote>');
   });
 
-  it('numbers the verses of a range, in superscript', () => {
+  it('numbers the ayahs of a range, in superscript', () => {
     const quote = quotePassage({
       translation,
       versification,
@@ -223,7 +223,7 @@ describe('quotePassage', () => {
     expect(quote.html).toContain('<sup>8</sup>');
   });
 
-  it('adds the chapter to the number where the range crosses one', () => {
+  it('adds the surah to the number where the range crosses one', () => {
     const quote = quotePassage({
       translation,
       versification,
@@ -249,7 +249,7 @@ describe('quotePassage', () => {
     expect(quote.html).toContain('a=1&amp;b=2');
   });
 
-  it('leaves out a verse the translation omits', () => {
+  it('leaves out a ayah the translation omits', () => {
     const data = createVizData(
       [],
       new Map([

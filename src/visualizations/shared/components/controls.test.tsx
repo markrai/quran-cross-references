@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { GENRES } from '../../../core/bible/genres.ts';
-import { CANONICAL_VERSIFICATION } from '../../../core/bible/versification.ts';
+import { GENRES } from '../../../core/quran/genres.ts';
+import { CANONICAL_QURAN } from '../../../core/quran/quran-versification.ts';
 import { verseIndex } from '../../../test-utils/fixtures.ts';
 import { GenreToggles } from './GenreToggles.tsx';
 import { ReferenceSearch } from './ReferenceSearch.tsx';
@@ -10,14 +10,14 @@ import { ReferenceSearch } from './ReferenceSearch.tsx';
 describe('ReferenceSearch', () => {
   function renderSearch() {
     const onSelect = vi.fn();
-    render(<ReferenceSearch versification={CANONICAL_VERSIFICATION} onSelect={onSelect} />);
+    render(<ReferenceSearch versification={CANONICAL_QURAN} onSelect={onSelect} />);
     return { onSelect, input: screen.getByRole('searchbox') };
   }
 
-  it('opens a verse that is typed in full', async () => {
+  it('opens a ayah that is typed in full', async () => {
     const { onSelect, input } = renderSearch();
     await userEvent.type(input, 'John 3:16{Enter}');
-    expect(onSelect).toHaveBeenCalledWith({ kind: 'verse', verse: verseIndex('John', 3, 16) });
+    expect(onSelect).toHaveBeenCalledWith({ kind: 'ayah', ayah: verseIndex('John', 3, 16) });
   });
 
   it.each(['jn 3 16', 'Gen.1.1', 'ps 23', 'JOHN 3:16'])(
@@ -29,10 +29,10 @@ describe('ReferenceSearch', () => {
     },
   );
 
-  it('opens a whole chapter when no verse is given', async () => {
+  it('opens a whole surah when no ayah is given', async () => {
     const { onSelect, input } = renderSearch();
     await userEvent.type(input, 'Psalm 23{Enter}');
-    expect(onSelect).toHaveBeenCalledWith({ kind: 'chapter', book: 'Ps', chapter: 23 });
+    expect(onSelect).toHaveBeenCalledWith({ kind: 'surah', surah: 'Ps', surah: 23 });
   });
 
   it('says what is wrong instead of doing nothing', async () => {

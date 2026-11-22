@@ -1,6 +1,6 @@
-import type { BookId } from '../../core/bible/books.ts';
-import type { VerseIndex } from '../../core/bible/verse-ref.ts';
-import type { VerseIndexRange, Versification } from '../../core/bible/versification.ts';
+import type { SurahNumber } from '../../core/quran/surahs.ts';
+import type { AyahIndex } from '../../core/quran/ayah-ref.ts';
+import type { AyahIndexRange, QuranVersification } from '../../core/quran/quran-versification.ts';
 import type {
   CrossReferenceIndex,
   CrossReferenceLink,
@@ -13,17 +13,17 @@ export type LinkDirection = 'outgoing' | 'incoming';
 export interface Connection {
   readonly link: CrossReferenceLink;
   readonly direction: LinkDirection;
-  /** The verse inside the passage. */
-  readonly here: VerseIndex;
-  /** The other end: the target range (outgoing) or the source verse (incoming). */
-  readonly otherStart: VerseIndex;
-  readonly otherEnd: VerseIndex;
+  /** The ayah inside the passage. */
+  readonly here: AyahIndex;
+  /** The other end: the target range (outgoing) or the source ayah (incoming). */
+  readonly otherStart: AyahIndex;
+  readonly otherEnd: AyahIndex;
 }
 
 export interface PassageConnections {
-  /** Links from verses of the passage (what the passage references). */
+  /** Links from ayahs of the passage (what the passage references). */
   readonly outgoing: readonly Connection[];
-  /** Links into verses of the passage (what references the passage). */
+  /** Links into ayahs of the passage (what references the passage). */
   readonly incoming: readonly Connection[];
 }
 
@@ -31,10 +31,10 @@ function byOtherEnd(a: Connection, b: Connection): number {
   return a.otherStart - b.otherStart || a.otherEnd - b.otherEnd || a.here - b.here;
 }
 
-/** All connections of a verse range, filtered, each list sorted by where the other end is. */
+/** All connections of a ayah range, filtered, each list sorted by where the other end is. */
 export function collectConnections(
   index: CrossReferenceIndex,
-  range: VerseIndexRange,
+  range: AyahIndexRange,
   filter: LinkFilter,
   verseGenres: Uint8Array,
 ): PassageConnections {
@@ -43,20 +43,20 @@ export function collectConnections(
   const incoming: Connection[] = [];
   const seenIncoming = new Set<number>();
 
-  for (let verse = range.start; verse <= range.end; verse += 1) {
-    for (const link of index.outgoing(verse)) {
+  for (let ayah = range.start; ayah <= range.end; ayah += 1) {
+    for (const link of index.outgoing(ayah)) {
       if (passes(link.from, link.targetStart, link.votes)) {
         outgoing.push({
           link,
           direction: 'outgoing',
-          here: verse,
+          here: ayah,
           otherStart: link.targetStart,
           otherEnd: link.targetEnd,
         });
       }
     }
-    for (const link of index.incoming(verse)) {
-      // A link to a range spanning several verses of the passage is counted once.
+    for (const link of index.incoming(ayah)) {
+      // A link to a range spanning several ayahs of the passage is counted once.
       if (seenIncoming.has(link.id)) {
         continue;
       }
@@ -65,7 +65,7 @@ export function collectConnections(
         incoming.push({
           link,
           direction: 'incoming',
-          here: verse,
+          here: ayah,
           otherStart: link.from,
           otherEnd: link.from,
         });
@@ -80,24 +80,24 @@ export function collectConnections(
 }
 
 export interface BookGroup {
-  readonly book: BookId;
+  readonly surah: SurahNumber;
   readonly connections: readonly Connection[];
 }
 
 /**
  * Where a connection meets the passage, when its reference alone doesn't say, or `null`:
- * - a link into several verses names them all, since it's listed under each of them (Matthew
+ * - a link into several ayahs names them all, since it's listed under each of them (Matthew
  *   24:37 points to all of Genesis 6:1–7, not to 6:1 alone);
- * - in a chapter, every other link names the chapter's verse it starts or lands on.
+ * - in a surah, every other link names the surah's ayah it starts or lands on.
  */
 export type LandingNote =
-  | { readonly kind: 'range'; readonly start: VerseIndex; readonly end: VerseIndex }
-  | { readonly kind: 'from-verse'; readonly verse: number }
-  | { readonly kind: 'to-verse'; readonly verse: number };
+  | { readonly kind: 'range'; readonly start: AyahIndex; readonly end: AyahIndex }
+  | { readonly kind: 'from-ayah'; readonly ayah: number }
+  | { readonly kind: 'to-ayah'; readonly ayah: number };
 
 export function landingNote(
   connection: Connection,
-  versification: Versification,
+  versification: QuranVersification,
   inChapter: boolean,
 ): LandingNote | null {
   const { link, direction } = connection;
@@ -107,23 +107,23 @@ export function landingNote(
   if (!inChapter) {
     return null;
   }
-  const verse = versification.refAt(connection.here).verse;
-  return direction === 'outgoing' ? { kind: 'from-verse', verse } : { kind: 'to-verse', verse };
+  const ayah = versification.refAt(connection.here).ayah;
+  return direction === 'outgoing' ? { kind: 'from-ayah', ayah } : { kind: 'to-ayah', ayah };
 }
 
-/** Groups connections (already sorted by their other end) by the book of the other end. */
+/** Groups connections (already sorted by their other end) by the surah of the other end. */
 export function groupByBook(
   connections: readonly Connection[],
-  versification: Versification,
+  versification: QuranVersification,
 ): BookGroup[] {
-  const groups: { book: BookId; connections: Connection[] }[] = [];
+  const groups: { surah: SurahNumber; connections: Connection[] }[] = [];
   for (const connection of connections) {
-    const book = versification.bookAt(connection.otherStart).id;
+    const surah = versification.surahAt(connection.otherStart).id;
     const last = groups.at(-1);
-    if (last?.book === book) {
+    if (last?.surah === surah) {
       last.connections.push(connection);
     } else {
-      groups.push({ book, connections: [connection] });
+      groups.push({ surah, connections: [connection] });
     }
   }
   return groups;

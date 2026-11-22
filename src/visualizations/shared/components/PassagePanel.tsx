@@ -1,16 +1,16 @@
 import { Fragment, useEffect, useId, useMemo, useState, type ReactNode } from 'react';
-import { GENRES, getBookGenre } from '../../../core/bible/genres.ts';
+import { GENRES, getSurahGenre } from '../../../core/quran/genres.ts';
 import {
-  chapterPassageOf,
+  surahPassageOf,
   formatPassage,
   passageRange,
-  toPassageOsisId,
-  versePassage,
+  toPassageId,
+  ayahPassage,
   type Passage,
-} from '../../../core/bible/passage.ts';
-import { formatVerseIndexRange, formatVerseRef } from '../../../core/bible/reference-format.ts';
-import type { VerseIndex } from '../../../core/bible/verse-ref.ts';
-import type { Versification } from '../../../core/bible/versification.ts';
+} from '../../../core/quran/passage.ts';
+import { formatAyahIndexRange, formatVerseRef } from '../../../core/quran/reference.ts';
+import type { AyahIndex } from '../../../core/quran/ayah-ref.ts';
+import type { QuranVersification } from '../../../core/quran/quran-versification.ts';
 import { elementAt } from '../../../core/lib/array.ts';
 import {
   CloseIcon,
@@ -34,7 +34,7 @@ import {
   type ExternalTranslation,
 } from '../../../translations/external-translations.ts';
 import type { Translation } from '../../../translations/translation.ts';
-import { verseTextOrNote } from '../../../translations/verse-text.ts';
+import { verseTextOrNote } from '../../../translations/ayah-text.ts';
 import {
   collectConnections,
   groupByBook,
@@ -48,7 +48,7 @@ import { GENRE_COLORS, GENRE_HEX } from '../palette.ts';
 import { OriginalWordsSection } from './OriginalWordsSection.tsx';
 import { PanelSection } from './PanelSection.tsx';
 import type { VizData } from '../viz-data.ts';
-import { buildVerseShareRequest } from '../verse-share.ts';
+import { buildVerseShareRequest } from '../ayah-share.ts';
 import { openVerseShare } from './VerseShareDialog.tsx';
 import { useLocalization, type Localization } from '../../../i18n/use-locale.tsx';
 import styles from './PassagePanel.module.css';
@@ -75,7 +75,7 @@ const INITIAL_ITEMS = 40;
 const COPIED_FEEDBACK_MS = 1600;
 
 /**
- * Copies a verse or passage, in full, with its reference and link, e.g. to quote it in a
+ * Copies a ayah or passage, in full, with its reference and link, e.g. to quote it in a
  * discussion. It shows on hover (on touch screens, always, dimmed), and not at all where the page
  * can't use the clipboard.
  */
@@ -128,20 +128,20 @@ function CopyQuoteButton({
   );
 }
 
-function neighbor(passage: Passage, step: -1 | 1, versification: Versification): Passage | null {
+function neighbor(passage: Passage, step: -1 | 1, versification: QuranVersification): Passage | null {
   const range = passageRange(passage, versification);
-  const verse = step < 0 ? range.start - 1 : range.end + 1;
-  if (!versification.isValidIndex(verse)) {
+  const ayah = step < 0 ? range.start - 1 : range.end + 1;
+  if (!versification.isValidIndex(ayah)) {
     return null;
   }
-  return passage.kind === 'verse' ? versePassage(verse) : chapterPassageOf(verse, versification);
+  return passage.kind === 'ayah' ? ayahPassage(ayah) : surahPassageOf(ayah, versification);
 }
 
-/** A linked passage longer than this shows its first verses, and how many more there are. */
+/** A linked passage longer than this shows its first ayahs, and how many more there are. */
 const MAX_PASSAGE_VERSES = 12;
 
 /**
- * The text a connection leads to, in full: a verse, or a passage's verses with their numbers (up
+ * The text a connection leads to, in full: a ayah, or a passage's ayahs with their numbers (up
  * to `MAX_PASSAGE_VERSES`; a very long passage says how much more there is).
  */
 function ConnectionText({
@@ -151,11 +151,11 @@ function ConnectionText({
   end,
 }: {
   readonly translation: Translation;
-  readonly versification: Versification;
-  readonly start: VerseIndex;
-  readonly end: VerseIndex;
+  readonly versification: QuranVersification;
+  readonly start: AyahIndex;
+  readonly end: AyahIndex;
 }) {
-  const { t, books, n } = useLocalization();
+  const { t, surahs, n } = useLocalization();
   // The text is in the translation's language, which is not always the interface's: a reader
   // on a Portuguese interface may be reading the KJV. Saying so is what lets a screen reader
   // pronounce it, and a right-to-left text lay itself out.
@@ -170,22 +170,22 @@ function ConnectionText({
   }
   const first = versification.refAt(start);
   const last = Math.min(end, start + MAX_PASSAGE_VERSES - 1);
-  const verses = Array.from({ length: last - start + 1 }, (_, offset) => start + offset);
+  const ayahs = Array.from({ length: last - start + 1 }, (_, offset) => start + offset);
   const more = end - last;
   return (
     <span className={styles.snippet} lang={lang} dir={dir}>
-      {verses.map((verse) => {
-        const ref = versification.refAt(verse);
+      {ayahs.map((ayah) => {
+        const ref = versification.refAt(ayah);
         const mark =
-          ref.book !== first.book
-            ? formatVerseRef(ref, books)
-            : ref.chapter !== first.chapter
-              ? `${String(ref.chapter)}:${String(ref.verse)}`
-              : String(ref.verse);
+          ref.surah !== first.surah
+            ? formatVerseRef(ref, surahs)
+            : ref.surah !== first.surah
+              ? `${String(ref.surah)}:${String(ref.ayah)}`
+              : String(ref.ayah);
         return (
-          <Fragment key={verse}>
+          <Fragment key={ayah}>
             <sup className={styles.verseMark}>{mark}</sup>
-            {verseTextOrNote(translation, verse)}{' '}
+            {verseTextOrNote(translation, ayah)}{' '}
           </Fragment>
         );
       })}
@@ -197,7 +197,7 @@ function ConnectionText({
 }
 
 /**
- * Sends the verse on as a picture. It shares the reveal of `CopyQuoteButton` — hover on a
+ * Sends the ayah on as a picture. It shares the reveal of `CopyQuoteButton` — hover on a
  * pointer, always but quiet on a touch screen — because it is the same kind of thing in the
  * same place, and a second way of appearing would be a second thing to learn.
  */
@@ -213,8 +213,8 @@ function ShareVerseButton({
     <button
       type="button"
       className={styles.share}
-      aria-label={t('share.verse')(reference)}
-      title={t('share.verse')(reference)}
+      aria-label={t('share.ayah')(reference)}
+      title={t('share.ayah')(reference)}
       onClick={onShare}
     >
       <ShareVerseIcon />
@@ -236,12 +236,12 @@ function ReadElsewhere({
   translations,
 }: {
   readonly passage: Passage;
-  readonly versification: Versification;
+  readonly versification: QuranVersification;
   readonly translations: readonly ExternalTranslation[];
 }) {
-  const { t, books } = useLocalization();
+  const { t, surahs } = useLocalization();
   const labelId = useId();
-  const reference = formatPassage(passage, versification, books);
+  const reference = formatPassage(passage, versification, surahs);
   return (
     <div className={styles.elsewhere} role="group" aria-labelledby={labelId}>
       <span id={labelId} className={styles.elsewhereLabel}>
@@ -279,7 +279,7 @@ function ReadElsewhere({
 
 /**
  * Details of the focused passage: its text, where it connects (by genre) and every connection,
- * grouped by book. Every connection is a button that travels there, so nothing depends on hover.
+ * grouped by surah. Every connection is a button that travels there, so nothing depends on hover.
  */
 export function PassagePanel({
   data,
@@ -292,7 +292,7 @@ export function PassagePanel({
   shareUrl,
 }: PassagePanelProps) {
   const localization = useLocalization();
-  const { t, books, genreName } = localization;
+  const { t, surahs, genreName } = localization;
   const { versification, translation, crossReferences, verseGenres } = data;
   const connections = useMemo(
     () =>
@@ -305,11 +305,11 @@ export function PassagePanel({
     [crossReferences.index, passage, versification, filter, verseGenres],
   );
   const range = passageRange(passage, versification);
-  const book = versification.bookAt(range.start);
-  const genre = getBookGenre(book.id);
+  const surah = versification.surahAt(range.start);
+  const genre = getSurahGenre(surah.id);
   const previous = neighbor(passage, -1, versification);
   const next = neighbor(passage, 1, versification);
-  const isVerse = passage.kind === 'verse';
+  const isVerse = passage.kind === 'ayah';
   const elsewhere = externalTranslationsFor(translation.manifest.language);
   // Where the passage can be opened: elsewhere in the app, then on other sites.
   const actionRow =
@@ -329,9 +329,9 @@ export function PassagePanel({
           <p className={styles.eyebrow}>
             <span className={styles.key} style={{ background: GENRE_COLORS[genre.id] }} />
             {genreName(genre.id)} ·{' '}
-            {book.testament === 'OT' ? t('testament.OT') : t('testament.NT')}
+            {surah.testament === 'OT' ? t('testament.OT') : t('testament.NT')}
           </p>
-          <h2 className={styles.title}>{formatPassage(passage, versification, books)}</h2>
+          <h2 className={styles.title}>{formatPassage(passage, versification, surahs)}</h2>
         </div>
         <button
           type="button"
@@ -366,9 +366,9 @@ export function PassagePanel({
       </header>
 
       {/* Keyed by passage: following a link starts the new passage's details at the top. */}
-      <div key={toPassageOsisId(passage, versification)} className={styles.scroll}>
-        {/* A verse's links follow its text; a chapter's come before its (long) list of verses. */}
-        {passage.kind === 'verse' ? (
+      <div key={toPassageId(passage, versification)} className={styles.scroll}>
+        {/* A ayah's links follow its text; a surah's come before its (long) list of ayahs. */}
+        {passage.kind === 'ayah' ? (
           <>
             <div className={styles.quotable}>
               <p
@@ -376,18 +376,18 @@ export function PassagePanel({
                 lang={translation.manifest.language}
                 dir={translation.manifest.direction}
               >
-                {verseTextOrNote(translation, passage.verse)}
+                {verseTextOrNote(translation, passage.ayah)}
               </p>
-              {/* A verse this translation leaves out has nothing to put on a card. */}
-              {translation.verseText(passage.verse) !== '' && (
+              {/* A ayah this translation leaves out has nothing to put on a card. */}
+              {translation.verseText(passage.ayah) !== '' && (
                 <ShareVerseButton
-                  reference={formatPassage(passage, versification, books)}
+                  reference={formatPassage(passage, versification, surahs)}
                   onShare={() => {
                     openVerseShare(
                       buildVerseShareRequest({
                         data,
                         filter,
-                        verse: passage.verse,
+                        ayah: passage.ayah,
                         url: shareUrl(passage),
                         localization,
                       }),
@@ -421,7 +421,7 @@ export function PassagePanel({
           description={t('panel.references.note')}
           countLabel={t('panel.passages')}
           connections={connections.outgoing}
-          showSourceVerse={passage.kind === 'chapter'}
+          showSourceVerse={passage.kind === 'surah'}
           data={data}
           onSelect={onSelect}
           onPreview={onPreview}
@@ -434,15 +434,15 @@ export function PassagePanel({
           description={t('panel.referencedBy.note')}
           countLabel={t('panel.passages')}
           connections={connections.incoming}
-          showSourceVerse={passage.kind === 'chapter'}
+          showSourceVerse={passage.kind === 'surah'}
           data={data}
           onSelect={onSelect}
           onPreview={onPreview}
           shareUrl={shareUrl}
         />
-        {/* A verse at a time: a chapter's words would be most of its vocabulary. */}
-        {passage.kind === 'verse' && (
-          <OriginalWordsSection verse={passage.verse} data={data} onSelect={onSelect} />
+        {/* A ayah at a time: a surah's words would be most of its vocabulary. */}
+        {passage.kind === 'ayah' && (
+          <OriginalWordsSection ayah={passage.ayah} data={data} onSelect={onSelect} />
         )}
       </div>
     </div>
@@ -456,39 +456,39 @@ function ChapterVerses({
   connections,
   onSelect,
 }: {
-  readonly start: VerseIndex;
-  readonly end: VerseIndex;
+  readonly start: AyahIndex;
+  readonly end: AyahIndex;
   readonly translation: Translation;
   readonly connections: readonly Connection[];
   readonly onSelect: (passage: Passage) => void;
 }) {
   const { t, n } = useLocalization();
-  const counts = new Map<VerseIndex, number>();
+  const counts = new Map<AyahIndex, number>();
   for (const connection of connections) {
     counts.set(connection.here, (counts.get(connection.here) ?? 0) + 1);
   }
-  const verses = Array.from({ length: end - start + 1 }, (_, offset) => start + offset);
+  const ayahs = Array.from({ length: end - start + 1 }, (_, offset) => start + offset);
   return (
     <PanelSection
-      id="verses"
+      id="ayahs"
       icon={ReadingIcon}
-      title={t('panel.verses')}
-      description={t('panel.verses.note')}
-      count={verses.length}
+      title={t('panel.ayahs')}
+      description={t('panel.ayahs.note')}
+      count={ayahs.length}
       countLabel={t('panel.versesCounted')}
     >
-      {verses.map((verse, offset) => (
+      {ayahs.map((ayah, offset) => (
         <button
-          key={verse}
+          key={ayah}
           type="button"
           className={styles.verseRow}
           onClick={() => {
-            onSelect(versePassage(verse));
+            onSelect(ayahPassage(ayah));
           }}
         >
           <span className={styles.verseNumber}>{offset + 1}</span>
-          <span className={styles.snippet}>{verseTextOrNote(translation, verse)}</span>
-          <span className={styles.count}>{n(counts.get(verse) ?? 0)}</span>
+          <span className={styles.snippet}>{verseTextOrNote(translation, ayah)}</span>
+          <span className={styles.count}>{n(counts.get(ayah) ?? 0)}</span>
         </button>
       ))}
     </PanelSection>
@@ -502,16 +502,16 @@ function ChapterVerses({
  */
 function describeLandingNote(
   note: LandingNote,
-  versification: Versification,
-  { t, books, n }: Localization,
+  versification: QuranVersification,
+  { t, surahs, n }: Localization,
 ): string {
   switch (note.kind) {
     case 'range':
-      return t('note.toRange')(formatVerseIndexRange(versification, books, note.start, note.end));
-    case 'from-verse':
-      return t('note.fromVerse')(n(note.verse));
-    case 'to-verse':
-      return t('note.toVerse')(n(note.verse));
+      return t('note.toRange')(formatAyahIndexRange(versification, surahs, note.start, note.end));
+    case 'from-ayah':
+      return t('note.fromVerse')(n(note.ayah));
+    case 'to-ayah':
+      return t('note.toVerse')(n(note.ayah));
   }
 }
 
@@ -612,7 +612,7 @@ function ConnectionSection({
   readonly shareUrl: (passage: Passage) => string;
 }) {
   const localization = useLocalization();
-  const { t, books, n } = localization;
+  const { t, surahs, n } = localization;
   const [limit, setLimit] = useState(INITIAL_ITEMS);
   const { versification, translation } = data;
   const visible = connections.slice(0, limit);
@@ -628,22 +628,22 @@ function ConnectionSection({
       {connections.length === 0 && <p className={styles.muted}>{t('panel.none')}</p>}
       {groupByBook(visible, versification).map((group) => (
         <div
-          key={`${group.book}-${String(group.connections[0]?.otherStart)}`}
+          key={`${group.surah}-${String(group.connections[0]?.otherStart)}`}
           className={styles.group}
         >
           <p className={styles.groupHeader}>
             <span
               className={styles.key}
-              style={{ background: GENRE_COLORS[getBookGenre(group.book).id] }}
+              style={{ background: GENRE_COLORS[getSurahGenre(group.surah).id] }}
             />
-            {books[group.book].name}
+            {surahs[group.surah].name}
             <span className={styles.count}>{n(group.connections.length)}</span>
           </p>
           {group.connections.map((connection) => {
             const note = landingNote(connection, versification, showSourceVerse);
-            const reference = formatVerseIndexRange(
+            const reference = formatAyahIndexRange(
               versification,
-              books,
+              surahs,
               connection.otherStart,
               connection.otherEnd,
             );
@@ -662,7 +662,7 @@ function ConnectionSection({
                   type="button"
                   className={styles.item}
                   onClick={() => {
-                    onSelect(versePassage(connection.otherStart));
+                    onSelect(ayahPassage(connection.otherStart));
                   }}
                   onFocus={() => {
                     onPreview?.(connection);
@@ -692,10 +692,10 @@ function ConnectionSection({
                     quotePassage({
                       translation,
                       versification,
-                      names: books,
+                      names: surahs,
                       start: connection.otherStart,
                       end: connection.otherEnd,
-                      url: shareUrl(versePassage(connection.otherStart)),
+                      url: shareUrl(ayahPassage(connection.otherStart)),
                     })
                   }
                 />

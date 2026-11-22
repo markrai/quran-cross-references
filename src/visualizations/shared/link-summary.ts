@@ -1,10 +1,10 @@
-import { GENRES } from '../../core/bible/genres.ts';
+import { GENRES } from '../../core/quran/genres.ts';
 import { elementAt } from '../../core/lib/array.ts';
 import type { CrossReferenceIndex } from '../../cross-references/cross-reference-index.ts';
 
 /** Headline numbers about the links a visualization currently shows. */
 export interface LinkSummary {
-  readonly verseCount: number;
+  readonly ayahCount: number;
   readonly shownLinks: number;
   readonly totalLinks: number;
   /** Verses that are the source or inside the target of at least one shown link. */
@@ -20,12 +20,12 @@ export function summarizeLinks(
   linkIds: ArrayLike<number>,
   verseGenres: Uint8Array,
 ): LinkSummary {
-  const connected = new Uint8Array(index.verseCount);
+  const connected = new Uint8Array(index.ayahCount);
   let connectedVerses = 0;
   let crossTestamentLinks = 0;
-  const mark = (verse: number) => {
-    if (connected[verse] === 0) {
-      connected[verse] = 1;
+  const mark = (ayah: number) => {
+    if (connected[ayah] === 0) {
+      connected[ayah] = 1;
       connectedVerses += 1;
     }
   };
@@ -34,8 +34,8 @@ export function summarizeLinks(
     const source = elementAt(index.sources, id);
     const targetStart = elementAt(index.targetStarts, id);
     mark(source);
-    for (let verse = targetStart; verse <= elementAt(index.targetEnds, id); verse += 1) {
-      mark(verse);
+    for (let ayah = targetStart; ayah <= elementAt(index.targetEnds, id); ayah += 1) {
+      mark(ayah);
     }
     const sourceIsNew = IS_NEW_TESTAMENT_GENRE[elementAt(verseGenres, source)];
     const targetIsNew = IS_NEW_TESTAMENT_GENRE[elementAt(verseGenres, targetStart)];
@@ -44,7 +44,7 @@ export function summarizeLinks(
     }
   }
   return {
-    verseCount: index.verseCount,
+    ayahCount: index.ayahCount,
     shownLinks: linkIds.length,
     totalLinks: index.linkCount,
     connectedVerses,

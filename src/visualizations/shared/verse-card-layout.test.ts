@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { arcsGeometry, fitText, genreBands, wrapText } from './verse-card-layout.ts';
+import { arcsGeometry, fitText, genreBands, wrapText } from './ayah-card-layout.ts';
 
 /** Every glyph half an em wide, which makes the arithmetic in these tests readable. */
 const measure = (text: string, fontSize: number) => text.length * fontSize * 0.5;
@@ -47,7 +47,7 @@ describe('fitText', () => {
     expect(fitted.lines).toEqual(['one two']);
   });
 
-  it('keeps the whole verse at the smallest size rather than refusing to set it', () => {
+  it('keeps the whole ayah at the smallest size rather than refusing to set it', () => {
     const fitted = fitText({
       text: 'a '.repeat(80),
       sizes,
@@ -86,7 +86,7 @@ describe('genreBands', () => {
     expect(genreBands(new Uint8Array([3, 3, 3]))).toEqual([{ start: 0, end: 2, genre: 3 }]);
   });
 
-  it('has nothing to say about no verses', () => {
+  it('has nothing to say about no ayahs', () => {
     expect(genreBands(new Uint8Array())).toEqual([]);
   });
 });
@@ -94,9 +94,9 @@ describe('genreBands', () => {
 describe('arcsGeometry', () => {
   const verseGenres = new Uint8Array([0, 1, 2, 3]);
 
-  it('places the verse along the line in proportion to where it falls in the Bible', () => {
+  it('places the ayah along the line in proportion to where it falls in the Bible', () => {
     const { verseX } = arcsGeometry({
-      verse: 2,
+      ayah: 2,
       targets: [],
       verseGenres,
       totalVerses: 4,
@@ -107,9 +107,9 @@ describe('arcsGeometry', () => {
     expect(verseX).toBe(50);
   });
 
-  it('colors each arc by the genre it lands in, and starts them all at the verse', () => {
+  it('colors each arc by the genre it lands in, and starts them all at the ayah', () => {
     const { arcs } = arcsGeometry({
-      verse: 0,
+      ayah: 0,
       targets: [1, 3],
       verseGenres,
       totalVerses: 4,
@@ -124,7 +124,7 @@ describe('arcsGeometry', () => {
 
   it('makes a longer link arch higher, up to a cap that keeps it on the card', () => {
     const { arcs } = arcsGeometry({
-      verse: 0,
+      ayah: 0,
       targets: [1, 3],
       verseGenres,
       totalVerses: 4,
@@ -141,7 +141,7 @@ describe('arcsGeometry', () => {
 
   it('falls back to the first genre for a target off the end of the list', () => {
     const { arcs } = arcsGeometry({
-      verse: 0,
+      ayah: 0,
       targets: [99],
       verseGenres,
       totalVerses: 100,

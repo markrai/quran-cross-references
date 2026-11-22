@@ -1,17 +1,17 @@
-import { BOOKS } from '../../../core/bible/books.ts';
-import type { VerseIndex } from '../../../core/bible/verse-ref.ts';
+import { SURAHS } from '../../../core/quran/surahs.ts';
+import type { AyahIndex } from '../../../core/quran/ayah-ref.ts';
 import type { Translation } from '../../../translations/translation.ts';
 
 export interface VerseMeasure {
-  readonly verse: VerseIndex;
+  readonly ayah: AyahIndex;
   readonly value: number;
 }
 
 export interface TranslationStats {
-  readonly verseCount: number;
-  readonly textVerseCount: number;
+  readonly ayahCount: number;
+  readonly textAyahCount: number;
   /** Verses the translation leaves empty (e.g. moved to footnotes). */
-  readonly omittedVerses: readonly VerseIndex[];
+  readonly omittedVerses: readonly AyahIndex[];
   readonly bookCount: number;
   readonly chapterCount: number;
   readonly wordCount: number;
@@ -27,35 +27,35 @@ export function countWords(text: string): number {
 }
 
 export function computeTranslationStats(translation: Translation): TranslationStats {
-  const omittedVerses: VerseIndex[] = [];
+  const omittedVerses: AyahIndex[] = [];
   let wordCount = 0;
   let characterCount = 0;
   let longestVerse: VerseMeasure | undefined;
   let shortestVerse: VerseMeasure | undefined;
 
-  for (let verse = 0; verse < translation.verseCount; verse += 1) {
-    const text = translation.verseText(verse);
+  for (let ayah = 0; ayah < translation.ayahCount; ayah += 1) {
+    const text = translation.verseText(ayah);
     if (text === '') {
-      omittedVerses.push(verse);
+      omittedVerses.push(ayah);
       continue;
     }
     const words = countWords(text);
     wordCount += words;
     characterCount += text.length;
     if (!longestVerse || words > longestVerse.value) {
-      longestVerse = { verse, value: words };
+      longestVerse = { ayah, value: words };
     }
     if (!shortestVerse || words < shortestVerse.value) {
-      shortestVerse = { verse, value: words };
+      shortestVerse = { ayah, value: words };
     }
   }
 
   const { versification } = translation;
   return {
-    verseCount: translation.verseCount,
-    textVerseCount: translation.verseCount - omittedVerses.length,
+    ayahCount: translation.ayahCount,
+    textAyahCount: translation.ayahCount - omittedVerses.length,
     omittedVerses,
-    bookCount: BOOKS.length,
+    bookCount: SURAHS.length,
     chapterCount: versification.chapterCount,
     wordCount,
     characterCount,

@@ -1,11 +1,11 @@
-import { getBookGenre } from '../../core/bible/genres.ts';
-import type { Versification } from '../../core/bible/versification.ts';
+import { getSurahGenre } from '../../core/quran/genres.ts';
+import type { QuranVersification } from '../../core/quran/quran-versification.ts';
 
-/** Genre ordinal of every verse, indexed by verse index (for fast per-link lookups). */
-export function computeVerseGenres(versification: Versification): Uint8Array {
-  const genres = new Uint8Array(versification.verseCount);
-  for (let verse = 0; verse < versification.verseCount; verse += 1) {
-    genres[verse] = getBookGenre(versification.bookAt(verse).id).ordinal;
+/** Genre ordinal of every ayah, indexed by ayah index (for fast per-link lookups). */
+export function computeVerseGenres(versification: QuranVersification): Uint8Array {
+  const genres = new Uint8Array(versification.ayahCount);
+  for (let ayah = 0; ayah < versification.ayahCount; ayah += 1) {
+    genres[ayah] = getSurahGenre(versification.surahAt(ayah).id).ordinal;
   }
   return genres;
 }

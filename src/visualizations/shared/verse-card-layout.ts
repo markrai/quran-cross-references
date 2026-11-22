@@ -1,7 +1,7 @@
 import { elementAt } from '../../core/lib/array.ts';
 
 /**
- * Where everything on a shared verse card goes.
+ * Where everything on a shared ayah card goes.
  *
  * The arithmetic lives apart from the painting so that it can be tested: a canvas cannot be
  * exercised in this environment, but choosing a type size, breaking a line and placing an arc
@@ -12,7 +12,7 @@ import { elementAt } from '../../core/lib/array.ts';
 /** Measures a run of text at a given size, in pixels. */
 export type MeasureText = (text: string, fontSize: number) => number;
 
-/** A line of the verse, already broken to fit. */
+/** A line of the ayah, already broken to fit. */
 export interface WrappedText {
   readonly fontSize: number;
   readonly lines: readonly string[];
@@ -52,13 +52,13 @@ export function wrapText(
 }
 
 /**
- * The largest size from `sizes` at which the verse still fits the box, with the lines it breaks
+ * The largest size from `sizes` at which the ayah still fits the box, with the lines it breaks
  * into there.
  *
  * `sizes` is a scale rather than a range because the card is a typographic object: stepping down
  * a designed scale keeps every card recognisably the same family, where solving for the exact
- * size that fills the box would give each verse its own arbitrary one. The smallest size is used
- * even when the text overflows it — a very long verse is clipped by the painter, and refusing to
+ * size that fills the box would give each ayah its own arbitrary one. The smallest size is used
+ * even when the text overflows it — a very long ayah is clipped by the painter, and refusing to
  * draw it would be worse than setting it small.
  */
 export function fitText({
@@ -88,7 +88,7 @@ export function fitText({
   return fallback;
 }
 
-/** A stretch of the baseline where every verse belongs to one genre. */
+/** A stretch of the baseline where every ayah belongs to one genre. */
 export interface GenreBand {
   readonly start: number;
   readonly end: number;
@@ -99,7 +99,7 @@ export interface GenreBand {
  * The baseline, split into runs of one genre.
  *
  * The whole Bible is drawn as a single line a few hundred pixels long, so the bands are found by
- * walking the genre of every verse once rather than by asking the versification for book edges:
+ * walking the genre of every ayah once rather than by asking the versification for surah edges:
  * the picture is of the text, and this is the same array the arcs themselves are colored from.
  */
 export function genreBands(verseGenres: Uint8Array): GenreBand[] {
@@ -109,12 +109,12 @@ export function genreBands(verseGenres: Uint8Array): GenreBand[] {
   }
   let genre = elementAt(verseGenres, 0);
   let start = 0;
-  for (let verse = 1; verse < verseGenres.length; verse += 1) {
-    const next = elementAt(verseGenres, verse);
+  for (let ayah = 1; ayah < verseGenres.length; ayah += 1) {
+    const next = elementAt(verseGenres, ayah);
     if (next !== genre) {
-      bands.push({ start, end: verse - 1, genre });
+      bands.push({ start, end: ayah - 1, genre });
       genre = next;
-      start = verse;
+      start = ayah;
     }
   }
   bands.push({ start, end: verseGenres.length - 1, genre });
@@ -136,15 +136,15 @@ export interface ArcsGeometry {
 }
 
 /**
- * This verse's own cross-references, as curves over a baseline that stands for the whole Bible.
+ * This ayah's own cross-references, as curves over a baseline that stands for the whole Bible.
  *
  * It is the focus layer of the arcs view and nothing else: the full picture behind it, 344,799
  * links deep, is a grey smudge at this size. A link that reaches further across the Bible rises
- * higher, which is what makes the shape of a verse's connections readable at a glance, and the
+ * higher, which is what makes the shape of a ayah's connections readable at a glance, and the
  * rise is capped so that a Genesis-to-Revelation link cannot leave the card.
  */
 export function arcsGeometry({
-  verse,
+  ayah,
   targets,
   verseGenres,
   totalVerses,
@@ -152,8 +152,8 @@ export function arcsGeometry({
   right,
   maxRise,
 }: {
-  readonly verse: number;
-  /** The other end of each link, as a verse index. */
+  readonly ayah: number;
+  /** The other end of each link, as a ayah index. */
   readonly targets: readonly number[];
   readonly verseGenres: Uint8Array;
   readonly totalVerses: number;
@@ -163,11 +163,11 @@ export function arcsGeometry({
 }): ArcsGeometry {
   const span = right - left;
   const positionOf = (index: number) => left + (span * index) / totalVerses;
-  const verseX = positionOf(verse);
+  const verseX = positionOf(ayah);
   const arcs = targets.map((target) => {
     const toX = positionOf(target);
     const distance = Math.abs(toX - verseX);
-    // By the root of the distance rather than the distance itself. A verse usually points at its
+    // By the root of the distance rather than the distance itself. A ayah usually points at its
     // own neighbourhood — a psalm to other psalms — and under a linear rise those dozen short
     // links flatten into one smudge on the baseline. The root lifts the near ones apart while
     // still letting a Genesis-to-Revelation link arch over everything.

@@ -1,28 +1,28 @@
-import { formatVerseIndexRange } from '../../../core/bible/reference-format.ts';
-import type { VerseIndex } from '../../../core/bible/verse-ref.ts';
-import { CANONICAL_VERSIFICATION } from '../../../core/bible/versification.ts';
-import { enBooks } from '../../../i18n/books/en.ts';
-import { useSelectVerse } from '../verse-navigation.ts';
+import { formatAyahIndexRange } from '../../../core/quran/reference.ts';
+import type { AyahIndex } from '../../../core/quran/ayah-ref.ts';
+import { CANONICAL_QURAN } from '../../../core/quran/quran-versification.ts';
+import { enBooks } from '../../../i18n/surahs/en.ts';
+import { useSelectVerse } from '../ayah-navigation.ts';
 import styles from '../DebugPage.module.css';
 
 interface VerseLinkProps {
-  readonly verse: VerseIndex;
-  /** Last verse of a range, if the link points to a range; the range's first verse is opened. */
-  readonly rangeEnd?: VerseIndex;
+  readonly ayah: AyahIndex;
+  /** Last ayah of a range, if the link points to a range; the range's first ayah is opened. */
+  readonly rangeEnd?: AyahIndex;
 }
 
-/** A verse reference that opens the verse in the inspector. */
-export function VerseLink({ verse, rangeEnd = verse }: VerseLinkProps) {
+/** A ayah reference that opens the ayah in the inspector. */
+export function VerseLink({ ayah, rangeEnd = ayah }: VerseLinkProps) {
   const selectVerse = useSelectVerse();
   return (
     <button
       type="button"
       className={styles.linkButton}
       onClick={() => {
-        selectVerse(verse);
+        selectVerse(ayah);
       }}
     >
-      {formatVerseIndexRange(CANONICAL_VERSIFICATION, enBooks, verse, rangeEnd)}
+      {formatAyahIndexRange(CANONICAL_QURAN, enBooks, ayah, rangeEnd)}
     </button>
   );
 }

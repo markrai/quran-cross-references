@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { formatPassage, passageRange, type Passage } from '../../core/bible/passage.ts';
+import { formatPassage, passageRange, type Passage } from '../../core/quran/passage.ts';
 import { ClickIcon, PinchIcon, TapIcon } from '../../shared/ui/icons.tsx';
 import { useLocalization } from '../../i18n/use-locale.tsx';
 import { collectConnections, connectionLinkIds, type Connection } from '../shared/connections.ts';
@@ -33,11 +33,11 @@ export function ArcsStage({
   preview,
   onSelect,
 }: ArcsStageProps) {
-  const { t, books, locale } = useLocalization();
+  const { t, surahs, locale } = useLocalization();
   const genres = locale.genres;
   // The axis needs names to paint its first frame, but a change of language must not tear down
   // the WebGL context: the effect below hands the controller the new ones instead.
-  const namesRef = useRef({ books, genres });
+  const namesRef = useRef({ surahs, genres });
   const containerRef = useRef<HTMLDivElement>(null);
   const glCanvasRef = useRef<HTMLCanvasElement>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -60,7 +60,7 @@ export function ArcsStage({
       glCanvas,
       overlayCanvas,
       versification: data.versification,
-      names: namesRef.current.books,
+      names: namesRef.current.surahs,
       genreNames: namesRef.current.genres,
       onHover: setHover,
       onSelect: (passage) => {
@@ -78,9 +78,9 @@ export function ArcsStage({
   }, [data.versification]);
 
   useEffect(() => {
-    namesRef.current = { books, genres };
-    controllerRef.current?.setNames(books, genres);
-  }, [books, genres]);
+    namesRef.current = { surahs, genres };
+    controllerRef.current?.setNames(surahs, genres);
+  }, [surahs, genres]);
 
   useEffect(() => {
     controllerRef.current?.setActive(active);
@@ -199,7 +199,7 @@ function HoverTooltip({
 }) {
   const tooltipRef = useRef<HTMLDivElement>(null);
   const { versification, crossReferences, verseGenres } = data;
-  const { t, books, n } = useLocalization();
+  const { t, surahs, n } = useLocalization();
   const count = useMemo(() => {
     const connections = collectConnections(
       crossReferences.index,
@@ -218,7 +218,7 @@ function HoverTooltip({
   });
   return (
     <div ref={tooltipRef} className={styles.tooltip} data-input={hover.input}>
-      <strong>{formatPassage(hover.passage, versification, books)}</strong>
+      <strong>{formatPassage(hover.passage, versification, surahs)}</strong>
       <span>{t('arcs.connections')(n(count), count)}</span>
       <span className={styles.gestures}>
         {hover.input === 'touch' ? <TapIcon /> : <ClickIcon />} {t('hint.focus')} · <PinchIcon />{' '}

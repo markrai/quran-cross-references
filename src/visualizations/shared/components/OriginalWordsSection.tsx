@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { formatPassage, versePassage, type Passage } from '../../../core/bible/passage.ts';
-import type { VerseIndex } from '../../../core/bible/verse-ref.ts';
+import { formatPassage, ayahPassage, type Passage } from '../../../core/quran/passage.ts';
+import type { AyahIndex } from '../../../core/quran/ayah-ref.ts';
 import { ExpandIcon, WordsIcon } from '../../../shared/ui/icons.tsx';
-import { verseTextOrNote } from '../../../translations/verse-text.ts';
+import { verseTextOrNote } from '../../../translations/ayah-text.ts';
 import type { OriginalWordsDataset } from '../../../words/load-original-words.ts';
 import { originalWordsIfLoaded, originalWordsLoader, resetOriginalWords } from '../viz-data.ts';
 import { useLocalization } from '../../../i18n/use-locale.tsx';
@@ -10,12 +10,12 @@ import { PanelSection } from './PanelSection.tsx';
 import type { VizData } from '../viz-data.ts';
 import styles from './PassagePanel.module.css';
 
-/** How many of a verse's words to list before the rest are a click away. */
+/** How many of a ayah's words to list before the rest are a click away. */
 const INITIAL_WORDS = 6;
 
 /**
  * The words are the one part of the app that is not downloaded until it is wanted: a reader who
- * never opens a verse never pays for it. `null` until it arrives, which is when the section
+ * never opens a ayah never pays for it. `null` until it arrives, which is when the section
  * appears; a failed download leaves the panel exactly as it was.
  */
 function useOriginalWords(): OriginalWordsDataset | null {
@@ -33,7 +33,7 @@ function useOriginalWords(): OriginalWordsDataset | null {
       },
       () => {
         // A download that failed should not settle the question for the whole visit: forgetting
-        // it means the next verse the reader opens asks again.
+        // it means the next ayah the reader opens asks again.
         resetOriginalWords();
       },
     );
@@ -45,7 +45,7 @@ function useOriginalWords(): OriginalWordsDataset | null {
 }
 
 /**
- * The dictionary words of a verse, and the other verses that use them.
+ * The dictionary words of a ayah, and the other ayahs that use them.
  *
  * This is a different kind of link from the cross-references above it, and is kept apart from
  * them on purpose: a cross-reference is somebody's judgement that two passages belong together,
@@ -53,15 +53,15 @@ function useOriginalWords(): OriginalWordsDataset | null {
  * three places says something about those places and one used in a hundred says much less.
  */
 export function OriginalWordsSection({
-  verse,
+  ayah,
   data,
   onSelect,
 }: {
-  readonly verse: VerseIndex;
+  readonly ayah: AyahIndex;
   readonly data: VizData;
   readonly onSelect: (passage: Passage) => void;
 }) {
-  const { t, books, n } = useLocalization();
+  const { t, surahs, n } = useLocalization();
   const words = useOriginalWords();
   const [expanded, setExpanded] = useState(false);
   const [openWord, setOpenWord] = useState<number | null>(null);
@@ -70,11 +70,11 @@ export function OriginalWordsSection({
   if (!words) {
     return null;
   }
-  const inVerse = words.index.wordsOf(verse);
+  const inVerse = words.index.wordsOf(ayah);
   if (inVerse.length === 0) {
     return null;
   }
-  const hebrew = versification.bookAt(verse).testament === 'OT';
+  const hebrew = versification.surahAt(ayah).testament === 'OT';
   const language = t(hebrew ? 'language.hebrew' : 'language.greek');
   const visible = expanded ? inVerse : inVerse.slice(0, INITIAL_WORDS);
 
@@ -103,7 +103,7 @@ export function OriginalWordsSection({
                 <span className={styles.itemRef}>
                   <strong lang={hebrew ? 'he' : 'el'}>{word.lemma}</strong>
                   <span className={styles.wordSound}>{word.transliteration}</span>
-                  <span className={styles.count}>{n(word.verseCount)}</span>
+                  <span className={styles.count}>{n(word.ayahCount)}</span>
                   <ExpandIcon className={styles.chevron} />
                 </span>
                 <span className={styles.snippet}>{word.gloss}</span>
@@ -114,13 +114,13 @@ export function OriginalWordsSection({
                     key={other}
                     type="button"
                     className={`${styles.item} ${styles.wordVerse}`}
-                    aria-current={other === verse ? 'true' : undefined}
+                    aria-current={other === ayah ? 'true' : undefined}
                     onClick={() => {
-                      onSelect(versePassage(other));
+                      onSelect(ayahPassage(other));
                     }}
                   >
                     <span className={styles.itemRef}>
-                      <strong>{formatPassage(versePassage(other), versification, books)}</strong>
+                      <strong>{formatPassage(ayahPassage(other), versification, surahs)}</strong>
                     </span>
                     <span className={styles.snippet}>{verseTextOrNote(translation, other)}</span>
                   </button>

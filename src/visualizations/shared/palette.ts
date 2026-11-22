@@ -1,4 +1,4 @@
-import { GENRES, type GenreId } from '../../core/bible/genres.ts';
+import { GENRES, type GenreId } from '../../core/quran/genres.ts';
 
 /** Background of every visualization (the dark theme's `--color-background`). */
 export const VIZ_SURFACE = '#0d0d0d';
@@ -14,7 +14,7 @@ export const VIZ_SURFACE = '#0d0d0d';
  *
  * Ten colors cannot all be pairwise distinct (the validator's all-pairs check caps at three),
  * so every visualization must also encode genre by position (genres are contiguous runs of
- * books) and by labels.
+ * surahs) and by labels.
  */
 export const GENRE_COLORS: Readonly<Record<GenreId, string>> = {
   law: '#eb568f',

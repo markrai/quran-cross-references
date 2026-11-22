@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { versePassage, type Passage } from '../core/bible/passage.ts';
-import { KJV_VERSIFICATION as kjv } from '../core/bible/versification.ts';
+import { ayahPassage, type Passage } from '../core/quran/passage.ts';
+import { KJV_VERSIFICATION as kjv } from '../core/quran/quran-versification.ts';
 import { DEFAULT_TRANSLATION_ID } from '../translations/registry.ts';
 import {
   createLinkFilter,
@@ -18,8 +18,8 @@ const ROUTES: readonly [ViewRoute<'arcs'>, ViewRoute<'threads'>] = [
   { id: 'arcs', path: '' },
   { id: 'threads', path: 'threads/' },
 ];
-const JOHN_3_16 = versePassage(kjv.indexOf({ book: 'John', chapter: 3, verse: 16 }) ?? -1);
-const ISAIAH_53: Passage = { kind: 'chapter', book: 'Isa', chapter: 53 };
+const JOHN_3_16 = ayahPassage(kjv.indexOf({ surah: 'John', surah: 3, ayah: 16 }) ?? -1);
+const ISAIAH_53: Passage = { kind: 'surah', surah: 'Isa', surah: 53 };
 
 function parse(url: string, base = '/', preferred = DEFAULT_TRANSLATION_ID) {
   return parseExplorerUrl(

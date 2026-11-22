@@ -1,9 +1,9 @@
-import { CANONICAL_VERSIFICATION } from '../core/bible/versification.ts';
-import type { VerseIndex } from '../core/bible/verse-ref.ts';
+import { CANONICAL_QURAN } from '../core/quran/quran-versification.ts';
+import type { AyahIndex } from '../core/quran/ayah-ref.ts';
 import { CrossReferenceIndex } from '../cross-references/cross-reference-index.ts';
 import { getTranslationManifest } from '../translations/registry.ts';
 import { Translation } from '../translations/translation.ts';
-import { computeVerseGenres } from '../visualizations/shared/verse-genres.ts';
+import { computeVerseGenres } from '../visualizations/shared/ayah-genres.ts';
 import type { VizData } from '../visualizations/shared/viz-data.ts';
 import {
   createCrossReferenceColumns,
@@ -15,9 +15,9 @@ import {
 /** A complete `VizData` for component tests: real versification, fixture links and text. */
 export function createVizData(
   links: readonly LinkSpec[] = [],
-  verses: ReadonlyMap<VerseIndex, string> = new Map(),
+  ayahs: ReadonlyMap<AyahIndex, string> = new Map(),
 ): VizData {
-  const versification = CANONICAL_VERSIFICATION;
+  const versification = CANONICAL_QURAN;
   const columns = createCrossReferenceColumns(links);
   return {
     versification,
@@ -25,7 +25,7 @@ export function createVizData(
     translation: new Translation(
       getTranslationManifest('bsb'),
       versification,
-      createTranslationFile(verses),
+      createTranslationFile(ayahs),
     ),
     crossReferences: {
       manifest: {
@@ -41,7 +41,7 @@ export function createVizData(
       provenance: PROVENANCE,
       notices: [],
       sourceRowCount: links.length,
-      index: new CrossReferenceIndex(columns, versification.verseCount),
+      index: new CrossReferenceIndex(columns, versification.ayahCount),
     },
   };
 }

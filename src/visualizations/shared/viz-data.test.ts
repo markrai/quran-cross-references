@@ -46,7 +46,7 @@ const WORDS = {
     transliteration: ['reshit'],
     gloss: ['beginning'],
     offsets: [0, 1],
-    verses: [GEN_1_1],
+    ayahs: [GEN_1_1],
   },
 };
 
@@ -87,7 +87,7 @@ describe('vizCoreLoader', () => {
     const second = await vizCoreLoader.load();
     expect(second).toBe(first);
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(first.verseGenres).toHaveLength(first.versification.verseCount);
+    expect(first.verseGenres).toHaveLength(first.versification.ayahCount);
     expect(first.crossReferences.index.outgoing(GEN_1_1)).toHaveLength(1);
   });
 
@@ -143,7 +143,7 @@ describe('the original words', () => {
     expect(originalWordsIfLoaded()?.maxVerses).toBe(100);
   });
 
-  it('are forgotten after a failure, so the next verse opened tries again', async () => {
+  it('are forgotten after a failure, so the next ayah opened tries again', async () => {
     const fetch = serveDatasets();
     await originalWordsLoader.load();
     resetOriginalWords();

@@ -29,11 +29,11 @@ function Line({ parts }: { readonly parts: Emphasized }) {
 /** A quiet corner summary of what is on screen; context, not the main event. */
 export function LinkStats({ summary, hint }: LinkStatsProps) {
   const { t, n, share } = useLocalization();
-  const { verseCount, shownLinks, totalLinks, connectedVerses, crossTestamentLinks } = summary;
+  const { ayahCount, shownLinks, totalLinks, connectedVerses, crossTestamentLinks } = summary;
   return (
     <div className={styles.stats} aria-label={t('stats.label')}>
       <span>
-        <Line parts={t('stats.verses')(n(verseCount), verseCount)} /> ·{' '}
+        <Line parts={t('stats.ayahs')(n(ayahCount), ayahCount)} /> ·{' '}
         <Line
           parts={t('stats.links')(
             n(shownLinks),
@@ -43,7 +43,7 @@ export function LinkStats({ summary, hint }: LinkStatsProps) {
         />
       </span>
       <span className={styles.secondary}>
-        <Line parts={t('stats.connected')(share(connectedVerses, verseCount))} /> ·{' '}
+        <Line parts={t('stats.connected')(share(connectedVerses, ayahCount))} /> ·{' '}
         <Line parts={t('stats.crossTestament')(n(crossTestamentLinks), crossTestamentLinks)} />
       </span>
       {hint !== undefined && (

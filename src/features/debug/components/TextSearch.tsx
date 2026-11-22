@@ -46,16 +46,16 @@ export function TextSearch({ id, translation }: TextSearchProps) {
       {query !== '' && (
         <>
           <p className={styles.muted}>
-            {formatInteger(result.totalCount)} verses contain “{query}”
+            {formatInteger(result.totalCount)} ayahs contain “{query}”
             {result.totalCount > RESULT_LIMIT && `; showing the first ${RESULT_LIMIT}`}.
           </p>
           <DataTable
-            rows={result.verses}
-            rowKey={(verse) => verse}
-            emptyMessage="No verses match."
+            rows={result.ayahs}
+            rowKey={(ayah) => ayah}
+            emptyMessage="No ayahs match."
             columns={[
-              { header: 'Verse', render: (verse) => <VerseLink verse={verse} /> },
-              { header: 'Text', render: (verse) => translation.verseText(verse) },
+              { header: 'Ayah', render: (ayah) => <VerseLink ayah={ayah} /> },
+              { header: 'Text', render: (ayah) => translation.verseText(ayah) },
             ]}
           />
         </>

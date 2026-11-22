@@ -14,7 +14,7 @@ const NAVIGATION: readonly { readonly id: string; readonly label: string }[] = [
     id: crossReferencesSectionId(manifest.id),
     label: 'Cross-references',
   })),
-  { id: SECTION_IDS.inspector, label: 'Verse inspector' },
+  { id: SECTION_IDS.inspector, label: 'Ayah inspector' },
   { id: SECTION_IDS.search, label: 'Text search' },
 ];
 

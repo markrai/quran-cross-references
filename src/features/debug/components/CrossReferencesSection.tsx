@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import type { Testament } from '../../../core/bible/books.ts';
-import { CANONICAL_VERSIFICATION } from '../../../core/bible/versification.ts';
+import type { Testament } from '../../../core/quran/surahs.ts';
+import { CANONICAL_QURAN } from '../../../core/quran/quran-versification.ts';
 import type { CrossReferenceDataset } from '../../../cross-references/load-cross-references.ts';
 import { formatDecimal, formatInteger, formatShare } from '../../../shared/lib/format.ts';
 import { Bar } from '../../../shared/ui/Bar.tsx';
@@ -8,7 +8,7 @@ import { DataTable } from '../../../shared/ui/DataTable.tsx';
 import { KeyValueList } from '../../../shared/ui/KeyValueList.tsx';
 import { Section } from '../../../shared/ui/Section.tsx';
 import styles from '../DebugPage.module.css';
-import { computeCrossReferenceStats, type VerseCount } from '../stats/cross-reference-stats.ts';
+import { computeCrossReferenceStats, type AyahCount } from '../stats/cross-reference-stats.ts';
 import { NoticeList } from './NoticeList.tsx';
 import { SourceDetails } from './SourceDetails.tsx';
 import { VerseLink } from './VerseLink.tsx';
@@ -24,20 +24,20 @@ function withShare(part: number, whole: number): string {
   return `${formatInteger(part)} (${formatShare(part, whole)})`;
 }
 
-function VerseCountTable({
+function AyahCountTable({
   caption,
   rows,
 }: {
   readonly caption: string;
-  readonly rows: readonly VerseCount[];
+  readonly rows: readonly AyahCount[];
 }) {
   return (
     <DataTable
       caption={caption}
       rows={rows}
-      rowKey={(row) => row.verse}
+      rowKey={(row) => row.ayah}
       columns={[
-        { header: 'Verse', render: (row) => <VerseLink verse={row.verse} /> },
+        { header: 'Ayah', render: (row) => <VerseLink ayah={row.ayah} /> },
         { header: 'Links', align: 'end', render: (row) => formatInteger(row.count) },
       ]}
     />
@@ -46,8 +46,8 @@ function VerseCountTable({
 
 export function CrossReferencesSection({ id, dataset }: CrossReferencesSectionProps) {
   const { manifest, index } = dataset;
-  const stats = useMemo(() => computeCrossReferenceStats(index, CANONICAL_VERSIFICATION), [index]);
-  const verseCount = index.verseCount;
+  const stats = useMemo(() => computeCrossReferenceStats(index, CANONICAL_QURAN), [index]);
+  const ayahCount = index.ayahCount;
   const maxBucketCount = Math.max(...stats.votes.histogram.map((bucket) => bucket.count));
   const longestRange =
     stats.longestRangeLinkId === undefined ? undefined : index.link(stats.longestRangeLinkId);
@@ -72,30 +72,30 @@ export function CrossReferencesSection({ id, dataset }: CrossReferencesSectionPr
           items={[
             { label: 'Raw rows', value: formatInteger(dataset.sourceRowCount) },
             { label: 'Links', value: formatInteger(stats.linkCount) },
-            { label: 'Distinct verse pairs', value: formatInteger(stats.distinctPairCount) },
+            { label: 'Distinct ayah pairs', value: formatInteger(stats.distinctPairCount) },
             {
               label: 'Reciprocal pairs',
               value: `${formatInteger(stats.reciprocalPairCount)} (A → B and B → A)`,
             },
             {
               label: 'Verses with outgoing links',
-              value: withShare(stats.sourceVerseCount, verseCount),
+              value: withShare(stats.sourceAyahCount, ayahCount),
             },
             {
               label: 'Verses with incoming links',
-              value: withShare(stats.targetVerseCount, verseCount),
+              value: withShare(stats.targetAyahCount, ayahCount),
             },
             {
               label: 'Verses without any link',
-              value: withShare(stats.unconnectedVerses.length, verseCount),
+              value: withShare(stats.unconnectedVerses.length, ayahCount),
             },
             {
-              label: 'Links per verse (avg.)',
-              value: formatDecimal(stats.linkCount / Math.max(stats.sourceVerseCount, 1)),
+              label: 'Links per ayah (avg.)',
+              value: formatDecimal(stats.linkCount / Math.max(stats.sourceAyahCount, 1)),
             },
             { label: 'Links to a range', value: withShare(stats.rangeLinkCount, stats.linkCount) },
-            { label: '… spanning chapters', value: formatInteger(stats.crossChapterRangeCount) },
-            { label: '… spanning books', value: formatInteger(stats.crossBookRangeCount) },
+            { label: '… spanning surahs', value: formatInteger(stats.crossChapterRangeCount) },
+            { label: '… spanning surahs', value: formatInteger(stats.crossBookRangeCount) },
             {
               label: '… containing their source',
               value: formatInteger(stats.selfInclusiveLinkCount),
@@ -104,9 +104,9 @@ export function CrossReferencesSection({ id, dataset }: CrossReferencesSectionPr
               label: 'Longest range',
               value: longestRange ? (
                 <>
-                  <VerseLink verse={longestRange.targetStart} rangeEnd={longestRange.targetEnd} />{' '}
-                  (from <VerseLink verse={longestRange.from} />,{' '}
-                  {formatInteger(longestRange.targetEnd - longestRange.targetStart + 1)} verses)
+                  <VerseLink ayah={longestRange.targetStart} rangeEnd={longestRange.targetEnd} />{' '}
+                  (from <VerseLink ayah={longestRange.from} />,{' '}
+                  {formatInteger(longestRange.targetEnd - longestRange.targetStart + 1)} ayahs)
                 </>
               ) : (
                 '—'
@@ -188,17 +188,17 @@ export function CrossReferencesSection({ id, dataset }: CrossReferencesSectionPr
       </div>
 
       <div className={styles.columns}>
-        <VerseCountTable caption="Most outgoing links" rows={stats.topSources} />
-        <VerseCountTable caption="Most incoming links" rows={stats.topTargets} />
+        <AyahCountTable caption="Most outgoing links" rows={stats.topSources} />
+        <AyahCountTable caption="Most incoming links" rows={stats.topTargets} />
         <DataTable
           caption="Most voted links"
           rows={stats.topVotedLinkIds.map((id) => index.link(id))}
           rowKey={(link) => link.id}
           columns={[
-            { header: 'From', render: (link) => <VerseLink verse={link.from} /> },
+            { header: 'From', render: (link) => <VerseLink ayah={link.from} /> },
             {
               header: 'To',
-              render: (link) => <VerseLink verse={link.targetStart} rangeEnd={link.targetEnd} />,
+              render: (link) => <VerseLink ayah={link.targetStart} rangeEnd={link.targetEnd} />,
             },
             { header: 'Votes', align: 'end', render: (link) => formatInteger(link.votes) },
           ]}
@@ -206,19 +206,19 @@ export function CrossReferencesSection({ id, dataset }: CrossReferencesSectionPr
       </div>
 
       <details>
-        <summary className={styles.summary}>Links by book</summary>
+        <summary className={styles.summary}>Links by surah</summary>
         <DataTable
-          rows={stats.books}
-          rowKey={(row) => row.book.id}
+          rows={stats.surahs}
+          rowKey={(row) => row.surah.id}
           columns={[
-            { header: 'Book', render: (row) => row.book.name },
-            { header: 'Verses', align: 'end', render: (row) => formatInteger(row.verseCount) },
+            { header: 'Surah', render: (row) => row.surah.name },
+            { header: 'Verses', align: 'end', render: (row) => formatInteger(row.ayahCount) },
             { header: 'Outgoing', align: 'end', render: (row) => formatInteger(row.outgoing) },
             { header: 'Incoming', align: 'end', render: (row) => formatInteger(row.incoming) },
             {
-              header: 'Outgoing per verse',
+              header: 'Outgoing per ayah',
               align: 'end',
-              render: (row) => formatDecimal(row.outgoing / row.verseCount),
+              render: (row) => formatDecimal(row.outgoing / row.ayahCount),
             },
           ]}
         />
@@ -229,8 +229,8 @@ export function CrossReferencesSection({ id, dataset }: CrossReferencesSectionPr
           Verses without any link ({formatInteger(stats.unconnectedVerses.length)})
         </summary>
         <p className={styles.inlineList}>
-          {stats.unconnectedVerses.map((verse) => (
-            <VerseLink key={verse} verse={verse} />
+          {stats.unconnectedVerses.map((ayah) => (
+            <VerseLink key={ayah} ayah={ayah} />
           ))}
         </p>
       </details>

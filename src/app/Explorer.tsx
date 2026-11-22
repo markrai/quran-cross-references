@@ -9,7 +9,7 @@ import {
   useTransition,
   use,
 } from 'react';
-import { formatPassage, type Passage } from '../core/bible/passage.ts';
+import { formatPassage, type Passage } from '../core/quran/passage.ts';
 import { ErrorBoundary } from '../shared/ui/ErrorBoundary.tsx';
 import { getTranslationManifest } from '../translations/registry.ts';
 import controls from '../visualizations/shared/components/controls.module.css';
@@ -48,7 +48,7 @@ const [HOME] = VIEWS;
  * home and starts over: it remounts every view in its default state.
  */
 export function Explorer({ core }: { readonly core: VizCore }) {
-  const { t, books } = useLocalization();
+  const { t, surahs } = useLocalization();
   const [, rememberLocale] = useLocalePreference();
   // The fallback for an address that names no language — the reader's own, not the one the
   // last address happened to set.
@@ -102,7 +102,7 @@ export function Explorer({ core }: { readonly core: VizCore }) {
   const active = VIEWS.find((view) => view.id === location.view) ?? HOME;
 
   const title = [
-    passage && formatPassage(passage, versification, books),
+    passage && formatPassage(passage, versification, surahs),
     active === HOME ? null : t(active.titleKey),
     t('app.name'),
   ]

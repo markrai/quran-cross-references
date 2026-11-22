@@ -5,7 +5,7 @@ import { verseIndex } from '../../../test-utils/fixtures.ts';
 import { createVizData } from '../../../test-utils/viz-data.ts';
 import { localizationFor } from '../../../i18n/use-locale.tsx';
 import { DEFAULT_LINK_FILTER } from '../link-filter.ts';
-import { buildVerseShareRequest } from '../verse-share.ts';
+import { buildVerseShareRequest } from '../ayah-share.ts';
 import { openVerseShare, VerseShareDialog } from './VerseShareDialog.tsx';
 
 const JOHN_3_16 = verseIndex('John', 3, 16);
@@ -22,7 +22,7 @@ function aRequest() {
   return buildVerseShareRequest({
     data: DATA,
     filter: DEFAULT_LINK_FILTER,
-    verse: JOHN_3_16,
+    ayah: JOHN_3_16,
     url: URL_OF_VERSE,
     localization: localizationFor('en'),
   });
@@ -77,21 +77,21 @@ async function open() {
   return request;
 }
 
-describe('the verse share dialog', () => {
+describe('the ayah share dialog', () => {
   it('does nothing when nothing is mounted to open', () => {
     expect(() => {
       openVerseShare(aRequest());
     }).not.toThrow();
   });
 
-  it('opens on a verse and names it', async () => {
+  it('opens on a ayah and names it', async () => {
     mountDialog();
     await open();
     expect(screen.getByRole('heading', { name: 'John 3:16' })).toBeTruthy();
   });
 
   /** A modal with no accessible name is announced as "dialog" and nothing else. */
-  it('tells a screen reader which verse it is about', async () => {
+  it('tells a screen reader which ayah it is about', async () => {
     mountDialog();
     await open();
     const dialog = document.querySelector('dialog');
@@ -116,7 +116,7 @@ describe('the verse share dialog', () => {
     expect(screen.queryByRole('link', { name: /Save image/ })).toBeNull();
   });
 
-  it('copies the verse itself, with its reference and a link', async () => {
+  it('copies the ayah itself, with its reference and a link', async () => {
     mountDialog();
     await open();
     await userEvent.click(screen.getByRole('button', { name: 'Copy text' }));
@@ -343,7 +343,7 @@ describe('the verse share dialog', () => {
     });
   });
 
-  it('lets the card go when it closes, rather than holding a bitmap per verse', async () => {
+  it('lets the card go when it closes, rather than holding a bitmap per ayah', async () => {
     mountDialog();
     await open();
     await screen.findByRole('img', { name: /John 3:16/ });

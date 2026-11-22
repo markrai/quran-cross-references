@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { CANONICAL_VERSIFICATION } from '../../../core/bible/versification.ts';
+import { CANONICAL_QURAN } from '../../../core/quran/quran-versification.ts';
 import type { OriginalWordColumns } from '../../../core/datasets/formats.ts';
 import { createTranslationFile, verseIndex } from '../../../test-utils/fixtures.ts';
 import { getTranslationManifest } from '../../../translations/registry.ts';
@@ -9,7 +9,7 @@ import { Translation } from '../../../translations/translation.ts';
 import { getWordSourceManifest } from '../../../words/registry.ts';
 import { OriginalWordIndex } from '../../../words/original-words.ts';
 import type { OriginalWordsDataset } from '../../../words/load-original-words.ts';
-import { computeVerseGenres } from '../verse-genres.ts';
+import { computeVerseGenres } from '../ayah-genres.ts';
 import type { VizData } from '../viz-data.ts';
 import { OriginalWordsSection } from './OriginalWordsSection.tsx';
 
@@ -26,7 +26,7 @@ function columns(): OriginalWordColumns {
     transliteration: ['plēthos', 'bara', 'reshit'],
     gloss: ['multitude', 'to create', 'beginning'],
     offsets: [0, 2, 3, 5],
-    verses: [LUKE_5_6, ACTS_5_14, GEN_1_1, GEN_1_1, GEN_49_3].map(Number),
+    ayahs: [LUKE_5_6, ACTS_5_14, GEN_1_1, GEN_1_1, GEN_49_3].map(Number),
   };
 }
 
@@ -41,18 +41,18 @@ function dataset(): OriginalWordsDataset {
     },
     notices: [],
     maxVerses: 100,
-    index: new OriginalWordIndex(columns(), CANONICAL_VERSIFICATION.verseCount),
+    index: new OriginalWordIndex(columns(), CANONICAL_QURAN.ayahCount),
   };
 }
 
 const data = {
-  versification: CANONICAL_VERSIFICATION,
+  versification: CANONICAL_QURAN,
   translation: new Translation(
     getTranslationManifest('bsb'),
-    CANONICAL_VERSIFICATION,
+    CANONICAL_QURAN,
     createTranslationFile(),
   ),
-  verseGenres: computeVerseGenres(CANONICAL_VERSIFICATION),
+  verseGenres: computeVerseGenres(CANONICAL_QURAN),
 } as unknown as VizData;
 
 // `vi.mock` is hoisted above the file, so its state has to be hoisted with it.
@@ -85,8 +85,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function renderSection(verse = GEN_1_1) {
-  return render(<OriginalWordsSection verse={verse} data={data} onSelect={vi.fn()} />);
+function renderSection(ayah = GEN_1_1) {
+  return render(<OriginalWordsSection ayah={ayah} data={data} onSelect={vi.fn()} />);
 }
 
 describe('OriginalWordsSection', () => {
@@ -109,7 +109,7 @@ describe('OriginalWordsSection', () => {
     expect(await screen.findByRole('heading', { name: /Greek/i })).toBeDefined();
   });
 
-  it("lists the verse's words, rarest first, with how it sounds and what it means", async () => {
+  it("lists the ayah's words, rarest first, with how it sounds and what it means", async () => {
     renderSection(GEN_1_1);
     const words = await screen.findAllByRole('button', { name: /bara|reshit/ });
     expect(words[0]?.textContent).toContain('בָּרָא');
@@ -123,7 +123,7 @@ describe('OriginalWordsSection', () => {
     expect(document.querySelector('strong[lang="he"]')).not.toBeNull();
   });
 
-  it('opens a word to show every verse that uses it', async () => {
+  it('opens a word to show every ayah that uses it', async () => {
     renderSection(ACTS_5_14);
     const word = await screen.findByRole('button', { name: /plēthos/ });
     await userEvent.click(word);
@@ -143,7 +143,7 @@ describe('OriginalWordsSection', () => {
     renderSection(GEN_1_1);
     const [first, second] = await screen.findAllByRole('button', { name: /bara|reshit/ });
     if (!first || !second) {
-      throw new Error('Expected both words of the verse.');
+      throw new Error('Expected both words of the ayah.');
     }
     await userEvent.click(first);
     await userEvent.click(second);
@@ -151,15 +151,15 @@ describe('OriginalWordsSection', () => {
     expect(second.getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('follows a verse when it is chosen', async () => {
+  it('follows a ayah when it is chosen', async () => {
     const onSelect = vi.fn();
-    render(<OriginalWordsSection verse={ACTS_5_14} data={data} onSelect={onSelect} />);
+    render(<OriginalWordsSection ayah={ACTS_5_14} data={data} onSelect={onSelect} />);
     await userEvent.click(await screen.findByRole('button', { name: /plēthos/ }));
     await userEvent.click(screen.getByText(/Luke 5:6/).closest('button') as HTMLElement);
-    expect(onSelect).toHaveBeenCalledWith({ kind: 'verse', verse: LUKE_5_6 });
+    expect(onSelect).toHaveBeenCalledWith({ kind: 'ayah', ayah: LUKE_5_6 });
   });
 
-  it('marks the verse being read, among the others', async () => {
+  it('marks the ayah being read, among the others', async () => {
     renderSection(ACTS_5_14);
     await userEvent.click(await screen.findByRole('button', { name: /plēthos/ }));
     expect(document.querySelector('[aria-current="true"]')?.textContent).toContain('Acts 5:14');
@@ -169,7 +169,7 @@ describe('OriginalWordsSection', () => {
     renderSection();
     expect(await screen.findByText(/STEP Bible/)).toBeDefined();
     expect(screen.getByText(/Tyndale House/)).toBeDefined();
-    expect(screen.getByText(/more than 100 verses are left out/)).toBeDefined();
+    expect(screen.getByText(/more than 100 ayahs are left out/)).toBeDefined();
   });
 
   it('keeps the credit visible when the section is folded away', async () => {
@@ -179,17 +179,17 @@ describe('OriginalWordsSection', () => {
     expect(screen.getByText(/STEP Bible/)).toBeDefined();
   });
 
-  it('shows nothing for a verse with no words of its own', async () => {
+  it('shows nothing for a ayah with no words of its own', async () => {
     state.loaded = dataset();
     const { container } = render(
-      <OriginalWordsSection verse={verseIndex('Rev', 22, 21)} data={data} onSelect={vi.fn()} />,
+      <OriginalWordsSection ayah={verseIndex('Rev', 22, 21)} data={data} onSelect={vi.fn()} />,
     );
     await waitFor(() => {
       expect(container.textContent).toBe('');
     });
   });
 
-  it('forgets a failed download, so the next verse tries again', async () => {
+  it('forgets a failed download, so the next ayah tries again', async () => {
     state.shouldFail = true;
     renderSection();
     await waitFor(() => {

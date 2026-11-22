@@ -1,97 +1,56 @@
-import type { VerseIndex } from '../core/bible/verse-ref.ts';
-import type { Versification } from '../core/bible/versification.ts';
-import type {
-  DatasetProvenance,
-  ImportNotice,
-  TranslationTextFile,
-} from '../core/datasets/formats.ts';
+import type { AyahIndex } from '../core/quran/ayah-ref.ts';
+import type { QuranVersification } from '../core/quran/quran-versification.ts';
+import type { DatasetProvenance, ImportNotice, TranslationTextFile } from '../core/datasets/formats.ts';
 import { elementAt } from '../core/lib/array.ts';
 import type { TranslationManifest } from './translation-manifest.ts';
 
 export interface TextSearchResult {
-  /** Total number of matching verses. */
   readonly totalCount: number;
-  /** Matching verses in canonical order, at most `limit` of them. */
-  readonly verses: readonly VerseIndex[];
+  readonly ayahs: readonly AyahIndex[];
 }
 
-/**
- * Normalizes text for case- and quote-style-insensitive matching (`God’s` matches `god's`).
- *
- * Square brackets go too. They mark the words a translator supplied and are kept in the text on
- * purpose, but nobody searching for "the Lord is my shepherd" types the brackets the KJV puts
- * around `[is]` — leaving them in makes every phrase that crosses a supplied word unfindable.
- */
 export function normalizeForSearch(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[‘’]/g, "'")
-    .replace(/[“”]/g, '"')
-    .replace(/[[\]]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return text.toLowerCase().replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim();
 }
 
-/** A bundled translation's full text, addressed by verse index. */
+/** The paired, independently attributed Arabic Quran text and English rendering. */
 export class Translation {
   readonly manifest: TranslationManifest;
-  readonly versification: Versification;
+  readonly versification: QuranVersification;
   readonly provenance: DatasetProvenance;
   readonly notices: readonly ImportNotice[];
+  readonly #arabic: readonly string[];
+  readonly #english: readonly string[];
+  #searchableEnglish: readonly string[] | undefined;
 
-  readonly #verses: readonly string[];
-  #searchableVerses: readonly string[] | undefined;
-
-  /** `file` must be validated against the manifest (see `parseTranslationTextFile`). */
-  constructor(
-    manifest: TranslationManifest,
-    versification: Versification,
-    file: TranslationTextFile,
-  ) {
-    if (file.verses.length !== versification.verseCount) {
-      throw new Error(
-        `Translation "${manifest.id}" has ${file.verses.length} verses, ` +
-          `expected ${versification.verseCount}.`,
-      );
+  constructor(manifest: TranslationManifest, versification: QuranVersification, file: TranslationTextFile) {
+    if (file.arabic.length !== versification.ayahCount || file.ayahs.length !== versification.ayahCount) {
+      throw new Error(`Quran text has ${String(file.arabic.length)} Arabic and ${String(file.ayahs.length)} English ayahs; expected ${String(versification.ayahCount)}.`);
     }
     this.manifest = manifest;
     this.versification = versification;
     this.provenance = file.provenance;
     this.notices = file.notices;
-    this.#verses = file.verses;
+    this.#arabic = file.arabic;
+    this.#english = file.ayahs;
   }
 
-  get verseCount(): number {
-    return this.#verses.length;
-  }
+  get ayahCount(): number { return this.#english.length; }
+  arabicText(index: AyahIndex): string { return elementAt(this.#arabic, index); }
+  englishText(index: AyahIndex): string { return elementAt(this.#english, index); }
 
-  /** Text of the verse, or an empty string if the translation omits it. */
-  verseText(index: VerseIndex): string {
-    return elementAt(this.#verses, index);
-  }
-
-  isOmitted(index: VerseIndex): boolean {
-    return this.verseText(index) === '';
-  }
-
-  /** Finds verses containing `query` (case-insensitive, ignoring quote styles). */
   search(query: string, limit: number): TextSearchResult {
     const needle = normalizeForSearch(query);
-    if (needle === '') {
-      return { totalCount: 0, verses: [] };
-    }
-    this.#searchableVerses ??= this.#verses.map(normalizeForSearch);
-
-    const verses: VerseIndex[] = [];
+    if (needle === '') return { totalCount: 0, ayahs: [] };
+    this.#searchableEnglish ??= this.#english.map(normalizeForSearch);
+    const ayahs: AyahIndex[] = [];
     let totalCount = 0;
-    this.#searchableVerses.forEach((text, index) => {
+    this.#searchableEnglish.forEach((text, index) => {
       if (text.includes(needle)) {
         totalCount += 1;
-        if (verses.length < limit) {
-          verses.push(index);
-        }
+        if (ayahs.length < limit) ayahs.push(index);
       }
     });
-    return { totalCount, verses };
+    return { totalCount, ayahs };
   }
 }

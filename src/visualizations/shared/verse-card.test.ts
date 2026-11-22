@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { CARD_HEIGHT, CARD_WIDTH, paintVerseCard, type VerseCardInput } from './verse-card.ts';
+import { CARD_HEIGHT, CARD_WIDTH, paintVerseCard, type VerseCardInput } from './ayah-card.ts';
 
 /**
  * A canvas that writes down what it was asked to draw instead of drawing it.
  *
- * The card is the one thing the app produces that leaves it — once a verse is in somebody's
- * WhatsApp there is no fixing it — and three of the things on it are not decoration: the verse,
+ * The card is the one thing the app produces that leaves it — once a ayah is in somebody's
+ * WhatsApp there is no fixing it — and three of the things on it are not decoration: the ayah,
  * the attribution the licences require, and the address that brings a reader back. A recording
  * context is how those can be asserted without a GPU, and it is testing the painter rather than
  * the mock, because what is asserted is the text and the colors it was given.
@@ -133,7 +133,7 @@ function recordingContext() {
 }
 
 const GENRE_HEX = ['#e2679c', '#e0763c', '#d8b945', '#b86fc4', '#3ba894', '#5590d6'];
-/** Six verses, one per genre, so a target's color is unambiguous in the assertions. */
+/** Six ayahs, one per genre, so a target's color is unambiguous in the assertions. */
 const VERSE_GENRES = new Uint8Array([0, 1, 2, 3, 4, 5]);
 
 function anInput(over: Partial<VerseCardInput> = {}): VerseCardInput {
@@ -141,12 +141,12 @@ function anInput(over: Partial<VerseCardInput> = {}): VerseCardInput {
     reference: 'Psalm 16:8',
     localeTag: 'en',
     landmarks: [
-      { label: 'Gen', verse: 0, genre: 0 },
-      { label: 'Acts', verse: 4, genre: 4 },
+      { label: 'Gen', ayah: 0, genre: 0 },
+      { label: 'Acts', ayah: 4, genre: 4 },
     ],
     testamentAt: 3,
     text: 'I have set the LORD always before me.',
-    verse: 2,
+    ayah: 2,
     targets: [0, 4, 5],
     verseGenres: VERSE_GENRES,
     totalVerses: 6,
@@ -178,7 +178,7 @@ describe('what the card says', () => {
     expect(said(painted)).not.toContain('Berean Standard Bible (BSB) · Public domain');
   });
 
-  it('names the verse, in the reader’s own language and in capitals', () => {
+  it('names the ayah, in the reader’s own language and in capitals', () => {
     expect(said(paint({ reference: 'João 3:16' }).painted)).toContain('JOÃO 3:16');
   });
 
@@ -192,7 +192,7 @@ describe('what the card says', () => {
     expect(said(painted)).toContain('trekhleb.dev/bible-cross-references/pt');
   });
 
-  it('sets the whole verse, losing no word to the line breaking', () => {
+  it('sets the whole ayah, losing no word to the line breaking', () => {
     const { painted } = paint();
     const verseLines = painted.filter((one) => one.font.includes('Iowan'));
     expect(verseLines.length).toBeGreaterThan(0);
@@ -201,7 +201,7 @@ describe('what the card says', () => {
     );
   });
 
-  it('sets a long verse too, at a smaller size rather than not at all', () => {
+  it('sets a long ayah too, at a smaller size rather than not at all', () => {
     const long = 'And '.repeat(90).trim();
     const { painted } = paint({ text: long });
     const verseLines = painted.filter((one) => one.font.includes('Iowan'));
@@ -246,17 +246,17 @@ describe('how the card is laid out', () => {
     expect(credit.map((one) => one.text).join(' ')).toBe(long);
   });
 
-  it('colors the reference by the book it is in', () => {
+  it('colors the reference by the surah it is in', () => {
     const reference = paint().painted.find((one) => one.text === 'PSALM 16:8');
-    // Verse 2 is the third genre in the fixture.
+    // Ayah 2 is the third genre in the fixture.
     expect(reference?.fill).toBe('#d8b945');
   });
 
-  it('tracks the reference out and then stops, so the verse is not spaced too', () => {
+  it('tracks the reference out and then stops, so the ayah is not spaced too', () => {
     const { painted } = paint();
     expect(painted.find((one) => one.text === 'PSALM 16:8')?.spacing).toBe('0.16em');
-    const verse = painted.find((one) => one.font.includes('Iowan'));
-    expect(verse?.spacing).toBe('0px');
+    const ayah = painted.find((one) => one.font.includes('Iowan'));
+    expect(ayah?.spacing).toBe('0px');
   });
 
   it('puts the address back to the left after setting it right, for whatever draws next', () => {
@@ -266,11 +266,11 @@ describe('how the card is laid out', () => {
     expect(paint().context.textAlign).toBe('left');
   });
 
-  it('sets the footer below the verse, not over it', () => {
+  it('sets the footer below the ayah, not over it', () => {
     const { painted } = paint();
-    const verse = painted.filter((one) => one.font.includes('Iowan'));
+    const ayah = painted.filter((one) => one.font.includes('Iowan'));
     const attribution = painted.find((one) => one.text.includes('Public domain'));
-    const lowestVerseLine = Math.max(...verse.map((one) => one.y));
+    const lowestVerseLine = Math.max(...ayah.map((one) => one.y));
     expect(attribution?.y).toBeGreaterThan(lowestVerseLine);
   });
 });
@@ -286,8 +286,8 @@ describe('the arcs on the card', () => {
     expect(curves.map((curve) => curve.stroke)).toEqual(['#e2679c', '#3ba894', '#5590d6']);
   });
 
-  it('starts every arc at the verse, and ends it where the link does', () => {
-    const { curves } = paint({ verse: 2, targets: [0, 5] });
+  it('starts every arc at the ayah, and ends it where the link does', () => {
+    const { curves } = paint({ ayah: 2, targets: [0, 5] });
     const starts = new Set(curves.map((curve) => curve.from[0]));
     expect(starts.size).toBe(1);
     // The further link ends further along the line.
@@ -295,13 +295,13 @@ describe('the arcs on the card', () => {
   });
 
   it('arches a far link higher than a near one', () => {
-    const { curves } = paint({ verse: 0, targets: [1, 5] });
+    const { curves } = paint({ ayah: 0, targets: [1, 5] });
     const [near, far] = curves;
     expect(far?.control[1]).toBeLessThan(near?.control[1] ?? 0);
   });
 
-  it('keeps the arcs under the verse and inside the card', () => {
-    const { curves } = paint({ verse: 0, targets: [5] });
+  it('keeps the arcs under the ayah and inside the card', () => {
+    const { curves } = paint({ ayah: 0, targets: [5] });
     for (const curve of curves) {
       expect(curve.control[1]).toBeGreaterThan(0);
       expect(curve.from[1]).toBeLessThan(CARD_HEIGHT);
@@ -330,14 +330,14 @@ describe('the arcs on the card', () => {
     expect(markCurves.length).toBeGreaterThan(0);
   });
 
-  it('marks which verse it is', () => {
-    const { arcs, curves } = paint({ verse: 2, targets: [0] });
+  it('marks which ayah it is', () => {
+    const { arcs, curves } = paint({ ayah: 2, targets: [0] });
     const dot = arcs.at(-1);
     expect(dot?.fill).toBe('#ecebe6');
     expect(dot?.x).toBeCloseTo(curves[0]?.from[0] ?? -1, 5);
   });
 
-  it('still draws the Bible and the footer for a verse nothing points at', () => {
+  it('still draws the Bible and the footer for a ayah nothing points at', () => {
     const { curves, lines, painted } = paint({ targets: [], countLabel: '0 cross-references' });
     expect(curves).toHaveLength(0);
     expect(lines.filter((line) => line.width > 2).length).toBe(GENRE_HEX.length);
@@ -346,7 +346,7 @@ describe('the arcs on the card', () => {
   });
 });
 
-describe('the books the card names', () => {
+describe('the surahs the card names', () => {
   it('names each one the arcs reach', () => {
     expect(said(paint().painted)).toEqual(expect.arrayContaining(['Gen', 'Acts']));
   });
@@ -374,9 +374,9 @@ describe('the books the card names', () => {
   it('drops a name rather than letting it collide with its neighbour', () => {
     const crowded = paint({
       landmarks: [
-        { label: 'Gen', verse: 0, genre: 0 },
-        { label: 'Exod', verse: 0, genre: 1 },
-        { label: 'Acts', verse: 5, genre: 4 },
+        { label: 'Gen', ayah: 0, genre: 0 },
+        { label: 'Exod', ayah: 0, genre: 1 },
+        { label: 'Acts', ayah: 5, genre: 4 },
       ],
     });
     const names = said(crowded.painted);
@@ -392,7 +392,7 @@ describe('the books the card names', () => {
     expect(tick?.from[1]).toBeLessThan(tick?.to[1] ?? 0);
   });
 
-  it('draws a card for a verse whose links reach nowhere worth naming', () => {
+  it('draws a card for a ayah whose links reach nowhere worth naming', () => {
     const { painted, curves } = paint({ landmarks: [], targets: [] });
     expect(curves).toHaveLength(0);
     expect(said(painted)).toContain('3 cross-references');

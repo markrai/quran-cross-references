@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_VERSIFICATION } from '../../../core/bible/versification.ts';
+import { CANONICAL_QURAN } from '../../../core/quran/quran-versification.ts';
 import { createTranslationFile, verseIndex } from '../../../test-utils/fixtures.ts';
 import { getTranslationManifest } from '../../../translations/registry.ts';
 import { Translation } from '../../../translations/translation.ts';
@@ -19,7 +19,7 @@ describe('computeTranslationStats', () => {
     const shortest = verseIndex('John', 11, 35);
     const translation = new Translation(
       getTranslationManifest('bsb'),
-      CANONICAL_VERSIFICATION,
+      CANONICAL_QURAN,
       createTranslationFile(
         new Map([
           [0, 'one two three four five six seven eight nine ten'],
@@ -30,17 +30,17 @@ describe('computeTranslationStats', () => {
     );
     const stats = computeTranslationStats(translation);
 
-    // Every other verse reads "Verse number <n>." (3 words).
-    const regularVerseCount = 31102 - 3;
+    // Every other ayah reads "Ayah number <n>." (3 words).
+    const regularAyahCount = 31102 - 3;
     expect(stats).toMatchObject({
-      verseCount: 31102,
-      textVerseCount: 31101,
+      ayahCount: 31102,
+      textAyahCount: 31101,
       omittedVerses: [omitted],
       bookCount: 66,
       chapterCount: 1189,
-      wordCount: regularVerseCount * 3 + 10 + 2,
-      longestVerse: { verse: 0, value: 10 },
-      shortestVerse: { verse: shortest, value: 2 },
+      wordCount: regularAyahCount * 3 + 10 + 2,
+      longestVerse: { ayah: 0, value: 10 },
+      shortestVerse: { ayah: shortest, value: 2 },
     });
   });
 });

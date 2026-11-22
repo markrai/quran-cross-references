@@ -3,7 +3,7 @@ import { verseIndex } from '../../test-utils/fixtures.ts';
 import { createVizData } from '../../test-utils/viz-data.ts';
 import { ENGLISH, localizationFor } from '../../i18n/use-locale.tsx';
 import { DEFAULT_LINK_FILTER } from './link-filter.ts';
-import { buildVerseShareRequest, siteOf } from './verse-share.ts';
+import { buildVerseShareRequest, siteOf } from './ayah-share.ts';
 
 const JOHN_3_16 = verseIndex('John', 3, 16);
 const ROM_5_8 = verseIndex('Rom', 5, 8);
@@ -25,21 +25,21 @@ function request(locale: 'en' | 'pt' = 'en') {
   return buildVerseShareRequest({
     data: DATA,
     filter: DEFAULT_LINK_FILTER,
-    verse: JOHN_3_16,
+    ayah: JOHN_3_16,
     url: 'https://trekhleb.dev/bible-cross-references/?ref=John.3.16',
     localization: localizationFor(locale),
   });
 }
 
 describe('buildVerseShareRequest', () => {
-  it('names the verse and carries its words', () => {
+  it('names the ayah and carries its words', () => {
     const card = request();
     expect(card.reference).toBe('John 3:16');
     expect(card.text).toBe('For God so loved the world…');
-    expect(card.verse).toBe(JOHN_3_16);
+    expect(card.ayah).toBe(JOHN_3_16);
   });
 
-  it('draws every link of the verse, in both directions', () => {
+  it('draws every link of the ayah, in both directions', () => {
     // One link out to Romans 5:8–9 and one in from Genesis 1:1.
     const { targets } = request();
     expect(targets).toHaveLength(2);
@@ -77,7 +77,7 @@ describe('buildVerseShareRequest', () => {
     expect(attribution.length).toBeGreaterThan(40);
   });
 
-  it('quotes the verse with its reference and the link, for the reader who wants words', () => {
+  it('quotes the ayah with its reference and the link, for the reader who wants words', () => {
     const { quote } = request();
     expect(quote.text).toContain('For God so loved the world…');
     expect(quote.text).toContain('John 3:16 (BSB)');
@@ -87,7 +87,7 @@ describe('buildVerseShareRequest', () => {
   it('reads the picture’s colors from the same genres the app draws from', () => {
     const card = request();
     expect(card.verseGenres).toBe(DATA.verseGenres);
-    expect(card.totalVerses).toBe(DATA.versification.verseCount);
+    expect(card.totalVerses).toBe(DATA.versification.ayahCount);
     expect(card.genreHex.length).toBeGreaterThan(0);
   });
 });
@@ -110,8 +110,8 @@ describe('siteOf', () => {
   });
 });
 
-describe('the books a card names', () => {
-  it('names the books its links reach, by their short forms', () => {
+describe('the surahs a card names', () => {
+  it('names the surahs its links reach, by their short forms', () => {
     const { landmarks } = request();
     expect(landmarks.map((one) => one.label)).toEqual(expect.arrayContaining(['Gen', 'Rom']));
   });
@@ -127,12 +127,12 @@ describe('the books a card names', () => {
   });
 
   it('puts them in the order they fall in the Bible, so the line reads left to right', () => {
-    const verses = request().landmarks.map((one) => one.verse);
-    expect([...verses].sort((a, b) => a - b)).toEqual(verses);
+    const ayahs = request().landmarks.map((one) => one.ayah);
+    expect([...ayahs].sort((a, b) => a - b)).toEqual(ayahs);
   });
 
   it('marks the New Testament where Matthew starts', () => {
     const { testamentAt } = request();
-    expect(DATA.versification.refAt(testamentAt)).toMatchObject({ book: 'Matt', chapter: 1 });
+    expect(DATA.versification.refAt(testamentAt)).toMatchObject({ surah: 'Matt', surah: 1 });
   });
 });

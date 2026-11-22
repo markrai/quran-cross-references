@@ -1,11 +1,11 @@
-import { CARD_HEIGHT, CARD_WIDTH, paintVerseCard, type VerseCardInput } from './verse-card.ts';
+import { CARD_HEIGHT, CARD_WIDTH, paintVerseCard, type VerseCardInput } from './ayah-card.ts';
 
 /**
  * The card as a PNG, ready to hand to the system share sheet.
  *
  * Only the canvas and the encoding live here; what is drawn is `paintVerseCard`, which is tested.
  * The fonts are awaited first — a card drawn before the serif has loaded is set in Times, and
- * nobody looks at the same verse twice to find out it looks better now.
+ * nobody looks at the same ayah twice to find out it looks better now.
  */
 export async function renderVerseCard(input: VerseCardInput): Promise<Blob> {
   await document.fonts.ready;

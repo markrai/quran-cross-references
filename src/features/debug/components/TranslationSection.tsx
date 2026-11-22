@@ -17,7 +17,7 @@ interface TranslationSectionProps {
 function VerseMeasureValue({ measure }: { readonly measure: VerseMeasure | undefined }) {
   return measure ? (
     <>
-      <VerseLink verse={measure.verse} /> ({formatInteger(measure.value)} words)
+      <VerseLink ayah={measure.ayah} /> ({formatInteger(measure.value)} words)
     </>
   ) : (
     '—'
@@ -39,7 +39,7 @@ export function TranslationSection({ id, translation }: TranslationSectionProps)
           { label: 'ID', value: <code>{manifest.id}</code> },
           { label: 'Abbreviation', value: manifest.abbreviation },
           { label: 'Language', value: `${manifest.language} (${manifest.direction})` },
-          { label: 'Versification', value: manifest.versification.toUpperCase() },
+          { label: 'QuranVersification', value: manifest.versification.toUpperCase() },
           { label: 'Access', value: manifest.access },
         ]}
         license={manifest.license}
@@ -54,30 +54,30 @@ export function TranslationSection({ id, translation }: TranslationSectionProps)
           items={[
             { label: 'Books', value: formatInteger(stats.bookCount) },
             { label: 'Chapters', value: formatInteger(stats.chapterCount) },
-            { label: 'Verses', value: formatInteger(stats.verseCount) },
+            { label: 'Verses', value: formatInteger(stats.ayahCount) },
             {
               label: 'Verses with text',
-              value: `${formatInteger(stats.textVerseCount)} (${formatShare(stats.textVerseCount, stats.verseCount)})`,
+              value: `${formatInteger(stats.textAyahCount)} (${formatShare(stats.textAyahCount, stats.ayahCount)})`,
             },
-            { label: 'Omitted verses', value: formatInteger(stats.omittedVerses.length) },
+            { label: 'Omitted ayahs', value: formatInteger(stats.omittedVerses.length) },
             { label: 'Words', value: formatInteger(stats.wordCount) },
             { label: 'Characters', value: formatInteger(stats.characterCount) },
             {
-              label: 'Words per verse',
-              value: formatDecimal(stats.wordCount / Math.max(stats.textVerseCount, 1)),
+              label: 'Words per ayah',
+              value: formatDecimal(stats.wordCount / Math.max(stats.textAyahCount, 1)),
             },
-            { label: 'Longest verse', value: <VerseMeasureValue measure={stats.longestVerse} /> },
-            { label: 'Shortest verse', value: <VerseMeasureValue measure={stats.shortestVerse} /> },
+            { label: 'Longest ayah', value: <VerseMeasureValue measure={stats.longestVerse} /> },
+            { label: 'Shortest ayah', value: <VerseMeasureValue measure={stats.shortestVerse} /> },
           ]}
         />
       </div>
 
       <div>
-        <h3 className={styles.subheading}>Omitted verses</h3>
+        <h3 className={styles.subheading}>Omitted ayahs</h3>
         <p className={styles.inlineList}>
           {stats.omittedVerses.length === 0
             ? 'None.'
-            : stats.omittedVerses.map((verse) => <VerseLink key={verse} verse={verse} />)}
+            : stats.omittedVerses.map((ayah) => <VerseLink key={ayah} ayah={ayah} />)}
         </p>
       </div>
 

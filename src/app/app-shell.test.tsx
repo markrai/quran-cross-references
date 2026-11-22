@@ -73,7 +73,7 @@ describe('mount', () => {
       await Promise.resolve();
     });
     expect(document.body.textContent).toContain('Hello');
-    // The install guide and the verse share sheet: one of each, however many views.
+    // The install guide and the ayah share sheet: one of each, however many views.
     expect(document.querySelectorAll('dialog')).toHaveLength(2);
   });
 
@@ -88,15 +88,15 @@ describe('VizDataBoundary', () => {
   it('shows the data once it has loaded', async () => {
     serve();
     await renderSuspending(
-      <VizDataBoundary>{(core) => <p>{core.versification.verseCount} verses</p>}</VizDataBoundary>,
+      <VizDataBoundary>{(core) => <p>{core.versification.ayahCount} ayahs</p>}</VizDataBoundary>,
     );
-    expect(screen.getByText(/31102 verses/)).toBeDefined();
+    expect(screen.getByText(/31102 ayahs/)).toBeDefined();
   });
 
   it('waits with a loading screen that says what is coming', () => {
     serve();
     render(<VizDataBoundary>{() => <p>done</p>}</VizDataBoundary>);
-    expect(screen.getByText(/Loading 31,102 verses/)).toBeDefined();
+    expect(screen.getByText(/Loading 31,102 ayahs/)).toBeDefined();
   });
 
   it('explains a failed download and offers to try again', async () => {
@@ -153,7 +153,7 @@ describe('VizPage', () => {
 
   it('shows the details panel, with a handle to open it fully', () => {
     render(
-      <VizPage credits={<span>Credits</span>} panel={<p>About this verse</p>}>
+      <VizPage credits={<span>Credits</span>} panel={<p>About this ayah</p>}>
         <canvas />
       </VizPage>,
     );
@@ -163,7 +163,7 @@ describe('VizPage', () => {
 
   it('opens and closes the sheet from its handle', async () => {
     render(
-      <VizPage credits={<span>Credits</span>} panel={<p>About this verse</p>}>
+      <VizPage credits={<span>Credits</span>} panel={<p>About this ayah</p>}>
         <canvas />
       </VizPage>,
     );
@@ -238,7 +238,7 @@ describe('DebugPage', () => {
     expect(screen.getAllByRole('listitem').length).toBeGreaterThan(3);
   });
 
-  // Renders one element per unlinked verse over a whole-Bible fixture, which is slow in
+  // Renders one element per unlinked ayah over a whole-Bible fixture, which is slow in
   // happy-dom and slower again on a loaded CI runner: measured at 7s beside 21 other files.
   it('shows the dashboard once the datasets are there', { timeout: 30_000 }, async () => {
     serve();

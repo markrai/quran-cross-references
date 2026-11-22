@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { CANONICAL_VERSIFICATION } from '../../../core/bible/versification.ts';
+import { CANONICAL_QURAN } from '../../../core/quran/quran-versification.ts';
 import {
   arcPoint,
   bookSegments,
@@ -11,7 +11,7 @@ import {
 } from '../loading-arcs.ts';
 import { GENRE_HEX, GENRE_RGB, type Rgb } from '../palette.ts';
 import { MAX_PIXEL_RATIO } from '../frames.ts';
-import { computeVerseGenres } from '../verse-genres.ts';
+import { computeVerseGenres } from '../ayah-genres.ts';
 import styles from './LoadingArcs.module.css';
 
 interface LoadingArcsProps {
@@ -132,17 +132,17 @@ function paintFlight(
 function paint(
   context: CanvasRenderingContext2D,
   layout: Layout,
-  books: readonly BookSegment[],
+  surahs: readonly BookSegment[],
   flights: readonly (readonly [ArcFlight, FlightFrame])[],
 ): void {
   context.clearRect(0, 0, layout.width, layout.height);
   context.globalCompositeOperation = 'source-over';
   context.globalAlpha = 0.9;
-  for (const book of books) {
-    const width = book.width * layout.axisWidth;
-    context.fillStyle = genreHex(book.genre);
+  for (const surah of surahs) {
+    const width = surah.width * layout.axisWidth;
+    context.fillStyle = genreHex(surah.genre);
     context.fillRect(
-      layout.left + book.start * layout.axisWidth,
+      layout.left + surah.start * layout.axisWidth,
       layout.axisY,
       width > 3 ? width - 1 : width,
       AXIS_THICKNESS,
@@ -159,8 +159,8 @@ function paint(
 }
 
 /**
- * The loading screen, a preview of the Arcs view: over the Bible's axis (its 66 books colored by
- * genre), arcs of light grow from verse to verse, land with a flash and leave a fading trace.
+ * The loading screen, a preview of the Arcs view: over the Bible's axis (its 66 surahs colored by
+ * genre), arcs of light grow from ayah to ayah, land with a flash and leave a fading trace.
  * Readers who prefer reduced motion see a still frame.
  */
 export function LoadingArcs({ label }: LoadingArcsProps) {
@@ -174,8 +174,8 @@ export function LoadingArcs({ label }: LoadingArcsProps) {
     if (!stage || !canvas || !context) {
       return undefined;
     }
-    const books = bookSegments(CANONICAL_VERSIFICATION);
-    const verseGenres = computeVerseGenres(CANONICAL_VERSIFICATION);
+    const surahs = bookSegments(CANONICAL_QURAN);
+    const verseGenres = computeVerseGenres(CANONICAL_QURAN);
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // The canvas bleeds past the stage (see the CSS), so glows near its edges are not clipped.
@@ -228,16 +228,16 @@ export function LoadingArcs({ label }: LoadingArcsProps) {
         if (flight && frame) frames.push([flight, frame]);
         else flights.splice(index, 1);
       }
-      paint(context, layout, books, frames);
+      paint(context, layout, surahs, frames);
       frameRequest = requestAnimationFrame(tick);
     };
 
     const observer = new ResizeObserver(() => {
       layout = measure();
-      if (reducedMotion) paint(context, layout, books, still);
+      if (reducedMotion) paint(context, layout, surahs, still);
     });
     observer.observe(stage);
-    if (reducedMotion) paint(context, layout, books, still);
+    if (reducedMotion) paint(context, layout, surahs, still);
     else frameRequest = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(frameRequest);

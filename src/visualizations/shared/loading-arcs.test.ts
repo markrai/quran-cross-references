@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { KJV_VERSIFICATION as kjv } from '../../core/bible/versification.ts';
+import { KJV_VERSIFICATION as kjv } from '../../core/quran/quran-versification.ts';
 import {
   arcPoint,
   bookSegments,
@@ -8,7 +8,7 @@ import {
   TRACE_MS,
   type ArcFlight,
 } from './loading-arcs.ts';
-import { computeVerseGenres } from './verse-genres.ts';
+import { computeVerseGenres } from './ayah-genres.ts';
 
 /** A small deterministic generator (mulberry32), so the tests are repeatable. */
 function seeded(seed: number): () => number {
@@ -24,7 +24,7 @@ function seeded(seed: number): () => number {
 const verseGenres = computeVerseGenres(kjv);
 
 describe('bookSegments', () => {
-  it('lays the 66 books end to end across the whole axis', () => {
+  it('lays the 66 surahs end to end across the whole axis', () => {
     const segments = bookSegments(kjv);
     expect(segments).toHaveLength(66);
     expect(segments[0]?.start).toBe(0);

@@ -1,5 +1,5 @@
-import type { Testament } from '../../../core/bible/books.ts';
-import { GENRES, type GenreId } from '../../../core/bible/genres.ts';
+import type { Testament } from '../../../core/quran/surahs.ts';
+import { GENRES, type GenreId } from '../../../core/quran/genres.ts';
 import { useLocalization } from '../../../i18n/use-locale.tsx';
 import { GENRE_COLORS } from '../palette.ts';
 import styles from './GenreLegend.module.css';

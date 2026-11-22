@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createCrossReferenceColumns } from '../test-utils/fixtures.ts';
 import { CrossReferenceIndex, CrossReferenceIntegrityError } from './cross-reference-index.ts';
 
-// A toy versification of 6 verses (indices 0–5).
+// A toy versification of 6 ayahs (indices 0–5).
 const VERSE_COUNT = 6;
 
 function createIndex() {
@@ -32,7 +32,7 @@ describe('CrossReferenceIndex', () => {
     expect(index.outgoingCount(0)).toBe(2);
   });
 
-  it('indexes incoming links under every verse of the target range', () => {
+  it('indexes incoming links under every ayah of the target range', () => {
     const index = createIndex();
     expect(index.incoming(3).map((link) => link.from)).toEqual([0, 0]);
     expect(index.incoming(2).map((link) => link.from)).toEqual([0]);

@@ -1,5 +1,5 @@
-import { CANONICAL_VERSIFICATION } from '../core/bible/versification.ts';
-import type { VerseIndex } from '../core/bible/verse-ref.ts';
+import { CANONICAL_QURAN } from '../core/quran/quran-versification.ts';
+import type { AyahIndex } from '../core/quran/ayah-ref.ts';
 import { CrossReferenceIndex } from '../cross-references/cross-reference-index.ts';
 import type { CrossReferenceDataset } from '../cross-references/load-cross-references.ts';
 import type { DebugData } from '../features/debug/debug-data.ts';
@@ -10,7 +10,7 @@ import { createCrossReferenceColumns, createTranslationFile, PROVENANCE } from '
 import type { LinkSpec } from './fixtures.ts';
 
 /**
- * The debug page draws one element per unlinked verse, so a fixture over the whole Bible would
+ * The debug page draws one element per unlinked ayah, so a fixture over the whole Bible would
  * build 31,000 of them for every test. These stop after Genesis 2: the code paths are the same,
  * and a test that renders them finishes in milliseconds.
  */
@@ -27,7 +27,7 @@ export function createLoadReport(path: string): DatasetLoadReport {
   };
 }
 
-/** A cross-reference dataset over the first few dozen verses of Genesis. */
+/** A cross-reference dataset over the first few dozen ayahs of Genesis. */
 export function createCrossReferenceDataset(links: readonly LinkSpec[]): CrossReferenceDataset {
   return {
     manifest: {
@@ -51,21 +51,21 @@ export function createCrossReferenceDataset(links: readonly LinkSpec[]): CrossRe
 }
 
 /**
- * A dataset over the whole Bible, cheap because it leaves no verse unlinked: the page's one
- * element per unlinked verse is what makes a full-size fixture expensive, not the links.
+ * A dataset over the whole Bible, cheap because it leaves no ayah unlinked: the page's one
+ * element per unlinked ayah is what makes a full-size fixture expensive, not the links.
  */
 export function createWholeBibleDataset(): CrossReferenceDataset {
-  const links = Array.from({ length: CANONICAL_VERSIFICATION.verseCount - 1 }, (_, verse) => ({
-    from: verse,
-    to: verse + 1,
-    votes: verse % 50,
+  const links = Array.from({ length: CANONICAL_QURAN.ayahCount - 1 }, (_, ayah) => ({
+    from: ayah,
+    to: ayah + 1,
+    votes: ayah % 50,
   }));
   return {
     ...createCrossReferenceDataset([]),
     sourceRowCount: links.length,
     index: new CrossReferenceIndex(
       createCrossReferenceColumns(links),
-      CANONICAL_VERSIFICATION.verseCount,
+      CANONICAL_QURAN.ayahCount,
     ),
   };
 }
@@ -73,15 +73,15 @@ export function createWholeBibleDataset(): CrossReferenceDataset {
 /** Everything the debug dashboard loads, small enough to render in a test. */
 export function createDebugData(
   links: readonly LinkSpec[] = [],
-  verses: ReadonlyMap<VerseIndex, string> = new Map(),
+  ayahs: ReadonlyMap<AyahIndex, string> = new Map(),
   dataset: CrossReferenceDataset = createCrossReferenceDataset(links),
 ): DebugData {
   return {
     translation: {
       translation: new Translation(
         getTranslationManifest('bsb'),
-        CANONICAL_VERSIFICATION,
-        createTranslationFile(verses),
+        CANONICAL_QURAN,
+        createTranslationFile(ayahs),
       ),
       report: createLoadReport('translations/bsb.json'),
     },

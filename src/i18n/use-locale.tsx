@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import type { GenreId } from '../core/bible/genres.ts';
+import type { GenreId } from '../core/quran/genres.ts';
 import { formatInteger, formatShare } from '../shared/lib/format.ts';
-import type { BookNames } from './books/types.ts';
+import type { SurahNames } from './surahs/types.ts';
 import type { InstallGuides } from './install/types.ts';
 import { useLocalePreference } from './locale-choice.ts';
 import type { LocaleId } from './locale-id.ts';
@@ -13,7 +13,7 @@ export interface Localization {
   readonly locale: Locale;
   /** One message, e.g. `t('panel.close')`. */
   readonly t: Translator;
-  readonly books: BookNames;
+  readonly surahs: SurahNames;
   readonly genreName: (genre: GenreId) => string;
   readonly install: InstallGuides;
   /** A count with the reader's own thousands separator. */
@@ -34,7 +34,7 @@ export function localizationFor(id: LocaleId): Localization {
   const localization: Localization = {
     locale,
     t: createTranslator(locale),
-    books: locale.books,
+    surahs: locale.surahs,
     genreName: (genre) => locale.genres[genre],
     install: locale.install,
     n: (value) => formatInteger(value, locale.tag),

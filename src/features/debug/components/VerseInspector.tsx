@@ -1,10 +1,10 @@
 import { useState, type SubmitEvent } from 'react';
-import { formatVerseRef } from '../../../core/bible/reference-format.ts';
-import { parseReference } from '../../../core/bible/reference-parse.ts';
-import { enBooks } from '../../../i18n/books/en.ts';
+import { formatVerseRef } from '../../../core/quran/reference.ts';
+import { parseReference } from '../../../core/quran/reference.ts';
+import { enBooks } from '../../../i18n/surahs/en.ts';
 import { describeReferenceError } from '../../../i18n/describe-reference-error.ts';
 import { ENGLISH } from '../../../i18n/use-locale.tsx';
-import { toOsisId, type VerseIndex } from '../../../core/bible/verse-ref.ts';
+import { toOsisId, type AyahIndex } from '../../../core/quran/ayah-ref.ts';
 import type { CrossReferenceLink } from '../../../cross-references/cross-reference-index.ts';
 import type { CrossReferenceDataset } from '../../../cross-references/load-cross-references.ts';
 import { formatInteger } from '../../../shared/lib/format.ts';
@@ -13,12 +13,12 @@ import { NextIcon, PreviousIcon, SearchIcon } from '../../../shared/ui/icons.tsx
 import { Section } from '../../../shared/ui/Section.tsx';
 import type { Translation } from '../../../translations/translation.ts';
 import styles from '../DebugPage.module.css';
-import { useSelectVerse } from '../verse-navigation.ts';
+import { useSelectVerse } from '../ayah-navigation.ts';
 import { VerseLink } from './VerseLink.tsx';
 
 interface VerseInspectorProps {
   readonly id: string;
-  readonly verse: VerseIndex;
+  readonly ayah: AyahIndex;
   readonly translation: Translation;
   readonly datasets: readonly CrossReferenceDataset[];
 }
@@ -32,13 +32,13 @@ function parseMinVotes(value: string): number | null {
   return value.trim() === '' || !Number.isFinite(number) ? null : number;
 }
 
-export function VerseInspector({ id, verse, translation, datasets }: VerseInspectorProps) {
+export function VerseInspector({ id, ayah, translation, datasets }: VerseInspectorProps) {
   const selectVerse = useSelectVerse();
   const [error, setError] = useState<string | null>(null);
   const [minVotes, setMinVotes] = useState<number | null>(null);
   const { versification } = translation;
-  const ref = versification.refAt(verse);
-  const text = translation.verseText(verse);
+  const ref = versification.refAt(ayah);
+  const text = translation.verseText(ayah);
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -50,18 +50,18 @@ export function VerseInspector({ id, verse, translation, datasets }: VerseInspec
       setError(describeReferenceError(result.error, ENGLISH));
       return;
     }
-    // A chapter-only reference opens the chapter's first verse.
-    const { book, chapter, verse: verseNumber = 1 } = result.reference;
-    const index = versification.indexOf({ book, chapter, verse: verseNumber });
+    // A surah-only reference opens the surah's first ayah.
+    const { surah, surah, ayah: verseNumber = 1 } = result.reference;
+    const index = versification.indexOf({ surah, surah, ayah: verseNumber });
     if (index === undefined) {
-      setError('This verse does not exist.');
+      setError('This ayah does not exist.');
       return;
     }
     setError(null);
     selectVerse(index);
   };
 
-  const preview = (link: CrossReferenceLink, verseOfLink: VerseIndex) => {
+  const preview = (link: CrossReferenceLink, verseOfLink: AyahIndex) => {
     const verseText = translation.verseText(verseOfLink) || '(omitted in this translation)';
     const extraVerses = link.targetEnd - link.targetStart;
     return verseOfLink === link.targetStart && extraVerses > 0
@@ -87,10 +87,10 @@ export function VerseInspector({ id, verse, translation, datasets }: VerseInspec
   return (
     <Section
       id={id}
-      title="Verse inspector"
-      description="Look up any verse and debug its cross-references. Accepts references like “John 3:16”, “jn 3 16”, “1co13:4”, “Ps 23” or “Gen.1.1”."
+      title="Ayah inspector"
+      description="Look up any ayah and debug its cross-references. Accepts references like “John 3:16”, “jn 3 16”, “1co13:4”, “Ps 23” or “Gen.1.1”."
     >
-      <form key={verse} className={styles.toolbar} onSubmit={handleSubmit}>
+      <form key={ayah} className={styles.toolbar} onSubmit={handleSubmit}>
         <input
           name="reference"
           className={styles.input}
@@ -105,9 +105,9 @@ export function VerseInspector({ id, verse, translation, datasets }: VerseInspec
         <button
           type="button"
           className={styles.button}
-          disabled={verse === 0}
+          disabled={ayah === 0}
           onClick={() => {
-            selectVerse(verse - 1);
+            selectVerse(ayah - 1);
           }}
         >
           <PreviousIcon />
@@ -116,9 +116,9 @@ export function VerseInspector({ id, verse, translation, datasets }: VerseInspec
         <button
           type="button"
           className={styles.button}
-          disabled={verse === versification.verseCount - 1}
+          disabled={ayah === versification.ayahCount - 1}
           onClick={() => {
-            selectVerse(verse + 1);
+            selectVerse(ayah + 1);
           }}
         >
           Next
@@ -137,7 +137,7 @@ export function VerseInspector({ id, verse, translation, datasets }: VerseInspec
           {text || <em>Omitted in the {translation.manifest.abbreviation}.</em>}
         </p>
         <p className={styles.muted}>
-          OSIS <code>{toOsisId(ref)}</code> · canonical index <code>{verse}</code> ·{' '}
+          OSIS <code>{toOsisId(ref)}</code> · canonical index <code>{ayah}</code> ·{' '}
           {translation.manifest.abbreviation}
         </p>
       </article>
@@ -156,8 +156,8 @@ export function VerseInspector({ id, verse, translation, datasets }: VerseInspec
       </label>
 
       {datasets.map(({ manifest, index }) => {
-        const outgoing = index.outgoing(verse).sort(byVotesDescending);
-        const incoming = index.incoming(verse).sort(byVotesDescending);
+        const outgoing = index.outgoing(ayah).sort(byVotesDescending);
+        const incoming = index.incoming(ayah).sort(byVotesDescending);
         const shownOutgoing = outgoing.filter(keep);
         const shownIncoming = incoming.filter(keep);
         return (
@@ -172,7 +172,7 @@ export function VerseInspector({ id, verse, translation, datasets }: VerseInspec
                 {
                   header: 'To',
                   render: (link) => (
-                    <VerseLink verse={link.targetStart} rangeEnd={link.targetEnd} />
+                    <VerseLink ayah={link.targetStart} rangeEnd={link.targetEnd} />
                   ),
                 },
                 votesColumn,
@@ -186,14 +186,14 @@ export function VerseInspector({ id, verse, translation, datasets }: VerseInspec
               rowKey={(link) => link.id}
               emptyMessage="No incoming links."
               columns={[
-                { header: 'From', render: (link) => <VerseLink verse={link.from} /> },
+                { header: 'From', render: (link) => <VerseLink ayah={link.from} /> },
                 {
                   header: 'Target',
                   render: (link) =>
                     link.targetStart === link.targetEnd ? (
-                      'this verse'
+                      'this ayah'
                     ) : (
-                      <VerseLink verse={link.targetStart} rangeEnd={link.targetEnd} />
+                      <VerseLink ayah={link.targetStart} rangeEnd={link.targetEnd} />
                     ),
                 },
                 votesColumn,

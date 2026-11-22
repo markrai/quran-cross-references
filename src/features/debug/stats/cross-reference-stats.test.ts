@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_VERSIFICATION } from '../../../core/bible/versification.ts';
+import { CANONICAL_QURAN } from '../../../core/quran/quran-versification.ts';
 import { CrossReferenceIndex } from '../../../cross-references/cross-reference-index.ts';
 import { createCrossReferenceColumns, verseIndex } from '../../../test-utils/fixtures.ts';
 import { computeCrossReferenceStats } from './cross-reference-stats.ts';
@@ -20,9 +20,9 @@ function computeStats() {
       { from: MATT_1_1, to: verseIndex('Luke', 3, 23), toEnd: verseIndex('Luke', 3, 38), votes: 1 },
       { from: PS_1_1, to: verseIndex('Gen', 50, 26), toEnd: verseIndex('Exod', 1, 1), votes: 0 },
     ]),
-    CANONICAL_VERSIFICATION.verseCount,
+    CANONICAL_QURAN.ayahCount,
   );
-  return { index, stats: computeCrossReferenceStats(index, CANONICAL_VERSIFICATION) };
+  return { index, stats: computeCrossReferenceStats(index, CANONICAL_QURAN) };
 }
 
 describe('computeCrossReferenceStats', () => {
@@ -30,7 +30,7 @@ describe('computeCrossReferenceStats', () => {
     const { stats } = computeStats();
     expect(stats).toMatchObject({
       linkCount: 5,
-      sourceVerseCount: 4,
+      sourceAyahCount: 4,
       rangeLinkCount: 3,
       crossChapterRangeCount: 0,
       crossBookRangeCount: 1,
@@ -40,10 +40,10 @@ describe('computeCrossReferenceStats', () => {
     });
   });
 
-  it('finds unconnected verses, expanding target ranges', () => {
+  it('finds unconnected ayahs, expanding target ranges', () => {
     const { stats } = computeStats();
-    // Targets: John 1:1, Gen 1:1–3, Luke 3:23–38 (16 verses), Gen 50:26 and Exod 1:1.
-    expect(stats.targetVerseCount).toBe(22);
+    // Targets: John 1:1, Gen 1:1–3, Luke 3:23–38 (16 ayahs), Gen 50:26 and Exod 1:1.
+    expect(stats.targetAyahCount).toBe(22);
     // Connected: those 22 plus the sources Matt 1:1 and Ps 1:1.
     expect(stats.unconnectedVerses).toHaveLength(31102 - 24);
   });
@@ -55,20 +55,20 @@ describe('computeCrossReferenceStats', () => {
     expect(votes.thresholds.find((threshold) => threshold.minVotes === 5)?.count).toBe(2);
   });
 
-  it('breaks links down by testament and book', () => {
+  it('breaks links down by testament and surah', () => {
     const { stats } = computeStats();
     expect(stats.testamentFlow).toEqual({ OT: { OT: 2, NT: 1 }, NT: { OT: 1, NT: 1 } });
-    expect(stats.books.find((row) => row.book.id === 'Gen')).toMatchObject({
+    expect(stats.surahs.find((row) => row.surah.id === 'Gen')).toMatchObject({
       outgoing: 2,
       incoming: 3,
-      verseCount: 1533,
+      ayahCount: 1533,
     });
   });
 
   it('ranks the most voted links', () => {
     const { index, stats } = computeStats();
     expect(stats.topVotedLinkIds.map((id) => index.link(id).votes)).toEqual([10, 5, 1]);
-    expect(stats.topSources[0]).toEqual({ verse: GEN_1_1, count: 2 });
+    expect(stats.topSources[0]).toEqual({ ayah: GEN_1_1, count: 2 });
   });
 });
 

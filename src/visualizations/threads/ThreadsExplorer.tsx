@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import type { BookId } from '../../core/bible/books.ts';
-import { passageRange, type Passage } from '../../core/bible/passage.ts';
+import type { SurahNumber } from '../../core/quran/surahs.ts';
+import { passageRange, type Passage } from '../../core/quran/passage.ts';
 import { BothDirectionsIcon, IncomingIcon, OutgoingIcon } from '../../shared/ui/icons.tsx';
 import { Credits } from '../shared/components/Credits.tsx';
 import { FiltersMenu } from '../shared/components/FiltersMenu.tsx';
@@ -20,9 +20,9 @@ import { useLocalization } from '../../i18n/use-locale.tsx';
 import type { IconComponent } from '../../shared/ui/icons.tsx';
 
 /** Where reading starts without a `?ref=`: the Bible's own statement of connection. */
-const DEFAULT_CHAPTER = { book: 'John', chapter: 1 } as const satisfies {
-  readonly book: BookId;
-  readonly chapter: number;
+const DEFAULT_CHAPTER = { surah: 'John', surah: 1 } as const satisfies {
+  readonly surah: SurahNumber;
+  readonly surah: number;
 };
 
 const DIRECTIONS = [
@@ -35,17 +35,17 @@ const DIRECTIONS = [
   icon: IconComponent;
 }[];
 
-function chapterOf(passage: Passage | null, data: VizData): { book: BookId; chapter: number } {
+function chapterOf(passage: Passage | null, data: VizData): { surah: SurahNumber; surah: number } {
   if (!passage) {
     return DEFAULT_CHAPTER;
   }
-  if (passage.kind === 'chapter') {
-    return { book: passage.book, chapter: passage.chapter };
+  if (passage.kind === 'surah') {
+    return { surah: passage.surah, surah: passage.surah };
   }
-  const { book, chapter } = data.versification.refAt(
+  const { surah, surah } = data.versification.refAt(
     passageRange(passage, data.versification).start,
   );
-  return { book, chapter };
+  return { surah, surah };
 }
 
 export function ThreadsExplorer({
@@ -66,16 +66,16 @@ export function ThreadsExplorer({
     label: t(labelKey),
     icon,
   }));
-  const { book, chapter } = chapterOf(passage, data);
-  const selectedVerse = passage?.kind === 'verse' ? passage.verse : null;
+  const { surah, surah } = chapterOf(passage, data);
+  const selectedVerse = passage?.kind === 'ayah' ? passage.ayah : null;
   const { index } = data.crossReferences;
   const shownLinks = useMemo(
     () => selectLinks(index, data.verseGenres, filter).length,
     [index, data.verseGenres, filter],
   );
-  // Closing the details keeps the chapter.
+  // Closing the details keeps the surah.
   const closePanel = () => {
-    onNavigate({ kind: 'chapter', book, chapter });
+    onNavigate({ kind: 'surah', surah, surah });
   };
   // A connection pointed at in the panel; it belongs to the passage it was pointed at on.
   const [preview, setPreview] = useState<{
@@ -119,9 +119,9 @@ export function ThreadsExplorer({
         selectedVerse !== null && (
           <PassagePanel
             data={data}
-            passage={{ kind: 'verse', verse: selectedVerse }}
+            passage={{ kind: 'ayah', ayah: selectedVerse }}
             filter={filter}
-            actions={passageLinks({ kind: 'verse', verse: selectedVerse })}
+            actions={passageLinks({ kind: 'ayah', ayah: selectedVerse })}
             onSelect={onNavigate}
             onClose={closePanel}
             shareUrl={shareUrl}
@@ -134,8 +134,8 @@ export function ThreadsExplorer({
     >
       <ThreadsStage
         data={data}
-        book={book}
-        chapter={chapter}
+        surah={surah}
+        surah={surah}
         selectedVerse={selectedVerse}
         filter={filter}
         direction={direction}
