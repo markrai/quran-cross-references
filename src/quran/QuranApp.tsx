@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { formatAyahId, type AyahRef } from '../core/quran/ayah-ref.ts';
 import { formatIndexRange, parseReference } from '../core/quran/reference.ts';
 import { passesQuranRelationshipFilter } from '../core/quran/relationship-filter.ts';
 import { SURAHS, getSurah } from '../core/quran/surahs.ts';
 import { QuranArcs } from './QuranArcs.tsx';
+import { QuranAnalytics } from './QuranAnalytics.tsx';
+import { loadQuranAnalytics } from './analytics.ts';
+import type { QuranAnalyticsDataset } from '../core/quran/analytics-types.ts';
 import { QuranExpressionGraph } from './QuranExpressionGraph.tsx';
 import { QuranExpressions } from './QuranExpressions.tsx';
 import { QuranThreads } from './QuranThreads.tsx';
@@ -23,6 +26,11 @@ type LoadState =
   | { readonly status: 'loading' }
   | { readonly status: 'error'; readonly message: string }
   | { readonly status: 'ready'; readonly data: QuranReaderData };
+
+type AnalyticsLoadState =
+  | { readonly status: 'idle' | 'loading' }
+  | { readonly status: 'error'; readonly message: string }
+  | { readonly status: 'ready'; readonly report: QuranAnalyticsDataset };
 
 type ExpressionLoadState =
   | { readonly status: 'idle' | 'loading' }
@@ -65,6 +73,9 @@ export function QuranApp() {
   const [offline, setOffline] = useState(() => !navigator.onLine);
   const [expressionState, setExpressionState] = useState<ExpressionLoadState>({ status: 'idle' });
   const [expressionAttempt, setExpressionAttempt] = useState(0);
+  const [analyticsState, setAnalyticsState] = useState<AnalyticsLoadState>({ status: 'idle' });
+  const [analyticsAttempt, setAnalyticsAttempt] = useState(0);
+  const analyticsCache = useRef<QuranAnalyticsDataset | null>(null);
 
   useEffect(() => {
     const update = () => {
@@ -116,7 +127,7 @@ export function QuranApp() {
   const data = loadState.status === 'ready' ? loadState.data : null;
 
   useEffect(() => {
-    if (!data || location.evidence !== 'exact') return;
+    if (!data || location.view === 'analytics' || location.evidence !== 'exact') return;
     const controller = new AbortController();
     void loadQuranExpressions(data.text.arabic, controller.signal)
       .then((index) => {
@@ -133,7 +144,33 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.evidence, expressionAttempt]);
+  }, [data, location.evidence, location.view, expressionAttempt]);
+
+  useEffect(() => {
+    if (!data || location.view !== 'analytics') return;
+    if (analyticsCache.current) {
+      setAnalyticsState({ status: 'ready', report: analyticsCache.current });
+      return;
+    }
+    const controller = new AbortController();
+    setAnalyticsState({ status: 'loading' });
+    void loadQuranAnalytics(data, controller.signal)
+      .then((report) => {
+        if (controller.signal.aborted) return;
+        analyticsCache.current = report;
+        setAnalyticsState({ status: 'ready', report });
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        setAnalyticsState({
+          status: 'error',
+          message: error instanceof Error ? error.message : 'Unable to verify analytics.',
+        });
+      });
+    return () => {
+      controller.abort();
+    };
+  }, [data, location.view, analyticsAttempt]);
 
   const expressionIndex = expressionState.status === 'ready' ? expressionState.index : null;
   const candidate =
@@ -198,7 +235,7 @@ export function QuranApp() {
       <main id="quran-main" className={styles.main}>
         <div className={styles.toolbar}>
           <div className={styles.viewTabs} role="group" aria-label="Visualization">
-            {(['arcs', 'threads'] as const).map((view) => (
+            {(['arcs', 'threads', 'analytics'] as const).map((view) => (
               <button
                 key={view}
                 type="button"
@@ -208,7 +245,7 @@ export function QuranApp() {
                   navigate({ ...location, view });
                 }}
               >
-                {view === 'arcs' ? 'Arcs' : 'Threads & Reader'}
+                {view === 'arcs' ? 'Arcs' : view === 'threads' ? 'Threads & Reader' : 'Analytics'}
               </button>
             ))}
           </div>
@@ -311,7 +348,7 @@ export function QuranApp() {
                 </select>
               </label>
             )}
-            {location.evidence === 'curated' && (
+            {location.view !== 'analytics' && location.evidence === 'curated' && (
               <label className={styles.field}>
                 <span>Relationships</span>
                 <select
@@ -383,6 +420,7 @@ export function QuranApp() {
         )}
         {data && (
           <>
+            {location.view !== 'analytics' && (
             <section className={styles.focusCard} aria-label="Selected ayah">
               <div className={styles.focusHeading}>
                 <div>
@@ -465,7 +503,60 @@ export function QuranApp() {
               )}
             </section>
 
-            {location.evidence === 'exact' && (
+            )}
+            {location.view === 'analytics' && (
+              <>
+                {(analyticsState.status === 'loading' || analyticsState.status === 'idle') && (
+                  <p className={styles.loading} role="status">Loading verified Quran analytics…</p>
+                )}
+                {analyticsState.status === 'error' && (
+                  <section className={styles.analyticsPanel} role="alert">
+                    <p className={styles.empty}>{analyticsState.message}</p>
+                    <button
+                      type="button"
+                      className={styles.goButton}
+                      onClick={() => {
+                        setAnalyticsState({ status: 'loading' });
+                        setAnalyticsAttempt((value) => value + 1);
+                      }}
+                    >
+                      Retry analytics
+                    </button>
+                  </section>
+                )}
+                {analyticsState.status === 'ready' && (
+                  <QuranAnalytics
+                    report={analyticsState.report}
+                    selectedSurah={location.reference.surah}
+                    onOpenSurah={(_surah, metric, firstAyah) => {
+                      navigate({
+                        ...location,
+                        view: 'arcs',
+                        evidence: metric === 'curated' ? 'curated' : 'exact',
+                        reference: data.relationships.versification.refAt(firstAyah),
+                        rangeEnd: null,
+                        selectedLink: null,
+                        selectedExpression: null,
+                        scope: 'all',
+                      });
+                    }}
+                    onOpenExpression={(id, firstAyah) => {
+                      navigate({
+                        ...location,
+                        view: 'arcs',
+                        evidence: 'exact',
+                        reference: data.relationships.versification.refAt(firstAyah),
+                        rangeEnd: null,
+                        selectedLink: null,
+                        selectedExpression: id,
+                        scope: 'all',
+                      });
+                    }}
+                  />
+                )}
+              </>
+            )}
+            {location.view !== 'analytics' && location.evidence === 'exact' && (
               <>
                 {(expressionState.status === 'idle' || expressionState.status === 'loading') && (
                   <p className={styles.loading} role="status">
@@ -501,7 +592,7 @@ export function QuranApp() {
               </>
             )}
 
-            {location.evidence === 'exact' ? (
+            {location.view !== 'analytics' && (location.evidence === 'exact' ? (
               location.view === 'arcs' ? (
                 selectedExpression && (
                   <QuranExpressionGraph
@@ -596,7 +687,7 @@ export function QuranApp() {
                 direction={location.direction}
                 onNavigate={focus}
               />
-            )}
+            ))}
           </>
         )}
       </main>
