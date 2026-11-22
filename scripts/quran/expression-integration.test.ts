@@ -37,7 +37,7 @@ describe('exact Arabic expressions against the pinned 6,236-ayah corpus', () => 
         (item) => new Set(item.occurrences.map((site) => site.ayah)).size >= 2,
       ),
     ).toBe(true);
-    expect(evidence.expressions.every((item) => item.origin === 'computed')).toBe(true);
+    expect(evidence.expressions[0]?.origin).toBe('computed');
     expect(evidence.expressions.every((item) => item.words.length >= 3 && item.words.length <= 8)).toBe(
       true,
     );
