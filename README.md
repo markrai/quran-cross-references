@@ -87,6 +87,14 @@ The separate `data/quran/analytics.json` report is generated exclusively from ve
 
 See [Phase 2C.1 acceptance and counting rules](docs/QURAN_PHASE_2C1.md).
 
+## Directed Quran Network (Phase 2C.2)
+
+The **Network** tab explores curated similar-passage topology at two scales. The surah network aggregates source-to-target surah pairs without inflating long ayah ranges into all-to-all links. It supports outgoing/incoming direction, a minimum connection-count filter and bounded partner pages. Every aggregate has an inspectable list of the original curated link IDs. The ayah neighborhood supports one or two hops, capped to 12 first-hop links per page and 24 second-hop links. Its nodes open navigable ayahs; edge labels open their underlying source passages.
+
+The graph is descriptive: connectivity is not a measure of religious significance or semantic similarity. Exact computed Arabic phrases remain a separate evidence mode and are never converted into artificial pairwise curated edges.
+
+The deterministic `data/quran/topology.json` report is SHA-256 pinned in the Quran manifest and verified against the loaded curated source relationships in the browser before rendering. Its compact footprint is included in the offline PWA; the full `expressions.json` remains on demand. The `view=network&network=ayah&depth=2` route is shareable. See [Phase 2C.2](docs/QURAN_PHASE_2C2.md).
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).
