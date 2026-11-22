@@ -84,6 +84,10 @@ function record(value: unknown, label: string): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
+function unknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
 function string(value: unknown, label: string): string {
   if (typeof value !== 'string' || !value.trim()) {
     return invalid(label + ' must be a nonempty string.');
@@ -167,7 +171,7 @@ export class QacMorphologyIndex {
       invalid('The expected corpus counts do not match QAC v0.4.');
     }
     const ayahs = dataset['ayahs'];
-    if (!Array.isArray(ayahs) || ayahs.length !== CANONICAL_QURAN.ayahCount) {
+    if (!unknownArray(ayahs) || ayahs.length !== CANONICAL_QURAN.ayahCount) {
       invalid('All canonical 6,236 ayahs must have annotation positions.');
     }
     let segmentCount = 0;
@@ -176,25 +180,25 @@ export class QacMorphologyIndex {
     const converted: QacWordAnalysis[][] = [];
     const verseRows: readonly unknown[] = ayahs;
     for (const [ayah, rawWords] of verseRows.entries()) {
-      const words: readonly unknown[] = Array.isArray(rawWords) ? (rawWords as unknown[]) : [];
-      if (!Array.isArray(words) || words.length < 1 || words.length > 300) {
+      if (!unknownArray(rawWords) || rawWords.length < 1 || rawWords.length > 300) {
         invalid('A QAC ayah has missing or implausible word positions.');
       }
+      const words = rawWords;
       const entries: QacWordAnalysis[] = [];
       for (const [word, rawSegments] of words.entries()) {
-        if (!Array.isArray(rawSegments) || rawSegments.length < 1 || rawSegments.length > 16) {
+        if (!unknownArray(rawSegments) || rawSegments.length < 1 || rawSegments.length > 16) {
           invalid('A QAC word has missing or implausible segments.');
         }
-        const segments: readonly unknown[] = rawSegments as unknown[];
+        const segments = rawSegments;
         const annotated: QacSegment[] = [];
         const lemmas = new Set<string>();
         const roots = new Set<string>();
         const pos = new Set<string>();
         for (const raw of segments) {
-          if (!Array.isArray(raw) || raw.length !== 3) {
+          if (!unknownArray(raw) || raw.length !== 3) {
             invalid('Each QAC segment requires a form, tag and features.');
           }
-          const items: readonly unknown[] = raw as unknown[];
+          const items = raw;
           const form = items[0];
           if (typeof form !== 'string') invalid('QAC segment form must be a string.');
           const tag = string(items[1], 'segment tag');
