@@ -26,6 +26,10 @@ function object(value: unknown, label: string): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
 function natural(value: unknown, label: string): number {
   if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) {
     throw new Error(label + ' must be a nonnegative integer.');
@@ -76,7 +80,7 @@ export class QuranExpressionIndex {
     const declaredCount = natural(stats['emittedExpressions'], 'Expression count');
     const declaredOccurrences = natural(stats['emittedOccurrences'], 'Occurrence count');
     const raw = dataset['expressions'];
-    if (!Array.isArray(raw) || raw.length !== declaredCount) {
+    if (!isUnknownArray(raw) || raw.length !== declaredCount) {
       throw new Error('Expression records do not match the declared count.');
     }
     const tokens = tokenizeQuranArabic(arabic);
@@ -102,7 +106,7 @@ export class QuranExpressionIndex {
         typeof entry['id'] !== 'string' ||
         !/^exact:v1:[a-f0-9]{64}$/.test(entry['id']) ||
         ids.has(entry['id']) ||
-        !Array.isArray(words) ||
+        !isUnknownArray(words) ||
         words.length < EXACT_EXPRESSION_MIN_WORDS ||
         words.length > EXACT_EXPRESSION_MAX_WORDS ||
         !words.every(
@@ -112,7 +116,7 @@ export class QuranExpressionIndex {
         throw new Error('Invalid or duplicate computed expression.');
       }
       const rawOccurrences = entry['occurrences'];
-      if (!Array.isArray(rawOccurrences) || rawOccurrences.length < 2) {
+      if (!isUnknownArray(rawOccurrences) || rawOccurrences.length < 2) {
         throw new Error('An exact expression needs occurrences in multiple ayahs.');
       }
       const occurrences: ExactExpressionOccurrence[] = [];
