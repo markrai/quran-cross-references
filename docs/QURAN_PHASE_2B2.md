@@ -57,8 +57,8 @@ IDs do not depend on discovery order.
   "origin": "computed",
   "words": ["<verbatim-word-1>", "<verbatim-word-2>", "<verbatim-word-3>"],
   "occurrences": [
-    {"ayah": 0, "start": 0, "end": 3},
-    {"ayah": 1, "start": 4, "end": 7}
+    { "ayah": 0, "start": 0, "end": 3 },
+    { "ayah": 1, "start": 4, "end": 7 }
   ]
 }
 ```
@@ -101,7 +101,7 @@ expressions/occurrences, and the highest frequency. It writes:
 
 The generator fails if its output exceeds **64 MiB**; it never silently
 drops candidate evidence to meet the budget. The 64 MiB limit is a safety
-ceiling for this *internal* first-stage audit, not permission to ship
+ceiling for this _internal_ first-stage audit, not permission to ship
 64 MiB into an offline PWA. Tune corpus policies only after reviewing
 the actual reported distribution and examples.
 
@@ -143,5 +143,5 @@ introduce clear type filters without treating computed matches as curated
 connections.
 
 **2B.4**: Consider separately licensed, verified morphology/lemma
-sources for *new* evidence classes. Exact word matching cannot provide
+sources for _new_ evidence classes. Exact word matching cannot provide
 roots or semantic identity.

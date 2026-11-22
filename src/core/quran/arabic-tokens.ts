@@ -22,7 +22,9 @@ export function tokenizeArabicAyah(text: string): readonly QuranArabicToken[] {
   return tokens;
 }
 
-export function tokenizeQuranArabic(ayahs: readonly string[]): readonly (readonly QuranArabicToken[])[] {
+export function tokenizeQuranArabic(
+  ayahs: readonly string[],
+): readonly (readonly QuranArabicToken[])[] {
   if (ayahs.length !== 6236) {
     throw new RangeError('Exact-expression corpus must contain all 6,236 canonical ayahs.');
   }

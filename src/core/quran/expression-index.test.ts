@@ -26,9 +26,7 @@ describe('exact repeated Arabic expression detection', () => {
     expect(result.statistics.ayahCount).toBe(6236);
     expect(result.statistics.tokenCount).toBe(6244);
     expect(result.statistics.repeatedCandidates).toBeGreaterThan(1);
-    expect(result.statistics.redundantCandidates).toBe(
-      result.statistics.repeatedCandidates - 1,
-    );
+    expect(result.statistics.redundantCandidates).toBe(result.statistics.repeatedCandidates - 1);
     expect(result.statistics.emittedExpressions).toBe(1);
     expect(result.statistics.emittedOccurrences).toBe(2);
     expect(result.statistics.mostFrequentExpression).toBe(2);
@@ -39,9 +37,7 @@ describe('exact repeated Arabic expression detection', () => {
       corpus('ألف باء جيم دال', 'ألف باء جيم دال', 'ألف باء جيم هاء'),
     );
     const short = result.expressions.find((item) => item.words.join(' ') === 'ألف باء جيم');
-    const long = result.expressions.find(
-      (item) => item.words.join(' ') === 'ألف باء جيم دال',
-    );
+    const long = result.expressions.find((item) => item.words.join(' ') === 'ألف باء جيم دال');
     expect(short?.occurrences).toEqual([
       { ayah: 0, start: 0, end: 3 },
       { ayah: 1, start: 0, end: 3 },
@@ -52,22 +48,16 @@ describe('exact repeated Arabic expression detection', () => {
   });
 
   it('never treats repetitions in only one ayah or across ayah boundaries as matches', () => {
-    const sameAyah = detectExactArabicExpressions(
-      corpus('ألف باء جيم ألف باء جيم', 'باء'),
-    );
+    const sameAyah = detectExactArabicExpressions(corpus('ألف باء جيم ألف باء جيم', 'باء'));
     expect(sameAyah.expressions).toEqual([]);
-    const across = detectExactArabicExpressions(
-      corpus('ألف باء', 'جيم دال', 'ألف باء', 'جيم دال'),
-    );
+    const across = detectExactArabicExpressions(corpus('ألف باء', 'جيم دال', 'ألف باء', 'جيم دال'));
     expect(across.expressions).toEqual([]);
     expect(across.statistics.emittedOccurrences).toBe(0);
     expect(across.statistics.mostFrequentExpression).toBe(0);
   });
 
   it('captures all occurrence positions including repeated spans inside the same ayah', () => {
-    const scan = detectExactArabicExpressions(
-      corpus('ألف باء جيم ألف باء جيم', 'ألف باء جيم'),
-    );
+    const scan = detectExactArabicExpressions(corpus('ألف باء جيم ألف باء جيم', 'ألف باء جيم'));
     const item = scan.expressions.find((entry) => entry.words.join(' ') === 'ألف باء جيم');
     expect(item?.occurrences).toEqual([
       { ayah: 0, start: 0, end: 3 },
@@ -87,9 +77,7 @@ describe('exact repeated Arabic expression detection', () => {
   });
 
   it('preserves strict orthographic differences as separate evidence', () => {
-    const result = detectExactArabicExpressions(
-      corpus('قَالَ لَهُمْ رَبُّهُمْ', 'قال لهم ربهم'),
-    );
+    const result = detectExactArabicExpressions(corpus('قَالَ لَهُمْ رَبُّهُمْ', 'قال لهم ربهم'));
     expect(result.expressions).toEqual([]);
   });
 });

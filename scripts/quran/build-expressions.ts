@@ -3,7 +3,10 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { QuranEvidenceSource } from '../../src/core/quran/relationship-evidence.ts';
 import { importQuranText } from './datasets.ts';
-import { createExactExpressionEvidence, validateExactExpressionEvidence } from './expression-evidence.ts';
+import {
+  createExactExpressionEvidence,
+  validateExactExpressionEvidence,
+} from './expression-evidence.ts';
 import { verifyPinnedQuranSource } from './pinned-source.ts';
 
 interface Manifest {
@@ -31,7 +34,9 @@ const output = JSON.stringify(dataset) + '\n';
 const bytes = Buffer.byteLength(output, 'utf8');
 const maxBytes = 64 * 1024 * 1024;
 if (bytes > maxBytes) {
-  throw new Error('Exact-expression dataset exceeded 64 MiB. Review the profile before publication.');
+  throw new Error(
+    'Exact-expression dataset exceeded 64 MiB. Review the profile before publication.',
+  );
 }
 const directory = 'data/quran/generated';
 mkdirSync(directory, { recursive: true });

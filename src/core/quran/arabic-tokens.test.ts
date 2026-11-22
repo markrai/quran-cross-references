@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { QURAN_EXACT_TOKEN_POLICY, tokenizeArabicAyah, tokenizeQuranArabic } from './arabic-tokens.ts';
+import {
+  QURAN_EXACT_TOKEN_POLICY,
+  tokenizeArabicAyah,
+  tokenizeQuranArabic,
+} from './arabic-tokens.ts';
 
 describe('verbatim Uthmani Arabic tokenization', () => {
   it('retains diacritics, Quran marks, UTF-16 character offsets and word order', () => {
     expect(QURAN_EXACT_TOKEN_POLICY).toBe('tanzil-uthmani-whitespace-verbatim-v1');
     const text = '  بِسْمِ  ٱللَّهِ\tالرَّحْمَٰنِ  ';
     const tokens = tokenizeArabicAyah(text);
-    expect(tokens.map((token) => token.text)).toEqual([
-      'بِسْمِ',
-      'ٱللَّهِ',
-      'الرَّحْمَٰنِ',
-    ]);
+    expect(tokens.map((token) => token.text)).toEqual(['بِسْمِ', 'ٱللَّهِ', 'الرَّحْمَٰنِ']);
     expect(tokens.map((token) => token.word)).toEqual([0, 1, 2]);
     for (const token of tokens) {
       expect(text.slice(token.start, token.end)).toBe(token.text);

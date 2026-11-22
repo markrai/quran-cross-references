@@ -3,7 +3,10 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { QuranEvidenceSource } from '../../src/core/quran/relationship-evidence.ts';
 import { importQuranText } from './datasets.ts';
-import { createExactExpressionEvidence, validateExactExpressionEvidence } from './expression-evidence.ts';
+import {
+  createExactExpressionEvidence,
+  validateExactExpressionEvidence,
+} from './expression-evidence.ts';
 
 describe('exact Arabic expressions against the pinned 6,236-ayah corpus', () => {
   it('generates only verifiable distinct-ayah evidence from the unmodified Tanzil source', () => {
@@ -38,8 +41,8 @@ describe('exact Arabic expressions against the pinned 6,236-ayah corpus', () => 
       ),
     ).toBe(true);
     expect(evidence.expressions[0]?.origin).toBe('computed');
-    expect(evidence.expressions.every((item) => item.words.length >= 3 && item.words.length <= 8)).toBe(
-      true,
-    );
+    expect(
+      evidence.expressions.every((item) => item.words.length >= 3 && item.words.length <= 8),
+    ).toBe(true);
   }, 120_000);
 });

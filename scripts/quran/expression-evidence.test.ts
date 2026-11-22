@@ -62,18 +62,18 @@ describe('independent exact-expression evidence', () => {
     expect(() => createExactExpressionEvidence(arabic(), { ...SOURCE, id: 'other' })).toThrow(
       'source must be',
     );
-    expect(() =>
-      createExactExpressionEvidence(arabic(), { ...SOURCE, sha256: 'short' }),
-    ).toThrow('source must be');
-    expect(() =>
-      createExactExpressionEvidence(arabic(), { ...SOURCE, fileName: '' }),
-    ).toThrow('source must be');
-    expect(() =>
-      createExactExpressionEvidence(arabic(), { ...SOURCE, license: '' }),
-    ).toThrow('source must be');
-    expect(() =>
-      createExactExpressionEvidence(arabic(), { ...SOURCE, attribution: '' }),
-    ).toThrow('source must be');
+    expect(() => createExactExpressionEvidence(arabic(), { ...SOURCE, sha256: 'short' })).toThrow(
+      'source must be',
+    );
+    expect(() => createExactExpressionEvidence(arabic(), { ...SOURCE, fileName: '' })).toThrow(
+      'source must be',
+    );
+    expect(() => createExactExpressionEvidence(arabic(), { ...SOURCE, license: '' })).toThrow(
+      'source must be',
+    );
+    expect(() => createExactExpressionEvidence(arabic(), { ...SOURCE, attribution: '' })).toThrow(
+      'source must be',
+    );
     expect(() =>
       createExactExpressionEvidence(arabic(), { ...SOURCE, retrievedAt: 'invalid' }),
     ).toThrow('source must be');
@@ -156,19 +156,44 @@ describe('independent exact-expression evidence', () => {
     expect(() => altered({ occurrences: [] })).toThrow('two recorded occurrences');
     expect(() => altered({ occurrences: [null, null] })).toThrow('must be an object');
     expect(() =>
-      altered({ occurrences: [{ ayah: 0, start: 0, end: 4 }, { ayah: 0, start: 0, end: 4 }] }),
+      altered({
+        occurrences: [
+          { ayah: 0, start: 0, end: 4 },
+          { ayah: 0, start: 0, end: 4 },
+        ],
+      }),
     ).toThrow('unique and ordered');
     expect(() =>
-      altered({ occurrences: [{ ayah: 0, start: 0, end: 4 }, { ayah: 0, start: 1, end: 5 }] }),
+      altered({
+        occurrences: [
+          { ayah: 0, start: 0, end: 4 },
+          { ayah: 0, start: 1, end: 5 },
+        ],
+      }),
     ).toThrow('out-of-range word span');
     expect(() =>
-      altered({ occurrences: [{ ayah: 0, start: 0, end: 4 }, { ayah: 1, start: 1, end: 5 }] }),
+      altered({
+        occurrences: [
+          { ayah: 0, start: 0, end: 4 },
+          { ayah: 1, start: 1, end: 5 },
+        ],
+      }),
     ).toThrow('out-of-range word span');
     expect(() =>
-      altered({ occurrences: [{ ayah: 0, start: 0, end: 4 }, { ayah: 7000, start: 0, end: 4 }] }),
+      altered({
+        occurrences: [
+          { ayah: 0, start: 0, end: 4 },
+          { ayah: 7000, start: 0, end: 4 },
+        ],
+      }),
     ).toThrow('out-of-range word span');
     expect(() =>
-      altered({ occurrences: [{ ayah: 0, start: 0, end: 3 }, { ayah: 1, start: 0, end: 3 }] }),
+      altered({
+        occurrences: [
+          { ayah: 0, start: 0, end: 3 },
+          { ayah: 1, start: 0, end: 3 },
+        ],
+      }),
     ).toThrow('out-of-range word span');
   });
 
@@ -179,11 +204,7 @@ describe('independent exact-expression evidence', () => {
     const words = ['أَلِف', 'بَاء', 'جِيم', 'دَال'];
     const corrupted = { ...item, words, id: exactExpressionId(words) };
     expect(() =>
-      validateExactExpressionEvidence(
-        { ...dataset, expressions: [corrupted] },
-        arabic(),
-        SOURCE,
-      ),
+      validateExactExpressionEvidence({ ...dataset, expressions: [corrupted] }, arabic(), SOURCE),
     ).toThrow('word span differs');
   });
 });
