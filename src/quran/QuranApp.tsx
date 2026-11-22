@@ -56,7 +56,9 @@ export function QuranApp() {
   const [offline, setOffline] = useState(() => !navigator.onLine);
 
   useEffect(() => {
-    const update = () => { setOffline(!navigator.onLine); };
+    const update = () => {
+      setOffline(!navigator.onLine);
+    };
     window.addEventListener('online', update);
     window.addEventListener('offline', update);
     return () => {
@@ -253,6 +255,7 @@ export function QuranApp() {
                         url,
                         activeSurah.name + ' ' + formatAyahId(location.reference),
                       ).then((result) => {
+                        if (result === 'cancelled') return;
                         if (result === 'copied') setShareMessage('Ayah link copied');
                         else if (result === 'shared') setShareMessage('Ayah link shared');
                         else setShareMessage('Share this link: ' + url);
@@ -261,8 +264,8 @@ export function QuranApp() {
                   >
                     Share ayah
                   </button>
-                <div className={styles.stepper}>
-                  <button type="button" aria-label="Previous ayah" disabled={activeIndex === 0} onClick={() => {
+                  <div className={styles.stepper}>
+                    <button type="button" aria-label="Previous ayah" disabled={activeIndex === 0} onClick={() => {
                     if (activeIndex !== undefined && activeIndex > 0) {
                       focus(data.relationships.versification.refAt(activeIndex - 1));
                     }
@@ -272,7 +275,7 @@ export function QuranApp() {
                       focus(data.relationships.versification.refAt(activeIndex + 1));
                     }
                   }}>›</button>
-                </div>
+                  </div>
                 </div>
               </div>
               {shareMessage && <p className={styles.shareStatus} role="status">{shareMessage}</p>}
