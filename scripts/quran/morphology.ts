@@ -178,11 +178,8 @@ export function importMaqamMorphology(
     const surah = numberField(columns[0], 'surah');
     const ayah = numberField(columns[1], 'ayah');
     const position = numberField(columns[3], 'word position');
-    if (!CANONICAL_QURAN.isValidRef({ surah, ayah })) {
-      fail('Source row references an invalid canonical Quran ayah.');
-    }
     const ayahIndex = CANONICAL_QURAN.indexOf({ surah, ayah });
-    if (ayahIndex === null || ayahIndex < currentAyah || ayahIndex > currentAyah + 1) {
+    if (ayahIndex === undefined || ayahIndex < currentAyah || ayahIndex > currentAyah + 1) {
       fail('Source ayahs must appear in complete canonical order.');
     }
     if (ayahIndex !== currentAyah) {
