@@ -63,7 +63,7 @@ jobs:
       - name: Confirm Quran datasets were published
         shell: pwsh
         run: |
-          foreach ($file in @("public/quran-only/data/quran/text.json", "public/quran-only/data/quran/relationships.json", "public/quran-only/data/quran/manifest.json")) {
+          foreach ($file in @("public/quran-only/data/quran/text.json", "public/quran-only/data/quran/relationships.json", "public/quran-only/data/quran/evidence.json", "public/quran-only/data/quran/manifest.json")) {
             if (-not (Test-Path $file)) { throw "Missing Quran dataset: $file" }
           }
 
