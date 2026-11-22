@@ -24,6 +24,8 @@ describe('Quran-first canonical route', () => {
       selectedLink: null,
       evidence: 'curated',
       selectedExpression: null,
+      morphologyMode: 'lemma',
+      selectedMorphTerm: null,
       networkMode: 'surah',
       networkDepth: 1,
     });
@@ -31,6 +33,26 @@ describe('Quran-first canonical route', () => {
     expect(parseQuranLocation(named).reference).toEqual({ surah: 2, ayah: 255 });
     const invalid = new URL('https://example.test/?ref=2%3A287');
     expect(parseQuranLocation(invalid).reference).toEqual(DEFAULT_QURAN_LOCATION.reference);
+  });
+
+  it('round-trips MAQAM lemma/root annotations without conflating curated and exact links', () => {
+    const location = {
+      ...DEFAULT_QURAN_LOCATION,
+      reference: { surah: 2, ayah: 255 },
+      evidence: 'morphology' as const,
+      morphologyMode: 'root' as const,
+      selectedMorphTerm: 'ر.ح.م',
+      selectedLink: null,
+    };
+    const href = quranLocationUrl(location, '/site/');
+    expect(href).toContain('evidence=morphology');
+    expect(href).toContain('morph=root');
+    expect(href).toContain('term=');
+    expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(location);
+    const other = parseQuranLocation(new URL('https://example.test/?view=network&evidence=morphology&morph=root&term=x'));
+    expect(other.evidence).toBe('curated');
+    expect(other.selectedMorphTerm).toBeNull();
+    expect(other.morphologyMode).toBe('lemma');
   });
 
   it('round-trips analytics URLs while preserving their selected ayah', () => {
