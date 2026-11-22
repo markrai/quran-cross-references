@@ -36,7 +36,6 @@ jobs:
       - name: Record full-corpus SVG layout benchmark
         run: npm run bench:graph
 
-
   quran-windows:
     name: Quran source integrity (Windows)
     runs-on: windows-latest
