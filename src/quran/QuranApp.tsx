@@ -5,6 +5,9 @@ import { passesQuranRelationshipFilter } from '../core/quran/relationship-filter
 import { SURAHS, getSurah } from '../core/quran/surahs.ts';
 import { QuranArcs } from './QuranArcs.tsx';
 import { QuranAnalytics } from './QuranAnalytics.tsx';
+import { QuranTopology } from './QuranTopology.tsx';
+import { loadQuranTopology } from './topology.ts';
+import type { QuranTopologyDataset } from './topology-model.ts';
 import { loadQuranAnalytics } from './analytics.ts';
 import type { QuranAnalyticsDataset } from '../core/quran/analytics-types.ts';
 import { QuranExpressionGraph } from './QuranExpressionGraph.tsx';
@@ -31,6 +34,11 @@ type AnalyticsLoadState =
   | { readonly status: 'idle' | 'loading' }
   | { readonly status: 'error'; readonly message: string }
   | { readonly status: 'ready'; readonly report: QuranAnalyticsDataset };
+
+type TopologyLoadState =
+  | { readonly status: 'idle' | 'loading' }
+  | { readonly status: 'error'; readonly message: string }
+  | { readonly status: 'ready'; readonly report: QuranTopologyDataset };
 
 type ExpressionLoadState =
   | { readonly status: 'idle' | 'loading' }
@@ -76,6 +84,9 @@ export function QuranApp() {
   const [analyticsState, setAnalyticsState] = useState<AnalyticsLoadState>({ status: 'idle' });
   const [analyticsAttempt, setAnalyticsAttempt] = useState(0);
   const analyticsCache = useRef<QuranAnalyticsDataset | null>(null);
+  const [topologyState, setTopologyState] = useState<TopologyLoadState>({ status: 'idle' });
+  const [topologyAttempt, setTopologyAttempt] = useState(0);
+  const topologyCache = useRef<QuranTopologyDataset | null>(null);
 
   useEffect(() => {
     const update = () => {
@@ -127,7 +138,7 @@ export function QuranApp() {
   const data = loadState.status === 'ready' ? loadState.data : null;
 
   useEffect(() => {
-    if (!data || location.view === 'analytics' || location.evidence !== 'exact') return;
+    if (!data || location.view === 'analytics' || location.view === 'network' || location.evidence !== 'exact') return;
     const controller = new AbortController();
     void loadQuranExpressions(data.text.arabic, controller.signal)
       .then((index) => {
@@ -171,6 +182,32 @@ export function QuranApp() {
       controller.abort();
     };
   }, [data, location.view, analyticsAttempt]);
+
+  useEffect(() => {
+    if (!data || location.view !== 'network') return;
+    if (topologyCache.current) {
+      setTopologyState({ status: 'ready', report: topologyCache.current });
+      return;
+    }
+    const controller = new AbortController();
+    setTopologyState({ status: 'loading' });
+    void loadQuranTopology(data, controller.signal)
+      .then((report) => {
+        if (controller.signal.aborted) return;
+        topologyCache.current = report;
+        setTopologyState({ status: 'ready', report });
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        setTopologyState({
+          status: 'error',
+          message: error instanceof Error ? error.message : 'Unable to verify Quran topology.',
+        });
+      });
+    return () => {
+      controller.abort();
+    };
+  }, [data, location.view, topologyAttempt]);
 
   const expressionIndex = expressionState.status === 'ready' ? expressionState.index : null;
   const candidate =
@@ -235,22 +272,29 @@ export function QuranApp() {
       <main id="quran-main" className={styles.main}>
         <div className={styles.toolbar}>
           <div className={styles.viewTabs} role="group" aria-label="Visualization">
-            {(['arcs', 'threads', 'analytics'] as const).map((view) => (
+            {(['arcs', 'threads', 'analytics', 'network'] as const).map((view) => (
               <button
                 key={view}
                 type="button"
                 className={location.view === view ? styles.activeTab : styles.tab}
                 aria-pressed={location.view === view}
                 onClick={() => {
-                  navigate({ ...location, view });
+                  navigate({
+                    ...location,
+                    view,
+                    evidence: view === 'network' ? 'curated' : location.evidence,
+                    selectedExpression: view === 'network' ? null : location.selectedExpression,
+                    selectedLink: view === 'network' ? null : location.selectedLink,
+                    rangeEnd: view === 'network' ? null : location.rangeEnd,
+                  });
                 }}
               >
-                {view === 'arcs' ? 'Arcs' : view === 'threads' ? 'Threads & Reader' : 'Analytics'}
+                {view === 'arcs' ? 'Arcs' : view === 'threads' ? 'Threads & Reader' : view === 'analytics' ? 'Analytics' : 'Network'}
               </button>
             ))}
           </div>
           <div className={styles.toolbarFields}>
-            {location.view !== 'analytics' && (
+            {location.view !== 'analytics' && location.view !== 'network' && (
               <label className={styles.field}>
                 <span>Evidence type</span>
                 <select
@@ -350,7 +394,7 @@ export function QuranApp() {
                 </select>
               </label>
             )}
-            {location.view !== 'analytics' && location.evidence === 'curated' && (
+            {location.view !== 'analytics' && location.view !== 'network' && location.evidence === 'curated' && (
               <label className={styles.field}>
                 <span>Relationships</span>
                 <select
@@ -422,7 +466,7 @@ export function QuranApp() {
         )}
         {data && (
           <>
-            {location.view !== 'analytics' && (
+            {location.view !== 'analytics' && location.view !== 'network' && (
               <section className={styles.focusCard} aria-label="Selected ayah">
                 <div className={styles.focusHeading}>
                   <div>
@@ -559,7 +603,116 @@ export function QuranApp() {
                 )}
               </>
             )}
-            {location.view !== 'analytics' && location.evidence === 'exact' && (
+            {location.view === 'network' && (
+              <>
+                {(topologyState.status === 'loading' || topologyState.status === 'idle') && (
+                  <p className={styles.loading} role="status">Loading verified curated graph topology…</p>
+                )}
+                {topologyState.status === 'error' && (
+                  <section className={styles.topologyPanel} role="alert">
+                    <p className={styles.empty}>{topologyState.message}</p>
+                    <button
+                      type="button"
+                      className={styles.goButton}
+                      onClick={() => {
+                        setTopologyState({ status: 'loading' });
+                        setTopologyAttempt((value) => value + 1);
+                      }}
+                    >
+                      Retry network
+                    </button>
+                  </section>
+                )}
+                {topologyState.status === 'ready' && (
+                  <QuranTopology
+                    report={topologyState.report}
+                    relationships={data.relationships}
+                    focus={focusStart}
+                    direction={location.direction}
+                    mode={location.networkMode}
+                    depth={location.networkDepth}
+                    onDirection={(direction) => {
+                      navigate({ ...location, direction });
+                    }}
+                    onMode={(networkMode) => {
+                      navigate({
+                        ...location,
+                        networkMode,
+                        networkDepth: networkMode === 'surah' ? 1 : location.networkDepth,
+                      });
+                    }}
+                    onDepth={(networkDepth) => {
+                      navigate({ ...location, networkMode: 'ayah', networkDepth });
+                    }}
+                    onFocusSurah={(surah) => {
+                      navigate({
+                        ...location,
+                        reference: { surah, ayah: 1 },
+                        rangeEnd: null,
+                        selectedLink: null,
+                      });
+                    }}
+                    onFocusAyah={(ayah) => {
+                      navigate({
+                        ...location,
+                        networkMode: 'ayah',
+                        reference: data.relationships.versification.refAt(ayah),
+                        rangeEnd: null,
+                        selectedLink: null,
+                      });
+                    }}
+                    onOpenLink={(id) => {
+                      const selected = data.relationships.link(id);
+                      navigate({
+                        ...location,
+                        view: 'arcs',
+                        evidence: 'curated',
+                        scope: 'all',
+                        reference: data.relationships.versification.refAt(selected.source.start),
+                        rangeEnd: null,
+                        selectedLink: id,
+                        selectedExpression: null,
+                      });
+                    }}
+                    onReadAyah={(ayah) => {
+                      navigate({
+                        ...location,
+                        view: 'threads',
+                        evidence: 'curated',
+                        reference: data.relationships.versification.refAt(ayah),
+                        rangeEnd: null,
+                        selectedLink: null,
+                        selectedExpression: null,
+                      });
+                    }}
+                    onOpenExact={() => {
+                      navigate({
+                        ...location,
+                        view: 'arcs',
+                        evidence: 'exact',
+                        selectedLink: null,
+                        selectedExpression: null,
+                        rangeEnd: null,
+                      });
+                    }}
+                    surahHref={(surah) => quranLocationUrl({
+                      ...location,
+                      reference: { surah, ayah: 1 },
+                      rangeEnd: null,
+                      selectedLink: null,
+                    }, import.meta.env.BASE_URL)}
+                    ayahHref={(ayah) => quranLocationUrl({
+                      ...location,
+                      networkMode: 'ayah',
+                      reference: data.relationships.versification.refAt(ayah),
+                      rangeEnd: null,
+                      selectedLink: null,
+                    }, import.meta.env.BASE_URL)}
+                  />
+                )}
+              </>
+            )}
+            {location.view !== 'analytics' && location.view !== 'network' && location.evidence === 'exact' && (
               <>
                 {(expressionState.status === 'idle' || expressionState.status === 'loading') && (
                   <p className={styles.loading} role="status">
@@ -595,7 +748,7 @@ export function QuranApp() {
               </>
             )}
 
-            {location.view !== 'analytics' &&
+            {location.view !== 'analytics' && location.view !== 'network' &&
               (location.evidence === 'exact' ? (
                 location.view === 'arcs' ? (
                   selectedExpression && (
