@@ -38,7 +38,7 @@ describe('Quran passage sharing', () => {
       share: vi.fn(() => Promise.reject(error)),
       clipboard: { writeText: vi.fn(() => Promise.resolve()) },
     });
-    expect(await shareQuranReference(url, 'Al-Baqarah 2:255')).toBe('unavailable');
+    expect(await shareQuranReference(url, 'Al-Baqarah 2:255')).toBe('cancelled');
 
     vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn(() => Promise.reject(error)) } });
     expect(await shareQuranReference(url, 'Al-Baqarah 2:255')).toBe('unavailable');
