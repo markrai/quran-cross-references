@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { QuranRelationshipIndex } from '../core/quran/relationship-index.ts';
-import { buildQuranAnalytics } from '../../scripts/quran/analytics.ts';
-import type { QuranExactExpressionDataset } from '../../scripts/quran/expression-evidence.ts';
-import { parseQuranAnalytics } from './analytics.ts';
+import { QuranRelationshipIndex } from '../../src/core/quran/relationship-index.ts';
+import { buildQuranAnalytics } from './analytics.ts';
+import type { QuranExactExpressionDataset } from './expression-evidence.ts';
+import { parseQuranAnalytics } from '../../src/quran/analytics.ts';
 
 const hashes = { arabic: 'a'.repeat(64), curated: 'b'.repeat(64) };
 const index = new QuranRelationshipIndex({

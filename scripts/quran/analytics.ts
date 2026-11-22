@@ -19,7 +19,7 @@ export function buildQuranAnalytics(
   tanzilNotice: string,
 ): QuranAnalyticsDataset {
   if (
-    relationships.versification.id !== CANONICAL_QURAN.id ||
+    relationships.ayahCount !== CANONICAL_QURAN.ayahCount ||
     expressions.versification !== CANONICAL_QURAN.id ||
     expressions.statistics.ayahCount !== CANONICAL_QURAN.ayahCount
   ) {
