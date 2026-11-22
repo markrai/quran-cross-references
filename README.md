@@ -49,6 +49,18 @@ Phase 1D.2 removed the unused Bible application, translations, data importers, v
 
 **Search indexing remains disabled** until the remaining real-device, accessibility, and digital-edition rights checks pass. See [the release acceptance checklist](docs/RELEASE_CHECKLIST.md) before enabling indexing. A static site can provide a general link preview, but cannot generate a different Open Graph image for every ayah URL.
 
+## Relationship evidence (Phase 2B.1)
+
+The build now publishes a separate, provenance-validated
+`data/quran/evidence.json` sidecar. It gives the original curated
+relationships endpoint-stable IDs and a typed evidence classification without
+changing existing numerical `link=` URLs or Quran source texts. See
+[relationship evidence schema and validation](docs/RELATIONSHIP_EVIDENCE.md).
+
+`data/raw/` ignores all unpinned downloads by default, including former Bible
+archives. The three checksum-pinned Quran source snapshots remain explicitly
+tracked. New sources must be reviewed and allowlisted individually.
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).

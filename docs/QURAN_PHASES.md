@@ -169,6 +169,25 @@ under `BASE_PATH=/`, open `/quran/`.
   Scripture sources, hashes, attribution and relationship semantics
   remain unchanged.
 
+### Phase 2B.1: Typed relationship evidence and provenance
+
+- Publish a `quran-relationship-evidence` version 1 sidecar with one explicit
+  `curated-similar-passage` classification and source assertion per existing
+  curated relationship, without inventing confidence scores or interpretations.
+- Preserve `relationships.json` and all numeric `?link=N` IDs unchanged;
+  define endpoint-stable namespaced IDs independently of the array order.
+- Validate classification, evidence kind, source ID, source SHA-256, license,
+  attribution and retrieval date against `data/quran/sources.json`. Reject
+  missing, reordered or forged evidence records.
+- Keep existing bilingual reader, graph and offline behavior unchanged.
+  Make the new sidecar available to future typed relationship views, while
+  retaining backward-compatible lookup adapters for the old numeric IDs.
+- Default-ignore unpinned `data/raw/` downloads. Explicitly allowlist only
+  the three checksum-pinned Quran inputs. Verify both rules on Linux and Windows
+  with Git-based regression tests.
+- Preserve strict lint, formatting, coverage, production artifact and
+  desktop/phone tests; see `docs/RELATIONSHIP_EVIDENCE.md`.
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

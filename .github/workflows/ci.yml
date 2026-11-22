@@ -59,11 +59,11 @@ jobs:
       - name: Validate pinned Quran sources on Windows
         run: npm run data:quran
       - name: Test Quran source integrity, importers and graph
-        run: npx vitest run scripts/quran/pinned-source.test.ts scripts/quran/datasets.test.ts scripts/quran/graph.test.ts
+        run: npx vitest run scripts/quran/pinned-source.test.ts scripts/quran/datasets.test.ts scripts/quran/graph.test.ts scripts/quran/raw-ignore.test.ts src/core/quran/relationship-evidence.test.ts
       - name: Confirm Quran datasets were published
         shell: pwsh
         run: |
-          foreach ($file in @("public/quran-only/data/quran/text.json", "public/quran-only/data/quran/relationships.json", "public/quran-only/data/quran/manifest.json")) {
+          foreach ($file in @("public/quran-only/data/quran/text.json", "public/quran-only/data/quran/relationships.json", "public/quran-only/data/quran/evidence.json", "public/quran-only/data/quran/manifest.json")) {
             if (-not (Test-Path $file)) { throw "Missing Quran dataset: $file" }
           }
 
@@ -84,6 +84,7 @@ jobs:
           test -s dist/quran/index.html
           test -s dist/data/quran/text.json
           test -s dist/data/quran/relationships.json
+          test -s dist/data/quran/evidence.json
           test -s dist/data/quran/manifest.json
           test -s dist/manifest.webmanifest
           test -s dist/icons/icon-192.png
