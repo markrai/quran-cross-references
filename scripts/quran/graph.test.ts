@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { buildQuranArcGeometry, selectQuranRelationshipIds } from '../../src/core/quran/graph-adapters.ts';
+import {
+  buildQuranArcGeometry,
+  selectQuranRelationshipIds,
+} from '../../src/core/quran/graph-adapters.ts';
 import { QuranRelationshipIndex } from '../../src/core/quran/relationship-index.ts';
 import { importMutashabihat } from './datasets.ts';
 
