@@ -575,7 +575,7 @@ test.describe('Quran Phase 2C.1 reproducible analytics', () => {
   test('opens ranked exact Arabic evidence through stable expression links', async ({ page }) => {
     await page.goto('./?ref=55%3A13&view=analytics');
     await expect(page.getByRole('heading', { name: 'Most repeated exact phrases' })).toBeVisible();
-    await page.getByRole('button', { name: 'Explore ranked Arabic phrase 1' }).click();
+    await page.getByRole('button', { name: 'Explore ranked Arabic phrase 1', exact: true }).click();
     await expect(page).toHaveURL(/evidence=exact&expression=exact%3Av1%3A/);
     await expect(page.getByRole('heading', { name: 'Verbatim Arabic repetitions' })).toBeVisible();
     await expect(
