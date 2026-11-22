@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -91,9 +92,13 @@ jobs:
           path: dist
 
   quran-e2e:
-    name: Quran reader (desktop and phone)
+    name: Quran reader (${{ matrix.os }})
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -101,29 +106,29 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Download Quran site
+      - name: Download exact production build
         uses: actions/download-artifact@v8
         with:
           name: site
           path: dist
-      - name: Cache Chromium
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-      - name: Install Chromium
+      - name: Install Chromium and Linux browser dependencies
+        if: runner.os == 'Linux'
         run: npx playwright install --with-deps chromium
-      - name: Exercise Quran root and legacy deep links
-        run: npx playwright test tests/e2e/quran-reader.spec.ts --project=desktop --project=phone
-      - name: Upload failure report
-        if: failure()
+      - name: Install Chromium on Windows
+        if: runner.os == 'Windows'
+        run: npx playwright install chromium
+      - name: Run desktop and phone acceptance against the production build
+        run: npm run test:e2e:ci
+      - name: Preserve reports, screenshots and traces
+        if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-report-quran
+          name: playwright-${{ runner.os }}
           path: |
             playwright-report
             test-results
-          retention-days: 7
+          if-no-files-found: ignore
+          retention-days: 14
 
   deploy:
     name: Deploy Quran site to GitHub Pages
