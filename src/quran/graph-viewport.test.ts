@@ -17,6 +17,7 @@ describe('Quran graph viewport', () => {
     expect(DEFAULT_GRAPH_VIEWPORT).toEqual({ x: 0, width: GRAPH_WIDTH });
     expect(graphAyahAtWorldX(graphXOfAyah(0, 6236), 6236)).toBe(0);
     expect(graphAyahAtWorldX(graphXOfAyah(6235, 6236), 6236)).toBe(6235);
+    expect(graphAyahAtWorldX(graphXOfAyah(7, 6236), 6236)).toBe(7);
   });
 
   it('zooms around the cursor without moving the anchored location', () => {
@@ -54,6 +55,7 @@ describe('Quran graph viewport', () => {
     expect(graphWorldXAtClientX(zoomed, 125, 25, 400)).toBe(450);
     expect(graphWorldXAtClientX(zoomed, -10, 25, 400)).toBe(300);
     expect(graphWorldXAtClientX(zoomed, 500, 25, 400)).toBe(900);
+    expect(graphWorldXAtClientX(zoomed, 100, 25, 0)).toBe(600);
     expect(graphAyahAtWorldX(-100, 6236)).toBe(0);
     expect(graphAyahAtWorldX(10000, 6236)).toBe(6235);
   });
