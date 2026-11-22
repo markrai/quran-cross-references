@@ -1,17 +1,17 @@
 # Quran Cross-References: phased adoption
 
-## Current state: Quran-first application (Phase 1D.2)
+## Current state: Phase 1D.3 production-readiness implementation
 
 Phases 1A through 1C established the verified Quran model, graph adapters and
-bilingual reader. Phase 1D.1 switched the default application and runtime to
-Quran-only. Phase 1D.2 removed the obsolete Bible application and data pipeline
-from source control, leaving a small Quran-focused codebase.
+bilingual reader. Phase 1D.1 made Quran the default app, and Phase 1D.2 removed
+the unused Bible application. Phase 1D.3 adds site-level sharing metadata,
+generated installation artwork, an installable manifest, versioned offline
+reading, keyboard/mobile improvements, and complete Quran-text attribution.
 
-The original Bible implementation remains available in Git history. The Quran
-application retains its canonical root entry, `/quran/` compatibility entry
-and strict pinned-source verification. Quran SEO, PWA, icons, offline and
-accessibility acceptance are planned for Phase 1D.3. Both HTML entry points
-remain `noindex` until those gates are complete.
+The original Bible implementation remains available in Git history. Quran SEO
+indexing is **not** enabled automatically. Both entry points remain `noindex`
+until the tests and manual device, accessibility and source-rights gates in
+`docs/RELEASE_CHECKLIST.md` are satisfied.
 
 ### Included in Phase 1A
 
@@ -125,6 +125,30 @@ under `BASE_PATH=/`, open `/quran/`.
   license/attribution metadata unchanged. `npm run format` ignores raw
   snapshots and generated output.
 
+### Phase 1D.3: installation, offline, accessibility and attribution
+
+- Generate deterministic original PWA PNG icons at 192px, 512px and maskable
+  512px, plus a 1200×630 raster social preview, using a dependency-free Node
+  script. No Bible-era brand assets are reused.
+- Add a manifest scoped to this app's deployment base and register its service
+  worker only for production builds. The worker predownloads the built HTML,
+  JS/CSS, icons and **both Quran texts and their relationships** before becoming
+  active, versions the shell using content hashes, and drops only prior Quran
+  caches. Existing `/quran/` deep links work offline as well.
+- Add canonical site metadata, Open Graph and Twitter summaries and a
+  site-level PNG preview. On static hosting, these previews are necessarily
+  site-level rather than dynamically rendered for each ayah.
+- Add exact-reference sharing via the Web Share API with clipboard fallback,
+  a keyboard skip link, visible focus rings, at least 44px primary touch
+  controls, narrower phone layout and an offline indicator.
+- Embed the **verbatim Tanzil copyright/terms notice** in derived
+  `text.json`, without changing any Arabic ayah. Preserve visible source
+  attribution and a direct link to the generated provenance manifest.
+- Add browser acceptance for icon dimensions, metadata, a real offline
+  page reload and legacy-link navigation, keyboard control, and sharing.
+- Retain `noindex` until the manual device and source-rights review passes.
+  Check `docs/RELEASE_CHECKLIST.md` before public release.
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows
@@ -154,9 +178,9 @@ dedicated CC0 and is not a complete scholarly cross-reference set.
 
 ### Next merges
 
-1. **Phase 1D.3: Production readiness.** Add Quran metadata, share previews,
-   Quran-specific PWA/offline caching, mobile/accessibility acceptance and
-   complete source attribution/rights review. Remove `noindex` only then.
+1. **Phase 1D.3 release verification.** Complete real-device installation,
+   offline, screen-reader and Pickthall digital-edition rights review. Remove
+   `noindex` only in a separate verified release change.
 2. **Phase 2: Relationship exploration.** Improve Quran arc and thread navigation,
    relationship semantics and supported corpus breadth without fabricating rankings.
 
