@@ -38,8 +38,8 @@ export function buildQuranAnalytics(
     firstExactAyah: number | null;
   }[] = Array.from({ length: CANONICAL_QURAN.surahCount }, (_, index) => ({
     surah: index + 1,
-    ayahCount: CANONICAL_QURAN.surahRange(index + 1).end -
-      CANONICAL_QURAN.surahRange(index + 1).start + 1,
+    ayahCount:
+      CANONICAL_QURAN.surahRange(index + 1).end - CANONICAL_QURAN.surahRange(index + 1).start + 1,
     curatedLinks: 0,
     curatedWithin: 0,
     curatedAcross: 0,

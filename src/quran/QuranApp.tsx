@@ -421,93 +421,94 @@ export function QuranApp() {
         {data && (
           <>
             {location.view !== 'analytics' && (
-            <section className={styles.focusCard} aria-label="Selected ayah">
-              <div className={styles.focusHeading}>
-                <div>
-                  <p className={styles.eyebrow}>Selected passage</p>
-                  <h1>
-                    {activeSurah.name} · {formatAyahId(location.reference)}
-                  </h1>
-                </div>
-                <div className={styles.focusActions}>
-                  <button
-                    className={styles.shareButton}
-                    type="button"
-                    aria-label="Share ayah"
-                    onClick={() => {
-                      const url = new URL(
-                        quranLocationUrl(location, import.meta.env.BASE_URL),
-                        window.location.origin,
-                      ).href;
-                      void shareQuranReference(
-                        url,
-                        activeSurah.name + ' ' + formatAyahId(location.reference),
-                      ).then((result) => {
-                        if (result === 'cancelled') return;
-                        if (result === 'copied') setShareMessage('Ayah link copied');
-                        else if (result === 'shared') setShareMessage('Ayah link shared');
-                        else setShareMessage('Share this link: ' + url);
-                      });
-                    }}
-                  >
-                    Share ayah
-                  </button>
-                  <div className={styles.stepper}>
+              <section className={styles.focusCard} aria-label="Selected ayah">
+                <div className={styles.focusHeading}>
+                  <div>
+                    <p className={styles.eyebrow}>Selected passage</p>
+                    <h1>
+                      {activeSurah.name} · {formatAyahId(location.reference)}
+                    </h1>
+                  </div>
+                  <div className={styles.focusActions}>
                     <button
+                      className={styles.shareButton}
                       type="button"
-                      aria-label="Previous ayah"
-                      disabled={activeIndex === 0}
+                      aria-label="Share ayah"
                       onClick={() => {
-                        if (activeIndex !== undefined && activeIndex > 0) {
-                          focus(data.relationships.versification.refAt(activeIndex - 1));
-                        }
+                        const url = new URL(
+                          quranLocationUrl(location, import.meta.env.BASE_URL),
+                          window.location.origin,
+                        ).href;
+                        void shareQuranReference(
+                          url,
+                          activeSurah.name + ' ' + formatAyahId(location.reference),
+                        ).then((result) => {
+                          if (result === 'cancelled') return;
+                          if (result === 'copied') setShareMessage('Ayah link copied');
+                          else if (result === 'shared') setShareMessage('Ayah link shared');
+                          else setShareMessage('Share this link: ' + url);
+                        });
                       }}
                     >
-                      ‹
+                      Share ayah
                     </button>
-                    <button
-                      type="button"
-                      aria-label="Next ayah"
-                      disabled={
-                        activeIndex === undefined ||
-                        activeIndex === data.relationships.ayahCount - 1
-                      }
-                      onClick={() => {
-                        if (
-                          activeIndex !== undefined &&
-                          activeIndex < data.relationships.ayahCount - 1
-                        ) {
-                          focus(data.relationships.versification.refAt(activeIndex + 1));
+                    <div className={styles.stepper}>
+                      <button
+                        type="button"
+                        aria-label="Previous ayah"
+                        disabled={activeIndex === 0}
+                        onClick={() => {
+                          if (activeIndex !== undefined && activeIndex > 0) {
+                            focus(data.relationships.versification.refAt(activeIndex - 1));
+                          }
+                        }}
+                      >
+                        ‹
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Next ayah"
+                        disabled={
+                          activeIndex === undefined ||
+                          activeIndex === data.relationships.ayahCount - 1
                         }
-                      }}
-                    >
-                      ›
-                    </button>
+                        onClick={() => {
+                          if (
+                            activeIndex !== undefined &&
+                            activeIndex < data.relationships.ayahCount - 1
+                          ) {
+                            focus(data.relationships.versification.refAt(activeIndex + 1));
+                          }
+                        }}
+                      >
+                        ›
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-              {shareMessage && (
-                <p className={styles.shareStatus} role="status">
-                  {shareMessage}
-                </p>
-              )}
-              {activeIndex !== undefined && (
-                <>
-                  <p className={styles.focusArabic} lang="ar" dir="rtl">
-                    {data.text.arabic[activeIndex]}
+                {shareMessage && (
+                  <p className={styles.shareStatus} role="status">
+                    {shareMessage}
                   </p>
-                  <p className={styles.focusEnglish} lang="en" dir="ltr">
-                    {data.text.english[activeIndex]}
-                  </p>
-                </>
-              )}
-            </section>
-
+                )}
+                {activeIndex !== undefined && (
+                  <>
+                    <p className={styles.focusArabic} lang="ar" dir="rtl">
+                      {data.text.arabic[activeIndex]}
+                    </p>
+                    <p className={styles.focusEnglish} lang="en" dir="ltr">
+                      {data.text.english[activeIndex]}
+                    </p>
+                  </>
+                )}
+              </section>
             )}
             {location.view === 'analytics' && (
               <>
                 {(analyticsState.status === 'loading' || analyticsState.status === 'idle') && (
-                  <p className={styles.loading} role="status">Loading verified Quran analytics…</p>
+                  <p className={styles.loading} role="status">
+                    Loading verified Quran analytics…
+                  </p>
                 )}
                 {analyticsState.status === 'error' && (
                   <section className={styles.analyticsPanel} role="alert">
@@ -592,16 +593,94 @@ export function QuranApp() {
               </>
             )}
 
-            {location.view !== 'analytics' && (location.evidence === 'exact' ? (
-              location.view === 'arcs' ? (
-                selectedExpression && (
-                  <QuranExpressionGraph
-                    key={selectedExpression.id}
-                    expression={selectedExpression}
-                    ayahIndex={focusStart}
-                    onNavigate={navigateExpressionOccurrence}
+            {location.view !== 'analytics' &&
+              (location.evidence === 'exact' ? (
+                location.view === 'arcs' ? (
+                  selectedExpression && (
+                    <QuranExpressionGraph
+                      key={selectedExpression.id}
+                      expression={selectedExpression}
+                      ayahIndex={focusStart}
+                      onNavigate={navigateExpressionOccurrence}
+                    />
+                  )
+                ) : (
+                  <QuranThreads
+                    data={data}
+                    reference={location.reference}
+                    scope={location.scope}
+                    direction={location.direction}
+                    onNavigate={focus}
+                    showCurated={false}
                   />
                 )
+              ) : location.view === 'arcs' ? (
+                <>
+                  <QuranArcs
+                    index={data.relationships}
+                    surah={location.reference.surah}
+                    scope={location.scope}
+                    focus={focusedRange}
+                    selectedId={link?.id ?? null}
+                    onSelect={(id) => {
+                      navigate({ ...location, selectedLink: id });
+                    }}
+                    onNavigate={focus}
+                  />
+                  {link && (
+                    <section className={styles.linkDetail} aria-live="polite">
+                      <h2>Selected relationship</h2>
+                      <div className={styles.linkPair}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            focus(data.relationships.versification.refAt(link.source.start));
+                          }}
+                        >
+                          Source:{' '}
+                          {formatIndexRange(
+                            data.relationships.versification,
+                            link.source.start,
+                            link.source.end,
+                          )}
+                        </button>
+                        <span aria-hidden="true">→</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            focus(data.relationships.versification.refAt(link.target.start));
+                          }}
+                        >
+                          Target:{' '}
+                          {formatIndexRange(
+                            data.relationships.versification,
+                            link.target.start,
+                            link.target.end,
+                          )}
+                        </button>
+                      </div>
+                      <p>
+                        Original dataset context-after value: {link.contextAfter}. No votes or
+                        similarity strength are inferred.
+                      </p>
+                      <button
+                        className={styles.goButton}
+                        type="button"
+                        onClick={() => {
+                          navigate({
+                            ...location,
+                            view: 'threads',
+                            reference: data.relationships.versification.refAt(link.source.start),
+                            rangeEnd: null,
+                            selectedLink: null,
+                          });
+                        }}
+                      >
+                        Read in Threads
+                      </button>
+                    </section>
+                  )}
+                </>
               ) : (
                 <QuranThreads
                   data={data}
@@ -609,85 +688,8 @@ export function QuranApp() {
                   scope={location.scope}
                   direction={location.direction}
                   onNavigate={focus}
-                  showCurated={false}
                 />
-              )
-            ) : location.view === 'arcs' ? (
-              <>
-                <QuranArcs
-                  index={data.relationships}
-                  surah={location.reference.surah}
-                  scope={location.scope}
-                  focus={focusedRange}
-                  selectedId={link?.id ?? null}
-                  onSelect={(id) => {
-                    navigate({ ...location, selectedLink: id });
-                  }}
-                  onNavigate={focus}
-                />
-                {link && (
-                  <section className={styles.linkDetail} aria-live="polite">
-                    <h2>Selected relationship</h2>
-                    <div className={styles.linkPair}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          focus(data.relationships.versification.refAt(link.source.start));
-                        }}
-                      >
-                        Source:{' '}
-                        {formatIndexRange(
-                          data.relationships.versification,
-                          link.source.start,
-                          link.source.end,
-                        )}
-                      </button>
-                      <span aria-hidden="true">→</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          focus(data.relationships.versification.refAt(link.target.start));
-                        }}
-                      >
-                        Target:{' '}
-                        {formatIndexRange(
-                          data.relationships.versification,
-                          link.target.start,
-                          link.target.end,
-                        )}
-                      </button>
-                    </div>
-                    <p>
-                      Original dataset context-after value: {link.contextAfter}. No votes or
-                      similarity strength are inferred.
-                    </p>
-                    <button
-                      className={styles.goButton}
-                      type="button"
-                      onClick={() => {
-                        navigate({
-                          ...location,
-                          view: 'threads',
-                          reference: data.relationships.versification.refAt(link.source.start),
-                          rangeEnd: null,
-                          selectedLink: null,
-                        });
-                      }}
-                    >
-                      Read in Threads
-                    </button>
-                  </section>
-                )}
-              </>
-            ) : (
-              <QuranThreads
-                data={data}
-                reference={location.reference}
-                scope={location.scope}
-                direction={location.direction}
-                onNavigate={focus}
-              />
-            ))}
+              ))}
           </>
         )}
       </main>

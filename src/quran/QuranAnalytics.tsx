@@ -1,8 +1,5 @@
 import { useMemo, useState } from 'react';
-import type {
-  QuranAnalyticsDataset,
-  QuranAnalyticsSurah,
-} from '../core/quran/analytics-types.ts';
+import type { QuranAnalyticsDataset, QuranAnalyticsSurah } from '../core/quran/analytics-types.ts';
 import { CANONICAL_QURAN } from '../core/quran/quran-versification.ts';
 import { getSurah } from '../core/quran/surahs.ts';
 import styles from './QuranApp.module.css';
@@ -46,16 +43,11 @@ export function QuranAnalytics({
     const search = query.trim().toLocaleLowerCase('en');
     const matching = report.surahs.filter((row) => {
       const name = getSurah(row.surah).name.toLocaleLowerCase('en');
-      return (
-        !search ||
-        name.includes(search) ||
-        String(row.surah) === search
-      );
+      return !search || name.includes(search) || String(row.surah) === search;
     });
     if (order === 'density') {
       matching.sort(
-        (a, b) =>
-          metricValue(b, metric, unit) - metricValue(a, metric, unit) || a.surah - b.surah,
+        (a, b) => metricValue(b, metric, unit) - metricValue(a, metric, unit) || a.surah - b.surah,
       );
     }
     return matching;
@@ -165,9 +157,8 @@ export function QuranAnalytics({
             </label>
           </div>
           <p className={styles.analyticsHint} role="status">
-            {rows.length} surahs ·{' '}
-            {metric === 'curated' ? 'Curated links' : 'Computed word spans'} ·{' '}
-            {unit === 'per100' ? 'per 100 ayahs' : 'raw count'}
+            {rows.length} surahs · {metric === 'curated' ? 'Curated links' : 'Computed word spans'}{' '}
+            · {unit === 'per100' ? 'per 100 ayahs' : 'raw count'}
           </p>
           <div className={styles.analyticsBars} role="group" aria-label="Interactive surah bars">
             {rows.map((row) => {
@@ -181,7 +172,13 @@ export function QuranAnalytics({
                   type="button"
                   className={styles.analyticsBarButton}
                   data-selected={row.surah === selectedSurah ? 'true' : 'false'}
-                  aria-label={'Explore ' + name + ' ' + (metric === 'curated' ? 'curated' : 'computed') + ' evidence'}
+                  aria-label={
+                    'Explore ' +
+                    name +
+                    ' ' +
+                    (metric === 'curated' ? 'curated' : 'computed') +
+                    ' evidence'
+                  }
                   onClick={() => {
                     onOpenSurah(row.surah, metric, firstAyah);
                   }}
@@ -191,7 +188,11 @@ export function QuranAnalytics({
                   </span>
                   <span className={styles.analyticsBarTrack}>
                     <span
-                      className={metric === 'curated' ? styles.analyticsCuratedFill : styles.analyticsExactFill}
+                      className={
+                        metric === 'curated'
+                          ? styles.analyticsCuratedFill
+                          : styles.analyticsExactFill
+                      }
                       style={{ width: String((value / maxValue) * 100) + '%' }}
                     />
                   </span>
@@ -199,9 +200,7 @@ export function QuranAnalytics({
                 </button>
               );
             })}
-            {rows.length === 0 && (
-              <p className={styles.empty}>No surahs match this search.</p>
-            )}
+            {rows.length === 0 && <p className={styles.empty}>No surahs match this search.</p>}
           </div>
         </section>
 
@@ -220,24 +219,46 @@ export function QuranAnalytics({
                 <div
                   className={styles.analyticsStack}
                   role="img"
-                  aria-label={String(curatedWithin) + ' within-surah curated links and ' + String(curatedAcross) + ' cross-surah curated links'}
+                  aria-label={
+                    String(curatedWithin) +
+                    ' within-surah curated links and ' +
+                    String(curatedAcross) +
+                    ' cross-surah curated links'
+                  }
                 >
-                  <span style={{ width: evidencePercent(curatedWithin, report.totals.curatedLinks) }} />
-                  <span style={{ width: evidencePercent(curatedAcross, report.totals.curatedLinks) }} />
+                  <span
+                    style={{ width: evidencePercent(curatedWithin, report.totals.curatedLinks) }}
+                  />
+                  <span
+                    style={{ width: evidencePercent(curatedAcross, report.totals.curatedLinks) }}
+                  />
                 </div>
-                <p>{format(curatedWithin)} within · {format(curatedAcross)} across</p>
+                <p>
+                  {format(curatedWithin)} within · {format(curatedAcross)} across
+                </p>
               </div>
               <div>
                 <h3>Computed exact phrases</h3>
                 <div
                   className={styles.analyticsStack}
                   role="img"
-                  aria-label={String(exactWithin) + ' within-surah computed phrases and ' + String(exactAcross) + ' cross-surah computed phrases'}
+                  aria-label={
+                    String(exactWithin) +
+                    ' within-surah computed phrases and ' +
+                    String(exactAcross) +
+                    ' cross-surah computed phrases'
+                  }
                 >
-                  <span style={{ width: evidencePercent(exactWithin, report.totals.exactExpressions) }} />
-                  <span style={{ width: evidencePercent(exactAcross, report.totals.exactExpressions) }} />
+                  <span
+                    style={{ width: evidencePercent(exactWithin, report.totals.exactExpressions) }}
+                  />
+                  <span
+                    style={{ width: evidencePercent(exactAcross, report.totals.exactExpressions) }}
+                  />
                 </div>
-                <p>{format(exactWithin)} within · {format(exactAcross)} across</p>
+                <p>
+                  {format(exactWithin)} within · {format(exactAcross)} across
+                </p>
               </div>
             </div>
           </section>
@@ -245,8 +266,8 @@ export function QuranAnalytics({
             <div className={styles.panelHeading}>
               <h2>Most repeated exact phrases</h2>
               <p>
-                Ranked by recorded word-span occurrences, not importance or semantic
-                similarity. Select a phrase to inspect every source location.
+                Ranked by recorded word-span occurrences, not importance or semantic similarity.
+                Select a phrase to inspect every source location.
               </p>
             </div>
             <ol className={styles.analyticsPhraseList}>
@@ -265,8 +286,8 @@ export function QuranAnalytics({
                         {item.words.join(' ')}
                       </span>
                       <small>
-                        {format(item.spanCount)} spans · {format(item.distinctAyahCount)} ayahs
-                        · {format(item.surahCount)} surahs
+                        {format(item.spanCount)} spans · {format(item.distinctAyahCount)} ayahs ·{' '}
+                        {format(item.surahCount)} surahs
                       </small>
                     </span>
                   </button>
@@ -277,9 +298,9 @@ export function QuranAnalytics({
         </div>
       </div>
       <p className={styles.analyticsFootnote}>
-        Dataset classes are not interchangeable. A curated link touching two surahs contributes
-        once to each surah's incidence count, but only once to the global total. The computed
-        counts are strictly orthographic 3–8-word matches, not roots, lemmas, or interpretation.
+        Dataset classes are not interchangeable. A curated link touching two surahs contributes once
+        to each surah's incidence count, but only once to the global total. The computed counts are
+        strictly orthographic 3–8-word matches, not roots, lemmas, or interpretation.
       </p>
     </section>
   );

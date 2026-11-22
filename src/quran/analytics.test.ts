@@ -53,7 +53,12 @@ const expressions: QuranExactExpressionDataset = {
     },
   ],
 };
-const valid = buildQuranAnalytics(index, expressions, hashes, 'Copyright (C) 2007-2021 Tanzil Project');
+const valid = buildQuranAnalytics(
+  index,
+  expressions,
+  hashes,
+  'Copyright (C) 2007-2021 Tanzil Project',
+);
 
 describe('published Quran analytics validation', () => {
   it('accepts the complete typed report and requires the correct source hashes', () => {
@@ -66,12 +71,18 @@ describe('published Quran analytics validation', () => {
     expect(() => parseQuranAnalytics(null, hashes, 1)).toThrow('object');
     expect(() => parseQuranAnalytics({ ...valid, schemaVersion: 2 }, hashes, 1)).toThrow('schema');
     expect(() => parseQuranAnalytics({ ...valid, tanzilNotice: '' }, hashes, 1)).toThrow('notice');
-    expect(() => parseQuranAnalytics({ ...valid, totals: { ...valid.totals, curatedAcross: 0 } }, hashes, 1)).toThrow('totals');
-    expect(() => parseQuranAnalytics({ ...valid, totals: { ...valid.totals, exactSpans: -1 } }, hashes, 1)).toThrow('integer');
+    expect(() =>
+      parseQuranAnalytics({ ...valid, totals: { ...valid.totals, curatedAcross: 0 } }, hashes, 1),
+    ).toThrow('totals');
+    expect(() =>
+      parseQuranAnalytics({ ...valid, totals: { ...valid.totals, exactSpans: -1 } }, hashes, 1),
+    ).toThrow('integer');
   });
 
   it('requires all 114 canonical rows, valid per-100 denominators and traceable ayah positions', () => {
-    expect(() => parseQuranAnalytics({ ...valid, surahs: valid.surahs.slice(1) }, hashes, 1)).toThrow('114');
+    expect(() =>
+      parseQuranAnalytics({ ...valid, surahs: valid.surahs.slice(1) }, hashes, 1),
+    ).toThrow('114');
     const rows = [...valid.surahs];
     const first = rows[0];
     if (!first) throw new Error('Missing surah fixture.');
@@ -88,9 +99,19 @@ describe('published Quran analytics validation', () => {
     const entry = top[0];
     if (!entry) throw new Error('Missing expression fixture.');
     top[0] = { ...entry, id: 'made-up' };
-    expect(() => parseQuranAnalytics({ ...valid, topExpressions: top }, hashes, 1)).toThrow('ranking');
-    expect(() => parseQuranAnalytics({ ...valid, topExpressions: Array.from({ length: 33 }, () => valid.topExpressions[0]) }, hashes, 1)).toThrow('budget');
+    expect(() => parseQuranAnalytics({ ...valid, topExpressions: top }, hashes, 1)).toThrow(
+      'ranking',
+    );
+    expect(() =>
+      parseQuranAnalytics(
+        { ...valid, topExpressions: Array.from({ length: 33 }, () => valid.topExpressions[0]) },
+        hashes,
+        1,
+      ),
+    ).toThrow('budget');
     top[0] = { ...entry, spanCount: 1 };
-    expect(() => parseQuranAnalytics({ ...valid, topExpressions: top }, hashes, 1)).toThrow('ranking');
+    expect(() => parseQuranAnalytics({ ...valid, topExpressions: top }, hashes, 1)).toThrow(
+      'ranking',
+    );
   });
 });

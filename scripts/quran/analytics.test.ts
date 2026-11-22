@@ -6,7 +6,10 @@ import { QuranRelationshipIndex } from '../../src/core/quran/relationship-index.
 import type { QuranEvidenceSource } from '../../src/core/quran/relationship-evidence.ts';
 import { importMutashabihat, importQuranText } from './datasets.ts';
 import { buildQuranAnalytics } from './analytics.ts';
-import { createExactExpressionEvidence, type QuranExactExpressionDataset } from './expression-evidence.ts';
+import {
+  createExactExpressionEvidence,
+  type QuranExactExpressionDataset,
+} from './expression-evidence.ts';
 import { parseQuranAnalytics } from '../../src/quran/analytics.ts';
 
 const source = {
@@ -156,9 +159,7 @@ describe('Phase 2C.1 Quran analytics aggregates', () => {
       sourceRowCount: 1,
       duplicateCount: 0,
       repeatedRangeMemberCount: 0,
-      links: [
-        { source: { start: 6, end: 8 }, target: { start: 293, end: 294 }, contextAfter: 0 },
-      ],
+      links: [{ source: { start: 6, end: 8 }, target: { start: 293, end: 294 }, contextAfter: 0 }],
     });
     const result = buildQuranAnalytics(index, expressions, hashes, notice);
     expect(result.totals.curatedLinks).toBe(1);
@@ -222,10 +223,14 @@ describe('Phase 2C.1 Quran analytics aggregates', () => {
     });
     expect(report.surahs.reduce((sum, row) => sum + row.exactSpans, 0)).toBe(16924);
     expect(report.totals.curatedWithin + report.totals.curatedAcross).toBe(2445);
-    expect(report.totals.exactWithinSurahExpressions + report.totals.exactCrossSurahExpressions).toBe(5084);
+    expect(
+      report.totals.exactWithinSurahExpressions + report.totals.exactCrossSurahExpressions,
+    ).toBe(5084);
     expect(report.topExpressions).toHaveLength(32);
     expect(report.topExpressions[0]?.spanCount).toBe(114);
-    expect(parseQuranAnalytics(report, { arabic: arabic.sha256, curated: curated.sha256 }, 2445)).toBe(report);
+    expect(
+      parseQuranAnalytics(report, { arabic: arabic.sha256, curated: curated.sha256 }, 2445),
+    ).toBe(report);
     const duplicate = buildQuranAnalytics(
       relationships,
       evidence,
