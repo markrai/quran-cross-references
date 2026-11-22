@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { serveQuranBuild } from './serve-quran-build.ts';
 
 test.describe('Quran-first application', () => {
   test('loads a canonical root ayah link without requesting Bible datasets', async ({ page }) => {
@@ -106,11 +107,10 @@ test.describe('Quran production readiness', () => {
     );
   });
 
-  test('loads Arabic, English and related passages after losing network access', async ({
-    page,
-    context,
-  }) => {
-    await page.goto('./?ref=2%3A255');
+  test('loads Arabic, English and related passages after losing network access', async ({ page }) => {
+    const site = await serveQuranBuild();
+    try {
+      await page.goto(site.url + '?ref=2%3A255');
     await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
     await page.waitForFunction(async () => {
       const registration = await navigator.serviceWorker.ready;
@@ -142,8 +142,8 @@ test.describe('Quran production readiness', () => {
         'Failed request: ' + request.url() + ' ' + (request.failure()?.errorText ?? ''),
       );
     });
-    await context.setOffline(true);
-    try {
+    await site.stop();
+    {
       const probe = await page.evaluate(async () => {
         const scope = (await navigator.serviceWorker.ready).scope;
         const paths = ['', 'quran/', 'data/quran/text.json', 'data/quran/relationships.json'];
@@ -191,11 +191,12 @@ test.describe('Quran production readiness', () => {
       }
       await expect(page.locator('[aria-label="Selected ayah"] [lang="ar"]')).toBeVisible();
       await expect(page.locator('[aria-label="Selected ayah"] [lang="en"]')).toBeVisible();
-      await page.goto('quran/?ref=114%3A6&view=threads');
+      await page.goto(site.url + 'quran/?ref=114%3A6&view=threads');
       await expect(page.getByRole('heading', { name: /An-Nas.*114:6/ })).toBeVisible();
       await expect(page.getByRole('heading', { name: 'Threads from 114:6' })).toBeVisible();
+    }
     } finally {
-      await context.setOffline(false);
+      await site.stop();
     }
   });
 
