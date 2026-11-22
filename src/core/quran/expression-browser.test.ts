@@ -79,7 +79,9 @@ describe('published exact-expression inverted index', () => {
     expect(index.forAyah(7).map((match) => match.expression.words.length)).toEqual([4, 3]);
 
     const withExtra = dataset();
-    withExtra.expressions[0]?.occurrences.push({ ayah: 261, start: 1, end: 4 });
+    const firstExtra = withExtra.expressions[0];
+    if (!firstExtra) throw new Error('Missing fixture expression.');
+    firstExtra.occurrences.push({ ayah: 261, start: 1, end: 4 });
     expect(() => new QuranExpressionIndex(withExtra, arabic, source)).toThrow();
   });
 
@@ -134,50 +136,54 @@ describe('published exact-expression inverted index', () => {
 
   it('rejects malformed expression identity, origin, words and duplicate IDs', () => {
     const bad = dataset();
-    bad.expressions[0]!.id = 'unknown';
+    const firstEntry = bad.expressions[0];
+    if (!firstEntry) throw new Error('Missing fixture expression.');
+    firstEntry.id = 'unknown';
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('Invalid');
-    bad.expressions[0]!.id = id;
-    bad.expressions[0]!.origin = 'curated';
+    firstEntry.id = id;
+    firstEntry.origin = 'curated';
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('Invalid');
-    bad.expressions[0]!.origin = 'computed';
-    bad.expressions[0]!.kind = 'interpretation';
+    firstEntry.origin = 'computed';
+    firstEntry.kind = 'interpretation';
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('Invalid');
-    bad.expressions[0]!.kind = 'exact-repeated-expression';
-    bad.expressions[0]!.words = ['bad word', ...words.slice(1, 3)];
+    firstEntry.kind = 'exact-repeated-expression';
+    firstEntry.words = ['bad word', ...words.slice(1, 3)];
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('Invalid');
-    bad.expressions[0]!.words = [words[0]!];
+    firstEntry.words = [words[0] ?? ''];
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('Invalid');
-    bad.expressions[0]!.words = words.slice(0, 3);
-    bad.expressions.push({ ...bad.expressions[0]! });
+    firstEntry.words = words.slice(0, 3);
+    bad.expressions.push({ ...firstEntry });
     bad.statistics.emittedExpressions = 2;
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('duplicate');
   });
 
   it('rejects fabricated source spans, unordered occurrences and same-ayah-only matches', () => {
     const bad = dataset();
-    bad.expressions[0]!.words = ['INVALID', ...words.slice(1, 3)];
+    const firstEntry = bad.expressions[0];
+    if (!firstEntry) throw new Error('Missing fixture expression.');
+    firstEntry.words = ['INVALID', ...words.slice(1, 3)];
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('Arabic source span');
-    bad.expressions[0]!.words = words.slice(0, 3);
-    bad.expressions[0]!.occurrences = [
+    firstEntry.words = words.slice(0, 3);
+    firstEntry.occurrences = [
       { ayah: 7, start: 0, end: 3 },
       { ayah: 7, start: 0, end: 3 },
     ];
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('out-of-order');
-    bad.expressions[0]!.occurrences = [
+    firstEntry.occurrences = [
       { ayah: 7, start: 0, end: 3 },
       { ayah: 7, start: 1, end: 4 },
     ];
-    bad.expressions[0]!.words = words.slice(0, 3);
+    firstEntry.words = words.slice(0, 3);
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('Arabic source span');
-    bad.expressions[0]!.words = words.slice(1, 4);
-    bad.expressions[0]!.occurrences = [
+    firstEntry.words = words.slice(1, 4);
+    firstEntry.occurrences = [
       { ayah: 7, start: 1, end: 4 },
       { ayah: 7, start: 1, end: 4 },
     ];
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('out-of-order');
-    bad.expressions[0]!.occurrences = [{ ayah: 7, start: 1, end: 4 }];
+    firstEntry.occurrences = [{ ayah: 7, start: 1, end: 4 }];
     expect(() => new QuranExpressionIndex(bad, arabic, source)).toThrow('multiple ayahs');
-    bad.expressions[0]!.occurrences = [
+    firstEntry.occurrences = [
       { ayah: 7, start: 1, end: 4 },
       { ayah: 261, start: 1, end: 5 },
     ];
