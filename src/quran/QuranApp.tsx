@@ -98,9 +98,7 @@ export function QuranApp() {
       <header className={styles.header}>
         <div className={styles.brand}>
           <a href={defaultLink} className={styles.brandLink}>Quran Cross-References</a>
-          <span className={styles.previewLabel}>Preview · Phase 1C</span>
         </div>
-        <a className={styles.legacyLink} href={import.meta.env.BASE_URL}>Bible Explorer</a>
       </header>
 
       <main className={styles.main}>
@@ -300,7 +298,7 @@ export function QuranApp() {
         <p>Arabic text © <a href="https://tanzil.net/docs/Text_License">Tanzil Project</a>, Uthmani v1.1, reproduced without modification.
           English: Marmaduke Pickthall (1930), Tanzil digital edition.
           Curated similar passages: <a href="https://github.com/Waqar144/Quran_Mutashabihat_Data">Waqar144 Mutashabihat Data</a> (CC0).</p>
-        <p>Relationships indicate upstream textual similarities only, not verified theological interpretations. This is a preview; the Bible application remains the default.</p>
+        <p>Relationships indicate upstream textual similarities only, not verified theological interpretations.</p>
       </footer>
     </div>
   );
