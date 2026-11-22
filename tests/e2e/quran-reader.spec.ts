@@ -238,6 +238,7 @@ test.describe('Quran Phase 2A graph exploration', () => {
 
     const handle = page.getByRole('group', { name: 'Drag graph horizontally' });
     await expect(handle).toBeVisible();
+    await handle.scrollIntoViewIfNeeded();
     const box = await handle.boundingBox();
     expect(box).toBeTruthy();
     if (box) {
