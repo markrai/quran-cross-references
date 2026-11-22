@@ -85,7 +85,8 @@ export function parseQuranLocation(url: URL): QuranLocation {
       : null;
   const rawWord = params.get('word');
   const selectedMorphWord =
-    evidence === 'morphology' && rawWord !== null &&
+    evidence === 'morphology' &&
+    rawWord !== null &&
     /^(?:[1-9]|[1-9][0-9]|[12][0-9][0-9]|300)$/u.test(rawWord)
       ? Number(rawWord)
       : null;

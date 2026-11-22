@@ -30,10 +30,11 @@ export function QuranMorphology({
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
   const [searchError, setSearchError] = useState<string | null>(null);
-  const currentWord = selectedWord !== null && selectedWord > 0
-    ? words[selectedWord - 1]
-    : undefined;
-  const fallbackWord = words.findIndex((word) => word[grouping === 'root' ? 'roots' : 'lemmas'].length > 0);
+  const currentWord =
+    selectedWord !== null && selectedWord > 0 ? words[selectedWord - 1] : undefined;
+  const fallbackWord = words.findIndex(
+    (word) => word[grouping === 'root' ? 'roots' : 'lemmas'].length > 0,
+  );
   const first = fallbackWord >= 0 ? words[fallbackWord] : undefined;
   const initial = grouping === 'root' ? first?.roots[0] : first?.lemmas[0];
   const term = selectedTerm ?? initial ?? null;
@@ -65,13 +66,13 @@ export function QuranMorphology({
         <p>
           {index.wordCount.toLocaleString('en')} annotated words ·{' '}
           {index.segmentCount.toLocaleString('en')} morphological segments ·{' '}
-          {index.rootCount.toLocaleString('en')} roots ·{' '}
-          {index.lemmaCount.toLocaleString('en')} lemmas.
+          {index.rootCount.toLocaleString('en')} roots · {index.lemmaCount.toLocaleString('en')}{' '}
+          lemmas.
         </p>
         <p>
-          Prefixes, stems and suffixes come from the manually reviewed Quranic Arabic Corpus
-          v0.4. This evidence is linguistic annotation, not curated similarity, verbatim
-          phrase repetition, or an interpretation of verse meaning.
+          Prefixes, stems and suffixes come from the manually reviewed Quranic Arabic Corpus v0.4.
+          This evidence is linguistic annotation, not curated similarity, verbatim phrase
+          repetition, or an interpretation of verse meaning.
         </p>
       </div>
       <div className={styles.qacControls}>
@@ -110,13 +111,21 @@ export function QuranMorphology({
               placeholder={grouping === 'root' ? 'رحم or rHm' : 'Arabic or Buckwalter'}
             />
           </label>
-          <button type="submit" className={styles.goButton}>Find</button>
+          <button type="submit" className={styles.goButton}>
+            Find
+          </button>
         </form>
       </div>
-      {searchError && <p role="alert" className={styles.qacNote}>{searchError}</p>}
+      {searchError && (
+        <p role="alert" className={styles.qacNote}>
+          {searchError}
+        </p>
+      )}
       <div className={styles.qacColumns}>
         <section className={styles.qacSection} aria-label="Annotated words at selected ayah">
-          <h3>{formatAyahId(CANONICAL_QURAN.refAt(ayahIndex))} · {String(words.length)} source words</h3>
+          <h3>
+            {formatAyahId(CANONICAL_QURAN.refAt(ayahIndex))} · {String(words.length)} source words
+          </h3>
           <div className={styles.qacWords}>
             {words.map((word, position) => {
               const entries = grouping === 'root' ? word.roots : word.lemmas;
@@ -128,8 +137,12 @@ export function QuranMorphology({
                   aria-pressed={selectedWord === position + 1}
                   onClick={() => selectWord(position)}
                 >
-                  <span lang="ar" dir="rtl" className={styles.qacArabic}>{word.form || '…'}</span>
-                  <small>Word {String(position + 1)} · {word.pos.join(', ') || 'unclassified'}</small>
+                  <span lang="ar" dir="rtl" className={styles.qacArabic}>
+                    {word.form || '…'}
+                  </span>
+                  <small>
+                    Word {String(position + 1)} · {word.pos.join(', ') || 'unclassified'}
+                  </small>
                   <span lang="ar" dir="rtl">
                     {entries.map(buckwalterToArabic).join('، ') || 'Unannotated'}
                   </span>
@@ -143,21 +156,21 @@ export function QuranMorphology({
               <p>Select a word above to inspect its actual prefixes, stems and suffixes.</p>
             ) : (
               <>
-                <p>Word {String(selectedWord)} · {String(currentWord.segments.length)} segments</p>
+                <p>
+                  Word {String(selectedWord)} · {String(currentWord.segments.length)} segments
+                </p>
                 {currentWord.segments.map(([form, tag, features], position) => (
                   <div key={position} className={styles.qacSegment}>
                     <strong>{features.split('|')[0]}</strong>
-                    <span lang="ar" dir="rtl">{buckwalterToArabic(form) || '∅'}</span>
+                    <span lang="ar" dir="rtl">
+                      {buckwalterToArabic(form) || '∅'}
+                    </span>
                     <span>{tag}</span>
                     <small>{features.split('|').slice(1).join(' · ')}</small>
                   </div>
                 ))}
-                {currentWord.lemmas.length > 0 && (
-                  <p>Lemma: {currentWord.lemmas.join(', ')}</p>
-                )}
-                {currentWord.roots.length > 0 && (
-                  <p>Root: {currentWord.roots.join(', ')}</p>
-                )}
+                {currentWord.lemmas.length > 0 && <p>Lemma: {currentWord.lemmas.join(', ')}</p>}
+                {currentWord.roots.length > 0 && <p>Root: {currentWord.roots.join(', ')}</p>}
               </>
             )}
           </div>
@@ -165,16 +178,22 @@ export function QuranMorphology({
         <section className={styles.qacSection} aria-label="Morphology occurrence evidence">
           <h3>
             {grouping === 'root' ? 'Root' : 'Lemma'}{' '}
-            {term && <span lang="ar" dir="rtl">{buckwalterToArabic(term)}</span>}
+            {term && (
+              <span lang="ar" dir="rtl">
+                {buckwalterToArabic(term)}
+              </span>
+            )}
           </h3>
           {term === null ? (
-            <p className={styles.empty}>No annotation is available for this grouping in this ayah.</p>
+            <p className={styles.empty}>
+              No annotation is available for this grouping in this ayah.
+            </p>
           ) : (
             <>
               <p>
-                <strong>{hits.length.toLocaleString('en')}</strong> original corpus word
-                occurrences matching <code>{term}</code>. Each result identifies the annotated
-                source verse and word position.
+                <strong>{hits.length.toLocaleString('en')}</strong> original corpus word occurrences
+                matching <code>{term}</code>. Each result identifies the annotated source verse and
+                word position.
               </p>
               {hits.length === 0 && (
                 <p className={styles.empty}>No occurrence matches this exact corpus annotation.</p>
@@ -190,12 +209,17 @@ export function QuranMorphology({
                     aria-label={
                       'Open morphology source ' +
                       formatAyahId(CANONICAL_QURAN.refAt(site.ayah)) +
-                      ' word ' + String(site.word + 1)
+                      ' word ' +
+                      String(site.word + 1)
                     }
                   >
                     <strong>{formatAyahId(CANONICAL_QURAN.refAt(site.ayah))}</strong>
-                    <span lang="ar" dir="rtl" className={styles.qacArabic}>{site.form}</span>
-                    <small>word {String(site.word + 1)} · {site.pos}</small>
+                    <span lang="ar" dir="rtl" className={styles.qacArabic}>
+                      {site.form}
+                    </span>
+                    <small>
+                      word {String(site.word + 1)} · {site.pos}
+                    </small>
                   </button>
                 ))}
               </div>
@@ -207,7 +231,9 @@ export function QuranMorphology({
                 >
                   Previous occurrences
                 </button>
-                <span>Page {String(currentPage + 1)} of {String(count)}</span>
+                <span>
+                  Page {String(currentPage + 1)} of {String(count)}
+                </span>
                 <button
                   type="button"
                   disabled={currentPage + 1 >= count}
@@ -227,15 +253,16 @@ export function QuranMorphology({
           but identical word token boundaries across editions are not assumed.
         </p>
         <p>
-          Some words have multiple stems or no lemma/root annotation. Both are preserved:
-          multiple values appear separately, and absent values are not guessed. A shared
-          root can encompass different lemmas and meanings.
+          Some words have multiple stems or no lemma/root annotation. Both are preserved: multiple
+          values appear separately, and absent values are not guessed. A shared root can encompass
+          different lemmas and meanings.
         </p>
         <p>
           Morphology © 2011 Kais Dukes,{' '}
           <a href="https://corpus.quran.com" target="_blank" rel="noreferrer">
             Quranic Arabic Corpus
-          </a>. The original copyright block is included in the derived evidence file.
+          </a>
+          . The original copyright block is included in the derived evidence file.
         </p>
       </div>
     </section>

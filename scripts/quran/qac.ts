@@ -38,10 +38,7 @@ export function importQacMorphology(
     invalid('The unmodified Quranic Arabic Corpus copyright headers are missing.');
   }
 
-  const ayahs: QacSegment[][][] = Array.from(
-    { length: CANONICAL_QURAN.ayahCount },
-    () => [],
-  );
+  const ayahs: QacSegment[][][] = Array.from({ length: CANONICAL_QURAN.ayahCount }, () => []);
   let wordCount = 0;
   let segmentCount = 0;
   let stemCount = 0;
@@ -109,7 +106,10 @@ export function importQacMorphology(
   ) {
     invalid(
       'Expected 6,236 verses, 77,429 words and 128,219 segments; saw ' +
-        String(wordCount) + ' words and ' + String(segmentCount) + ' segments.',
+        String(wordCount) +
+        ' words and ' +
+        String(segmentCount) +
+        ' segments.',
     );
   }
   return {

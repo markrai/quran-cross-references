@@ -67,7 +67,9 @@ export async function loadQacMorphology(signal?: AbortSignal): Promise<QacMorpho
     throw new Error('QAC morphology exceeds the 14 MiB optional data budget.');
   }
   const hash = await crypto.subtle.digest('SHA-256', bytes);
-  const actual = Array.from(new Uint8Array(hash), (byte) => byte.toString(16).padStart(2, '0')).join('');
+  const actual = Array.from(new Uint8Array(hash), (byte) =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('');
   if (actual !== expected) {
     throw new Error('QAC morphology failed the published SHA-256 checksum.');
   }

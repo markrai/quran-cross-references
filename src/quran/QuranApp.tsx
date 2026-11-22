@@ -77,7 +77,15 @@ function useQuranLocation(): readonly [
 }
 
 function linkReference(location: QuranLocation, reference: AyahRef): QuranLocation {
-  return { ...location, reference, rangeEnd: null, selectedLink: null, selectedExpression: null, selectedMorphTerm: null, selectedMorphWord: null };
+  return {
+    ...location,
+    reference,
+    rangeEnd: null,
+    selectedLink: null,
+    selectedExpression: null,
+    selectedMorphTerm: null,
+    selectedMorphWord: null,
+  };
 }
 
 export function QuranApp() {
@@ -232,7 +240,8 @@ export function QuranApp() {
       location.view === 'analytics' ||
       location.view === 'network' ||
       location.evidence !== 'morphology'
-    ) return;
+    )
+      return;
     if (morphologyCache.current) {
       setMorphologyState({ status: 'ready', index: morphologyCache.current });
       return;
@@ -358,7 +367,11 @@ export function QuranApp() {
                   value={location.evidence}
                   onChange={(event) => {
                     const evidence = event.target.value;
-                    if (evidence === 'curated' || evidence === 'exact' || evidence === 'morphology') {
+                    if (
+                      evidence === 'curated' ||
+                      evidence === 'exact' ||
+                      evidence === 'morphology'
+                    ) {
                       setExpressionState({ status: 'idle' });
                       navigate({
                         ...location,
@@ -790,8 +803,7 @@ export function QuranApp() {
               location.view !== 'network' &&
               location.evidence === 'morphology' && (
                 <>
-                  {(morphologyState.status === 'idle' ||
-                    morphologyState.status === 'loading') && (
+                  {(morphologyState.status === 'idle' || morphologyState.status === 'loading') && (
                     <p className={styles.loading} role="status">
                       Loading and verifying Quranic Arabic Corpus morphology…
                     </p>
@@ -1008,8 +1020,8 @@ export function QuranApp() {
             Waqar144 Mutashabihat Data
           </a>{' '}
           (CC0). Original Arabic morphology:{' '}
-          <a href="https://corpus.quran.com">Quranic Arabic Corpus © 2011 Kais Dukes</a>{' '}
-          (v0.4 annotation).
+          <a href="https://corpus.quran.com">Quranic Arabic Corpus © 2011 Kais Dukes</a> (v0.4
+          annotation).
           <a href={import.meta.env.BASE_URL + 'data/quran/manifest.json'}>
             {' '}
             Verified dataset provenance

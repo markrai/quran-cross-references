@@ -15,7 +15,9 @@ const sources = JSON.parse(readFileSync('data/quran/sources.json', 'utf8')) as {
 const pin = sources.sources.find((entry) => entry.id === 'qac-morphology-v04');
 if (
   !pin ||
-  !pin.url.startsWith('https://raw.githubusercontent.com/taziksh/quran-frequencies/079cdc74cd494ec1b35011363288d80cae047c51/') ||
+  !pin.url.startsWith(
+    'https://raw.githubusercontent.com/taziksh/quran-frequencies/079cdc74cd494ec1b35011363288d80cae047c51/',
+  ) ||
   !/^[a-f0-9]{64}$/.test(pin.sha256)
 ) {
   throw new Error('The QAC v0.4 morphology source must have reviewed immutable provenance.');
@@ -28,7 +30,9 @@ const verify = (content: Buffer): void => {
   }
   const checksum = createHash('sha256').update(content).digest('hex');
   if (checksum !== pin.sha256) {
-    throw new Error('QAC v0.4 source checksum mismatch (expected ' + pin.sha256 + ', got ' + checksum + ').');
+    throw new Error(
+      'QAC v0.4 source checksum mismatch (expected ' + pin.sha256 + ', got ' + checksum + ').',
+    );
   }
 };
 
@@ -38,7 +42,9 @@ if (existsSync(destination)) {
 } else {
   const response = await fetch(pin.url);
   if (!response.ok) {
-    throw new Error('Unable to retrieve pinned QAC v0.4 source (HTTP ' + String(response.status) + ').');
+    throw new Error(
+      'Unable to retrieve pinned QAC v0.4 source (HTTP ' + String(response.status) + ').',
+    );
   }
   const content = Buffer.from(await response.arrayBuffer());
   verify(content);

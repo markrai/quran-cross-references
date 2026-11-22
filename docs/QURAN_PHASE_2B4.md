@@ -14,13 +14,14 @@ The raw QAC file is fetched from an immutable GitHub mirror at `taziksh/quran-fr
 
 The published `quran-qac-morphology` v1 format stores all QAC segments for each canonical ayah and word as source tuples of `[FORM, TAG, FEATURES]`. This preserves original Buckwalter forms and ordered feature fields while avoiding the inefficiency of duplicating JSON property names across 128,219 segments. No QAC features or extra STEM annotations are dropped. The full original copyright notice, including QAC and Tanzil 1.0.2 conditions, is retained in the artifact alongside the main reader's Tanzil 1.1 attribution.
 
-The browser verifies the SHA-256 of the transferred artifact against `manifest.json`, checks source pin metadata, preserves the separately classified evidence type, validates every word and segment, and rebuilds the lemma/root inverted index locally. Word positions are canonical *within QAC*, and verse references align to the existing 6,236-ayah versification. The app **does not assert exact surface-word alignment between QAC's Tanzil 1.0.2 edition and the reader's Tanzil 1.1 edition**.
+The browser verifies the SHA-256 of the transferred artifact against `manifest.json`, checks source pin metadata, preserves the separately classified evidence type, validates every word and segment, and rebuilds the lemma/root inverted index locally. Word positions are canonical _within QAC_, and verse references align to the existing 6,236-ayah versification. The app **does not assert exact surface-word alignment between QAC's Tanzil 1.0.2 edition and the reader's Tanzil 1.1 edition**.
 
 ## User experience
 
-The existing Arcs and Threads & Reader pages offer a third explicit evidence choice: **QAC annotated lemmas, roots and grammar**. Selecting it lazily downloads the larger morphology sidecar. It is *not* part of the offline PWA installation cache, so the standard Quran reader remains compact. The sidecar stays cached in memory after a verified load during that page session.
+The existing Arcs and Threads & Reader pages offer a third explicit evidence choice: **QAC annotated lemmas, roots and grammar**. Selecting it lazily downloads the larger morphology sidecar. It is _not_ part of the offline PWA installation cache, so the standard Quran reader remains compact. The sidecar stays cached in memory after a verified load during that page session.
 
 The explorer provides:
+
 - Selectable Arabic words at the currently focused verse with independently sourced QAC POS tags and lemma/root annotations.
 - A per-word segment inspector exposing original prefixes, stems, suffixes, TAG, and morphological features without inventing analyses.
 - Explicit lemma or root grouping, with exact Arabic/Buckwalter lookup.
@@ -28,7 +29,7 @@ The explorer provides:
 - Shareable, mutually exclusive deep links, such as `?ref=1%3A1&evidence=morphology&morph=root&term=rHm&word=3`. Navigating an occurrence preserves the search term and opens the verified canonical ayah plus the original QAC word position.
 - Reader context through the existing bilingual ayah and Threads UI, without mixing curated relationship arcs or computed exact-phrase evidence into the morphology result.
 
-A root represents a derivational family, *not* a statement that all its lemmas have the same meaning. A lemma represents an annotation editor's lexical grouping, *not* an automatically inferred paraphrase. Any missing root/lemma remains absent.
+A root represents a derivational family, _not_ a statement that all its lemmas have the same meaning. A lemma represents an annotation editor's lexical grouping, _not_ an automatically inferred paraphrase. Any missing root/lemma remains absent.
 
 ## Validation
 

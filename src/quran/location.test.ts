@@ -64,9 +64,10 @@ describe('Quran-first canonical route', () => {
       const url = new URL('https://example.test/?evidence=morphology&word=' + bad);
       expect(parseQuranLocation(url).selectedMorphWord).toBeNull();
     }
-    expect(parseQuranLocation(
-      new URL('https://example.test/?evidence=morphology&term=%20')
-    ).selectedMorphTerm).toBeNull();
+    expect(
+      parseQuranLocation(new URL('https://example.test/?evidence=morphology&term=%20'))
+        .selectedMorphTerm,
+    ).toBeNull();
   });
 
   it('round-trips analytics URLs while preserving their selected ayah', () => {

@@ -739,7 +739,6 @@ test.describe('Quran Phase 2C.2 curated graph network', () => {
   });
 });
 
-
 test.describe('Quran Phase 2B.4 original QAC morphology', () => {
   test('fetches QAC only on demand and lets the user explore real word, lemma and root occurrences', async ({
     page,
@@ -756,7 +755,9 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
     expect(morphologyRequests).toEqual([]);
     await page.getByRole('combobox', { name: 'Evidence type' }).selectOption('morphology');
     await expect(page).toHaveURL(/evidence=morphology/);
-    await expect(page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' }),
+    ).toBeVisible();
     expect(morphologyRequests).toHaveLength(1);
 
     const response = await request.get('data/quran/morphology.json');
@@ -790,14 +791,20 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
     await expect(page.getByText(/Page 2 of/)).toBeVisible();
     await occurrences.first().click();
     await expect(page).toHaveURL(/word=\d+/);
-    await expect(page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' }),
+    ).toBeVisible();
     await page.goBack();
     await expect(page).toHaveURL(/morph=root&term=rHm&word=3/);
   });
 
-  test('supports Arabic root search, deep-link restoration, and separate evidence switching', async ({ page }) => {
+  test('supports Arabic root search, deep-link restoration, and separate evidence switching', async ({
+    page,
+  }) => {
     await page.goto('./?ref=1%3A1&evidence=morphology&morph=root');
-    await expect(page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' }),
+    ).toBeVisible();
     await page.getByRole('textbox', { name: 'Search morphology term' }).fill('رحم');
     await page.getByRole('button', { name: 'Find', exact: true }).click();
     await expect(page).toHaveURL(/term=rHm/);
@@ -812,14 +819,18 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
 
   test('does not precache the large QAC sidecar with the offline reader', async ({ page }) => {
     await page.goto('./?ref=2%3A255&evidence=morphology');
-    await expect(page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' }),
+    ).toBeVisible();
     const cached = await page.evaluate(async () => {
       const registration = await navigator.serviceWorker.ready;
       const names = await caches.keys();
       const name = names.find((candidate) => candidate.startsWith('quran-cross-references-shell-'));
       if (!name) return { morphology: false, text: false };
       const cache = await caches.open(name);
-      const morphology = await cache.match(new URL('data/quran/morphology.json', registration.scope));
+      const morphology = await cache.match(
+        new URL('data/quran/morphology.json', registration.scope),
+      );
       const text = await cache.match(new URL('data/quran/text.json', registration.scope));
       return { morphology: morphology !== undefined, text: text !== undefined };
     });

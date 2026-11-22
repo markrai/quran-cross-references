@@ -63,9 +63,7 @@ const buckwalter: Readonly<Record<string, string>> = {
   '{': 'ٱ',
 };
 
-const arabicToBw = new Map(
-  Object.entries(buckwalter).map(([symbol, arabic]) => [arabic, symbol]),
-);
+const arabicToBw = new Map(Object.entries(buckwalter).map(([symbol, arabic]) => [arabic, symbol]));
 
 function arabicToBuckwalter(value: string): string {
   return Array.from(value, (symbol) => arabicToBw.get(symbol) ?? symbol).join('');
@@ -98,11 +96,7 @@ function featureValue(features: string, prefix: string): string | null {
   return item ? item.slice(prefix.length) : null;
 }
 
-function add(
-  index: Map<string, QacOccurrence[]>,
-  term: string,
-  occurrence: QacOccurrence,
-): void {
+function add(index: Map<string, QacOccurrence[]>, term: string, occurrence: QacOccurrence): void {
   const matches = index.get(term) ?? [];
   matches.push(occurrence);
   index.set(term, matches);
@@ -122,10 +116,7 @@ export class QacMorphologyIndex {
   readonly #roots = new Map<string, QacOccurrence[]>();
 
   constructor(value: unknown, source: QacSource) {
-    if (
-      source.id !== 'qac-morphology-v04' ||
-      !/^[a-f0-9]{64}$/.test(source.sha256)
-    ) {
+    if (source.id !== 'qac-morphology-v04' || !/^[a-f0-9]{64}$/.test(source.sha256)) {
       invalid('The source must be the reviewed pinned QAC v0.4 snapshot.');
     }
     const dataset = record(value, 'dataset');
@@ -148,13 +139,24 @@ export class QacMorphologyIndex {
       invalid('The original copyright and Tanzil notices are missing.');
     }
     if (
-      !string(dataset['tanzilNotice'], 'Tanzil v1.1 notice').includes('Copyright (C) 2007-2021 Tanzil Project')
+      !string(dataset['tanzilNotice'], 'Tanzil v1.1 notice').includes(
+        'Copyright (C) 2007-2021 Tanzil Project',
+      )
     ) {
       invalid('The displayed Tanzil Quran text notice is missing.');
     }
     const pin = record(dataset['source'], 'source');
-    for (const key of ['id', 'url', 'fileName', 'sha256', 'license', 'attribution', 'retrievedAt'] as const) {
-      if (pin[key] !== source[key]) invalid('The ' + key + ' provenance field does not match the source pin.');
+    for (const key of [
+      'id',
+      'url',
+      'fileName',
+      'sha256',
+      'license',
+      'attribution',
+      'retrievedAt',
+    ] as const) {
+      if (pin[key] !== source[key])
+        invalid('The ' + key + ' provenance field does not match the source pin.');
     }
     if (
       dataset['ayahCount'] !== CANONICAL_QURAN.ayahCount ||
@@ -255,14 +257,15 @@ export class QacMorphologyIndex {
     const registry = grouping === 'root' ? this.#roots : this.#lemmas;
     const trimmed = input.trim();
     if (registry.has(trimmed)) return trimmed;
-    const normalized = grouping === 'root'
-      ? trimmed.replaceAll('.', '').replaceAll('·', '').replaceAll(' ', '')
-      : trimmed;
+    const normalized =
+      grouping === 'root'
+        ? trimmed.replaceAll('.', '').replaceAll('·', '').replaceAll(' ', '')
+        : trimmed;
     const converted = arabicToBuckwalter(normalized);
     return registry.has(converted) ? converted : null;
   }
 
   occurrences(grouping: QacGrouping, term: string): readonly QacOccurrence[] {
-    return grouping === 'root' ? this.#roots.get(term) ?? [] : this.#lemmas.get(term) ?? [];
+    return grouping === 'root' ? (this.#roots.get(term) ?? []) : (this.#lemmas.get(term) ?? []);
   }
 }
