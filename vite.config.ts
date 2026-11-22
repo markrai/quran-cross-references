@@ -33,6 +33,7 @@ export default defineConfig(({ command, isPreview = false }) => ({
         'src/quran/model.ts',
         'src/quran/share.ts',
         'scripts/quran/datasets.ts',
+        'scripts/quran/expression-evidence.ts',
         'scripts/quran/pwa.ts',
         'scripts/quran/pinned-source.ts',
       ],
