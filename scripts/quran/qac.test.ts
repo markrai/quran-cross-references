@@ -100,6 +100,47 @@ describe('QAC v0.4 original segment-level importer', () => {
     );
   }, 120_000);
 
+  it('fails closed for malformed publication metadata, incomplete locations and segment features', () => {
+    const raw = readFileSync('data/raw/quranic-corpus-morphology-0.4.txt', 'utf8');
+    const dataset = importQacMorphology(raw, source, tanzilNotice);
+    const changeFirstWord = (replacement: unknown): unknown => {
+      const ayahs: unknown[] = [...dataset.ayahs];
+      const words: unknown[] = [...(dataset.ayahs[0] ?? [])];
+      words[0] = replacement;
+      ayahs[0] = words;
+      return { ...dataset, ayahs };
+    };
+    const assertInvalid = (payload: unknown) => {
+      expect(() => new QacMorphologyIndex(payload, source)).toThrow(
+        'Invalid published QAC morphology',
+      );
+    };
+    assertInvalid(null);
+    assertInvalid({ ...dataset, format: 'unexpected' });
+    assertInvalid({ ...dataset, qacNotice: '' });
+    assertInvalid({ ...dataset, qacNotice: 'tampered copyright' });
+    assertInvalid({ ...dataset, tanzilNotice: '' });
+    assertInvalid({ ...dataset, source: { ...source, attribution: 'wrong' } });
+    assertInvalid({ ...dataset, ayahs: [[], ...dataset.ayahs.slice(1)] });
+    assertInvalid(changeFirstWord([]));
+    assertInvalid(changeFirstWord([[1, 'N', 'STEM|POS:N']]));
+    assertInvalid(changeFirstWord([['a', '', 'STEM|POS:N']]));
+    assertInvalid(changeFirstWord([['a', 'N', '']]));
+    assertInvalid(changeFirstWord([['a', 'N', 'UNKNOWN|POS:N']]));
+    assertInvalid(changeFirstWord([['a', 'N']]));
+    assertInvalid(changeFirstWord([['a', 'N', 'STEM|POS:N'], ['b', 'N', 'STEM|POS:N']]));
+    expect(() => new QacMorphologyIndex(dataset, { ...source, id: 'other' })).toThrow(
+      'QAC v0.4 snapshot',
+    );
+    expect(() => new QacMorphologyIndex(dataset, { ...source, sha256: 'invalid' })).toThrow(
+      'QAC v0.4 snapshot',
+    );
+    expect(buckwalterToArabic('some-unknown')).toContain('-');
+    expect(() => new QacMorphologyIndex({ ...dataset, source: null }, source)).toThrow(
+      'source must be an object',
+    );
+  }, 120_000);
+
   it('reproduces a byte-identical typed projection from the same pinned source', () => {
     const raw = readFileSync('data/raw/quranic-corpus-morphology-0.4.txt', 'utf8');
     const first = JSON.stringify(importQacMorphology(raw, source, tanzilNotice));
