@@ -16,7 +16,7 @@ The Analytics tab is addressable as `?ref=2%3A255&view=analytics`, with the sele
 
 The right column shows global within/cross classifications separately for curated links and computed expressions. The top 32 exact phrases are ranked by word-span frequency, with stable IDs and source navigation. Phrase ranking is descriptive and is not an inferred theological relevance score.
 
-The compact `analytics.json` is included in the PWA's offline installation cache, but is fetched only upon entering Analytics. The complete `expressions.json` remains a separate optional request and is excluded from the PWA precache. A user opening a phrase from Analytics triggers normal Phase 2B.3 expression loading and validation.
+The compact `analytics.json` is fetched in the background during PWA service-worker installation and kept in its offline cache. The interactive reader does not parse or display the report until the user enters Analytics. The complete `expressions.json` remains a separate optional request and is excluded from the PWA precache. A user opening a phrase from Analytics triggers normal Phase 2B.3 expression loading and validation.
 
 ## Acceptance
 
