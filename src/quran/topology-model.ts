@@ -261,7 +261,7 @@ export function curatedNeighborhood(
     const seen = new Set(first.map((edge) => String(edge.id) + ':' + edge.direction));
     for (const neighbor of new Set(first.map((edge) => edge.neighbor))) {
       for (const edge of directEdges(index, neighbor, direction, 2)) {
-        const key = edge.id + ':' + edge.direction;
+        const key = String(edge.id) + ':' + edge.direction;
         if (edge.neighbor === focus || seen.has(key)) continue;
         seen.add(key);
         secondCount += 1;
