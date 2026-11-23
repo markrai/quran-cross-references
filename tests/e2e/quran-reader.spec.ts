@@ -100,6 +100,66 @@ test.describe('Phase 3A.1 bilingual verse search', () => {
   });
 });
 
+test.describe('Phase 3B.1 reader-first experience', () => {
+  test('restores research without losing the ayah or verse search after focused reading', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=2%3A255&view=threads&q=Allah&qlang=en');
+    const originalUrl = new URL(page.url()).search;
+    const search = page.getByRole('region', { name: 'Bilingual Quran verse search' });
+    await expect(search).toBeVisible();
+    await page.getByRole('button', { name: 'Enter reading mode' }).click();
+    await expect(page.getByRole('region', { name: 'Distraction-free Quran reader' })).toBeVisible();
+    await expect(search).toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Selected ayah relationships' })).toHaveCount(0);
+    await expect(page.getByRole('group', { name: 'Visualization' })).toHaveCount(0);
+    await expect(page.getByRole('combobox', { name: 'Surah' })).toBeVisible();
+    await expect(page.locator('#quran-ayah-2-255')).toBeInViewport();
+    expect(new URL(page.url()).search).toBe(originalUrl);
+
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Exit reading mode' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Distraction-free Quran reader' })).toBeVisible();
+    await page.getByRole('button', { name: 'Next ayah' }).click();
+    await expect(page).toHaveURL(/ref=2%3A256/);
+    await page.getByRole('button', { name: 'Exit reading mode' }).click();
+    await expect(search).toBeVisible();
+    await expect(search.getByRole('searchbox', { name: 'Verse text' })).toHaveValue('Allah');
+    await expect(page.getByRole('heading', { name: 'Threads from 2:256' })).toBeVisible();
+    await expect(page).toHaveURL(/q=Allah&qlang=en/);
+  });
+
+  test('persists independent typography and language settings, including RTL text', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=2%3A255&view=threads');
+    await page.getByText('Reading settings').click();
+    await page.getByRole('combobox', { name: 'Reader language' }).selectOption('arabic');
+    await page.getByRole('combobox', { name: 'Arabic text size' }).selectOption('140');
+    await page.getByRole('combobox', { name: 'English text size' }).selectOption('120');
+    await page.getByRole('combobox', { name: 'Reader line spacing' }).selectOption('spacious');
+    const reader = page.getByRole('region', { name: 'Quran text and relationship threads' });
+    await expect(reader.locator('[lang="ar"][dir="rtl"]').first()).toBeVisible();
+    await expect(reader.locator('[lang="en"]')).toHaveCount(0);
+    await expect(page.locator('#quran-main')).toHaveAttribute(
+      'style',
+      /--reading-arabic-size: 2\.45rem/,
+    );
+    await page.reload();
+    await page.getByText('Reading settings').click();
+    await expect(page.getByRole('combobox', { name: 'Reader language' })).toHaveValue('arabic');
+    await expect(page.getByRole('combobox', { name: 'Arabic text size' })).toHaveValue('140');
+    await expect(page.getByRole('combobox', { name: 'English text size' })).toHaveValue('120');
+    await expect(page.getByRole('combobox', { name: 'Reader line spacing' })).toHaveValue(
+      'spacious',
+    );
+    await page.getByRole('combobox', { name: 'Reader language' }).selectOption('english');
+    await expect(reader.locator('[lang="ar"]')).toHaveCount(0);
+    await expect(reader.locator('[lang="en"][dir="ltr"]').first()).toBeVisible();
+    await expect(page).toHaveURL(/ref=2%3A255&view=threads/);
+  });
+});
+
 test.describe('Quran production readiness', () => {
   test('publishes an installable manifest, generated icons and link preview metadata', async ({
     page,
