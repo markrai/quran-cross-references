@@ -26,6 +26,7 @@ const data: QuranReaderData = {
 };
 
 beforeEach(() => {
+  window.localStorage.clear();
   window.history.replaceState(null, '', '/?ref=2%3A1');
   vi.mocked(loadQuranReaderData).mockReset();
   vi.mocked(loadQuranReaderData).mockResolvedValue(data);
@@ -134,6 +135,68 @@ describe('Quran-first reader', () => {
     await screen.findByRole('heading', { name: /Al-Baqarah.*2:1/ });
     expect(screen.queryByRole('heading', { name: 'Selected relationship' })).toBeNull();
     expect(screen.getByText(/visible links/)).toBeTruthy();
+  });
+
+  it('switches to text-only reading without altering URLs, then restores research tools', async () => {
+    window.history.replaceState(null, '', '/?ref=2%3A255&view=threads');
+    render(<QuranApp />);
+    await screen.findByRole('heading', { name: /Al-Baqarah.*2:255/ });
+    const original = window.location.search;
+    expect(screen.getByRole('heading', { name: 'Threads from 2:255' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Enter reading mode' }));
+    expect(screen.getByRole('region', { name: 'Distraction-free Quran reader' })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: 'Threads from 2:255' })).toBeNull();
+    expect(screen.queryByRole('searchbox', { name: 'Verse text' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Arcs' })).toBeNull();
+    expect(screen.getByRole('combobox', { name: 'Surah' })).toBeTruthy();
+    expect(window.location.search).toBe(original);
+    fireEvent.click(screen.getByRole('button', { name: 'Next ayah' }));
+    expect(window.location.search).toContain('ref=2%3A256');
+    fireEvent.click(screen.getByRole('button', { name: 'Exit reading mode' }));
+    expect(screen.getByRole('heading', { name: 'Threads from 2:256' })).toBeTruthy();
+    expect(screen.getByRole('searchbox', { name: 'Verse text' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Arcs' })).toBeTruthy();
+  });
+
+  it('applies bilingual display settings and restores them across remounts', async () => {
+    window.history.replaceState(null, '', '/?ref=2%3A1&view=threads');
+    const rendered = render(<QuranApp />);
+    await screen.findByRole('heading', { name: 'Threads from 2:1' });
+    fireEvent.click(screen.getByText('Reading settings'));
+    fireEvent.change(screen.getByRole('combobox', { name: 'Reader language' }), {
+      target: { value: 'english' },
+    });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Arabic text size' }), {
+      target: { value: '140' },
+    });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Reader line spacing' }), {
+      target: { value: 'spacious' },
+    });
+    const reader = screen.getByRole('region', { name: 'Quran text and relationship threads' });
+    expect(reader.querySelector('[lang="ar"]')).toBeNull();
+    expect(reader.querySelector('[lang="en"]')).not.toBeNull();
+    expect(document.getElementById('quran-main')?.style.getPropertyValue('--reading-arabic-size')).toBe(
+      '2.45rem',
+    );
+    expect(window.location.search).toBe('?ref=2%3A1&view=threads');
+    rendered.unmount();
+    render(<QuranApp />);
+    await screen.findByRole('heading', { name: 'Threads from 2:1' });
+    fireEvent.click(screen.getByText('Reading settings'));
+    expect(screen.getByRole('combobox', { name: 'Reader language' })).toHaveProperty(
+      'value',
+      'english',
+    );
+    expect(screen.getByRole('combobox', { name: 'Reader line spacing' })).toHaveProperty(
+      'value',
+      'spacious',
+    );
+    fireEvent.change(screen.getByRole('combobox', { name: 'Reader language' }), {
+      target: { value: 'arabic' },
+    });
+    const arabic = screen.getByRole('region', { name: 'Quran text and relationship threads' });
+    expect(arabic.querySelector('[lang="en"]')).toBeNull();
+    expect(arabic.querySelector('[lang="ar"][dir="rtl"]')).not.toBeNull();
   });
 
   it('offers a retry if the dataset load fails', async () => {
