@@ -89,7 +89,9 @@ export function QuranThreads({
           </h2>
           <p>
             {surah.ayahCount} ayahs ·{' '}
-            {readerOnly ? 'Select an ayah to continue reading' : 'Select any ayah to explore its connections'}
+            {readerOnly
+              ? 'Select an ayah to continue reading'
+              : 'Select any ayah to explore its connections'}
           </p>
         </div>
         <ol className={styles.ayahList} start={1}>
@@ -133,82 +135,84 @@ export function QuranThreads({
       </div>
       {!readerOnly && (
         <aside
-        className={styles.threadPanel}
-        aria-label="Selected ayah relationships"
-        hidden={!showCurated}
-      >
-        <div className={styles.panelHeading}>
-          <h2>
-            Threads from {reference.surah}:{reference.ayah}
-          </h2>
-          <p>
-            {visible.length} curated connections ·{' '}
-            {direction === 'both' ? 'Both directions' : direction}
-          </p>
-        </div>
-        {visible.length === 0 ? (
-          <p className={styles.empty}>
-            No relationships in this dataset match your current filters.
-          </p>
-        ) : (
-          <>
-            <svg
-              viewBox="0 0 320 250"
-              className={styles.threadMap}
-              aria-label="Positions of related passages in the Quran"
-              role="img"
-            >
-              <line x1="24" y1="10" x2="24" y2="240" className={styles.axis} />
-              <line x1="296" y1="10" x2="296" y2="240" className={styles.axis} />
-              {markers.map((connection) => {
-                const other = (connection.other.start + connection.other.end) / 2;
-                const y = 10 + (other / (index.ayahCount - 1)) * 230;
-                const outgoing = connection.direction === 'outgoing';
-                return (
-                  <path
-                    key={connection.direction + String(connection.link.id)}
-                    d={`M 24 125 C 155 125 165 ${y} 296 ${y}`}
-                    fill="none"
-                    stroke={outgoing ? '#64c4b1' : '#d7ac7c'}
-                    strokeWidth="1.6"
-                    opacity="0.68"
-                  />
-                );
-              })}
-              <circle cx="24" cy="125" r="5" fill="#f2e5cb" />
-              <text x="24" y="247" textAnchor="middle" className={styles.threadMapLabel}>
-                Here
-              </text>
-            </svg>
-            <ol className={styles.connectionList}>
-              {visible.map((connection) => {
-                const otherRef = index.versification.refAt(connection.other.start);
-                return (
-                  <li key={connection.direction + String(connection.link.id)}>
-                    <button
-                      type="button"
-                      className={styles.connectionButton}
-                      onClick={() => {
-                        onNavigate(otherRef);
-                      }}
-                    >
-                      <span className={styles.connectionHeading}>
-                        <span>{connection.direction === 'outgoing' ? 'Outgoing' : 'Incoming'}</span>
-                        <strong>{connectionLabel(connection, data)}</strong>
-                      </span>
-                      <span className={styles.connectionPreview} lang="en" dir="ltr">
-                        {text.english[connection.other.start]}
-                      </span>
-                      {connection.link.contextAfter > 0 && (
-                        <small>Source context after: {connection.link.contextAfter} ayahs</small>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-          </>
-        )}
+          className={styles.threadPanel}
+          aria-label="Selected ayah relationships"
+          hidden={!showCurated}
+        >
+          <div className={styles.panelHeading}>
+            <h2>
+              Threads from {reference.surah}:{reference.ayah}
+            </h2>
+            <p>
+              {visible.length} curated connections ·{' '}
+              {direction === 'both' ? 'Both directions' : direction}
+            </p>
+          </div>
+          {visible.length === 0 ? (
+            <p className={styles.empty}>
+              No relationships in this dataset match your current filters.
+            </p>
+          ) : (
+            <>
+              <svg
+                viewBox="0 0 320 250"
+                className={styles.threadMap}
+                aria-label="Positions of related passages in the Quran"
+                role="img"
+              >
+                <line x1="24" y1="10" x2="24" y2="240" className={styles.axis} />
+                <line x1="296" y1="10" x2="296" y2="240" className={styles.axis} />
+                {markers.map((connection) => {
+                  const other = (connection.other.start + connection.other.end) / 2;
+                  const y = 10 + (other / (index.ayahCount - 1)) * 230;
+                  const outgoing = connection.direction === 'outgoing';
+                  return (
+                    <path
+                      key={connection.direction + String(connection.link.id)}
+                      d={`M 24 125 C 155 125 165 ${y} 296 ${y}`}
+                      fill="none"
+                      stroke={outgoing ? '#64c4b1' : '#d7ac7c'}
+                      strokeWidth="1.6"
+                      opacity="0.68"
+                    />
+                  );
+                })}
+                <circle cx="24" cy="125" r="5" fill="#f2e5cb" />
+                <text x="24" y="247" textAnchor="middle" className={styles.threadMapLabel}>
+                  Here
+                </text>
+              </svg>
+              <ol className={styles.connectionList}>
+                {visible.map((connection) => {
+                  const otherRef = index.versification.refAt(connection.other.start);
+                  return (
+                    <li key={connection.direction + String(connection.link.id)}>
+                      <button
+                        type="button"
+                        className={styles.connectionButton}
+                        onClick={() => {
+                          onNavigate(otherRef);
+                        }}
+                      >
+                        <span className={styles.connectionHeading}>
+                          <span>
+                            {connection.direction === 'outgoing' ? 'Outgoing' : 'Incoming'}
+                          </span>
+                          <strong>{connectionLabel(connection, data)}</strong>
+                        </span>
+                        <span className={styles.connectionPreview} lang="en" dir="ltr">
+                          {text.english[connection.other.start]}
+                        </span>
+                        {connection.link.contextAfter > 0 && (
+                          <small>Source context after: {connection.link.contextAfter} ayahs</small>
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </>
+          )}
         </aside>
       )}
     </section>
