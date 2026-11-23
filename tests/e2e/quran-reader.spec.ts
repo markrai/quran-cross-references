@@ -160,6 +160,87 @@ test.describe('Phase 3B.1 reader-first experience', () => {
   });
 });
 
+test.describe('Phase 3B.2 reading navigation and accessibility', () => {
+  test('provides one verse tab stop, canonical keyboard movement and preserved browser history', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=1%3A7&view=threads');
+    const reader = page.getByRole('region', { name: 'Quran text and relationship threads' });
+    const current = reader.locator('ol button[aria-current="true"]');
+    await expect(reader.locator('ol button[tabindex="0"]')).toHaveCount(1);
+    await expect(reader.locator('ol button[tabindex="-1"]')).toHaveCount(6);
+    await current.focus();
+
+    await page.keyboard.press('ArrowDown');
+    await expect(page).toHaveURL(/ref=2%3A1&view=threads/);
+    await expect(current).toBeFocused();
+    await expect(reader.getByRole('status')).toContainText('Selected Al-Baqarah 2:1');
+
+    await page.keyboard.press('End');
+    await expect(page).toHaveURL(/ref=2%3A286&view=threads/);
+    await expect(current).toBeFocused();
+
+    await page.keyboard.press('ArrowDown');
+    await expect(page).toHaveURL(/ref=3%3A1&view=threads/);
+    await expect(current).toBeFocused();
+
+    await page.keyboard.press('ArrowUp');
+    await expect(page).toHaveURL(/ref=2%3A286&view=threads/);
+
+    const url = page.url();
+    await page.getByRole('searchbox', { name: 'Ayah reference' }).focus();
+    await page.keyboard.press('ArrowDown');
+    expect(page.url()).toBe(url);
+    await page.goBack();
+    await expect(page).toHaveURL(/ref=3%3A1&view=threads/);
+    await expect(reader.locator('ol button[tabindex="0"]')).toHaveCount(1);
+  });
+
+  test('maintains 44px controls and surah navigation on a narrow phone', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    await page.goto('./?ref=114%3A6&view=threads');
+    await page.getByRole('button', { name: 'Enter reading mode' }).click();
+
+    const nav = page.getByRole('navigation', { name: 'Surah navigation' });
+    await expect(nav).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Next surah' })).toBeDisabled();
+    const previous = page.getByRole('button', { name: 'Previous surah' });
+    const bounds = await previous.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds?.height ?? 0).toBeGreaterThanOrEqual(44);
+    expect(bounds?.width ?? 0).toBeGreaterThanOrEqual(44);
+
+    const step = page.getByRole('button', { name: 'Next ayah' });
+    const stepBounds = await step.boundingBox();
+    expect(stepBounds?.height ?? 0).toBeGreaterThanOrEqual(44);
+    expect(stepBounds?.width ?? 0).toBeGreaterThanOrEqual(44);
+    const navRight = await nav.evaluate((element) => element.getBoundingClientRect().right);
+    expect(navRight).toBeLessThanOrEqual(321);
+
+    await previous.click();
+    await expect(page).toHaveURL(/ref=113%3A1&view=threads/);
+    await nav.getByRole('button', { name: 'Focus selected ayah' }).click();
+    await expect(
+      page.getByRole('region', { name: 'Distraction-free Quran reader' }).locator(
+        'ol button[aria-current="true"]',
+      ),
+    ).toBeFocused();
+  });
+
+  test('focuses the content landmark on view transitions without changing the ayah', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=2%3A255');
+    await page.getByRole('button', { name: 'Threads & Reader' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#quran-main')).toBeFocused();
+    await expect(page).toHaveURL(/ref=2%3A255&view=threads/);
+    await page.getByRole('button', { name: 'Arcs' }).click();
+    await expect(page.locator('#quran-main')).toBeFocused();
+    await expect(page).toHaveURL(/ref=2%3A255/);
+  });
+});
+
 test.describe('Quran production readiness', () => {
   test('publishes an installable manifest, generated icons and link preview metadata', async ({
     page,
