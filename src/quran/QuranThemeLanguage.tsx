@@ -99,7 +99,7 @@ export function QuranThemeLanguage({
     return morphology.status === 'ready'
       ? computeThemeLanguage(themes, selected.name, { kind, index: morphology.index })
       : null;
-  }, [themes, selected?.name, kind, morphology, expressions]);
+  }, [themes, selected, kind, morphology, expressions]);
   const ranked = useMemo(
     () => (report === null ? [] : rankThemeLanguage(report, direction, search)),
     [report, direction, search],
