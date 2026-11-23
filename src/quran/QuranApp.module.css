@@ -1853,3 +1853,102 @@
     text-align: center;
   }
 }
+
+.emotionStats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.emotionStats > div,
+.emotionIntersectionGrid > div {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0.9rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.7rem;
+}
+
+.emotionStats strong,
+.emotionIntersectionGrid strong {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.25rem;
+}
+
+.emotionStats span,
+.emotionIntersectionGrid span {
+  font-size: 0.79rem;
+  color: var(--color-text-muted);
+}
+
+.emotionColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);
+  gap: 1.1rem;
+  align-items: start;
+}
+
+.emotionLabels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.emotionLabels button {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.85rem;
+  text-align: left;
+  border-radius: 0.6rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.emotionLabels button[aria-pressed='true'],
+.emotionLabels button:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.emotionLabels button span {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.emotionCompareAction {
+  padding: 0.6rem 1rem 1.2rem;
+}
+
+.emotionIntersection {
+  padding: 0.5rem 1rem 1.2rem;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.emotionIntersectionGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+@media (max-width: 65rem) {
+  .emotionColumns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 40rem) {
+  .emotionStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .emotionIntersectionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -926,3 +926,124 @@ test.describe('Quran Phase 2D.1 independently annotated themes', () => {
     expect(cached).toEqual({ themes: false, text: true });
   });
 });
+
+test.describe('Quran Phase 2D.2 specialist-reviewed emotion evidence', () => {
+  test('loads optional emotion source without forcing QSAC or republishing source texts', async ({
+    page,
+    request,
+  }) => {
+    const emotionRequests: string[] = [];
+    const themeRequests: string[] = [];
+    page.on('request', (event) => {
+      if (event.url().endsWith('/data/quran/emotions.json')) emotionRequests.push(event.url());
+      if (event.url().endsWith('/data/quran/themes.json')) themeRequests.push(event.url());
+    });
+    await page.goto('./?ref=2%3A255');
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:255/ })).toBeVisible();
+    expect(emotionRequests).toEqual([]);
+    await page.getByRole('button', { name: 'Emotions', exact: true }).click();
+    await expect(page).toHaveURL(/view=emotions/);
+    await expect(
+      page.getByRole('heading', { name: 'Emotion labels and thematic intersections' }),
+    ).toBeVisible();
+    expect(emotionRequests).toHaveLength(1);
+    expect(themeRequests).toEqual([]);
+    await expect(page.getByLabel('ELQV source coverage audit')).toContainText('2,087');
+    const response = await request.get('data/quran/emotions.json');
+    expect(response.ok()).toBe(true);
+    const report = (await response.json()) as {
+      format: string;
+      origin: string;
+      rowCount: number;
+      distinctAyahCount: number;
+      membershipCount: number;
+      identicalDuplicateCount: number;
+      conflictedAyahCount: number;
+      entries: unknown[];
+    };
+    expect(report).toMatchObject({
+      format: 'quran-external-emotions',
+      origin: 'external-specialist-annotated-emotions',
+      rowCount: 2100,
+      distinctAyahCount: 2087,
+      membershipCount: 2092,
+      identicalDuplicateCount: 8,
+      conflictedAyahCount: 4,
+    });
+    expect(report.entries).toHaveLength(2087);
+    expect(Object.keys(report)).not.toContain('Verse Diac');
+    expect(Object.keys(report)).not.toContain('arabic');
+    expect(Object.keys(report)).not.toContain('english');
+  });
+
+  test('shows each disputed label instead of collapsing ambiguity, with browser back navigation', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=26%3A8&view=emotions&emotion=conflicts');
+    await expect(
+      page.getByRole('heading', { name: 'Emotion labels and thematic intersections' }),
+    ).toBeVisible();
+    await expect(page.getByLabel('Source-annotated emotion verses')).toContainText(
+      '4 distinct matching ayahs',
+    );
+    const verse = page.getByRole('button', { name: 'Read emotion-annotated Quran ayah 26:8' });
+    await expect(verse).toContainText('fear, anger, sadness');
+    await expect(verse).toContainText('Conflicting annotations');
+    await verse.click();
+    await expect(page).toHaveURL(/view=threads/);
+    await expect(page.getByRole('heading', { name: 'Threads from 26:8' })).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/view=emotions&emotion=conflicts/);
+    await expect(verse).toBeVisible();
+    await page.getByRole('combobox', { name: 'Emotion research filter' }).selectOption('fear');
+    await expect(page).toHaveURL(/view=emotions&emotion=fear/);
+    await expect(page.getByRole('button', { name: 'Next annotated verses' })).toBeEnabled();
+  });
+
+  test('loads QSAC independently only when requested and allows shareable topic intersections', async ({
+    page,
+  }) => {
+    const qsac: string[] = [];
+    page.on('request', (event) => {
+      if (event.url().endsWith('/data/quran/themes.json')) qsac.push(event.url());
+    });
+    await page.goto('./?ref=1%3A1&view=emotions&emotion=fear');
+    await expect(
+      page.getByRole('heading', { name: 'Emotion labels and thematic intersections' }),
+    ).toBeVisible();
+    expect(qsac).toEqual([]);
+    await page.getByRole('button', { name: 'Load QSAC topics for comparison' }).click();
+    await expect(page.getByRole('combobox', { name: 'Compare with QSAC topic' })).toBeVisible();
+    expect(qsac).toHaveLength(1);
+    await page
+      .getByRole('combobox', { name: 'Compare with QSAC topic' })
+      .selectOption('Divine Mercy');
+    await expect(page).toHaveURL(/view=emotions&theme=Divine\+Mercy&emotion=fear/);
+    await expect(page.getByLabel('Independent source intersections')).toContainText('Divine Mercy');
+    await expect(page.getByLabel('Source-annotated emotion verses')).toContainText(
+      'matching ayahs',
+    );
+    await page.reload();
+    await expect(page.getByRole('combobox', { name: 'Compare with QSAC topic' })).toHaveValue(
+      'Divine Mercy',
+    );
+  });
+
+  test('excludes the optional emotion source from installation precache', async ({ page }) => {
+    await page.goto('./?view=emotions');
+    await expect(
+      page.getByRole('heading', { name: 'Emotion labels and thematic intersections' }),
+    ).toBeVisible();
+    const cached = await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready;
+      const names = await caches.keys();
+      const name = names.find((candidate) => candidate.startsWith('quran-cross-references-shell-'));
+      if (!name) return { emotion: false, text: false };
+      const cache = await caches.open(name);
+      const emotion = await cache.match(new URL('data/quran/emotions.json', registration.scope));
+      const text = await cache.match(new URL('data/quran/text.json', registration.scope));
+      return { emotion: emotion !== undefined, text: text !== undefined };
+    });
+    expect(cached).toEqual({ emotion: false, text: true });
+  });
+});

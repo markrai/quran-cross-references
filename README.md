@@ -111,6 +111,16 @@ The **Themes** tab explores 338 topical annotations grouped into 18 domains and 
 
 The source CSV and ontology are fetched at pinned immutable revisions and SHA-256 checked during builds. Only original QSAC topic labels, ontology metadata, and canonical assignment IDs are published as `data/quran/themes.json`; **Saheeh International translation and the separate Arabic text columns are never republished**. QSAC v1.0 annotations and ontology © Ahmad Bilal, CC BY 4.0; see [Phase 2D.1](docs/QURAN_PHASE_2D1.md). The optional theme file is loaded when selected, not included in the PWA installation cache.
 
+## Independent specialist emotion annotations (Phase 2D.2)
+
+The **Emotions** tab adds a second, independently developed research source: [Emotionally-Labeled Quran Verses (ELQV)](https://github.com/Arwaalmrzoqi/ELQV) by Arwa Almarzoqi and Mohammed Alsuhaibani (2025). It provides expert-reviewed fear, joy, anger and sadness labels for a **selected sample**, not for the full Quran. The underlying research included human verification and LLM-assisted methods.
+
+Its original file has **2,100 rows, 2,087 distinct canonical ayahs and 2,092 unique verse-emotion memberships**. Eight repeated rows duplicate the same label, while four ayahs carry multiple, conflicting labels, which remain visible. No majority vote or new cross-reference edges are invented.
+
+Optionally load QSAC topics inside the Emotions tab to examine **cross-dataset intersections** and open the original bilingual ayahs. These are descriptive co-occurrence counts restricted to the ELQV sample, not annotator agreement or Quran-wide prevalence. The original Arabic and translation columns in the external CSV are not republished. The pinned, compact `data/quran/emotions.json` sidecar is fetched only on demand and excluded from PWA install precache.
+
+Share a filter or intersection using `?view=emotions&emotion=fear&theme=Divine+Mercy`. See [Phase 2D.2: expert emotion sample and intersections](docs/QURAN_PHASE_2D2.md) for the audit and limitations.
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).
