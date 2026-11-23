@@ -488,48 +488,48 @@ export function QuranApp() {
       <main id="quran-main" className={styles.main} style={readingStyle}>
         <div className={styles.toolbar}>
           {!readingMode && (
-          <div className={styles.viewTabs} role="group" aria-label="Visualization">
-            {(['arcs', 'threads', 'analytics', 'network', 'themes', 'emotions'] as const).map(
-              (view) => (
-                <button
-                  key={view}
-                  type="button"
-                  className={location.view === view ? styles.activeTab : styles.tab}
-                  aria-pressed={location.view === view}
-                  onClick={() => {
-                    if (view === location.view) return;
-                    const isResearch =
-                      view === 'network' || view === 'themes' || view === 'emotions';
-                    navigate({
-                      ...location,
-                      view,
-                      selectedTheme: view === 'emotions' ? null : location.selectedTheme,
-                      themeAnalysis: view === 'themes' ? 'browse' : location.themeAnalysis,
-                      selectedPattern: null,
-                      evidence: isResearch ? 'curated' : location.evidence,
-                      selectedExpression: isResearch ? null : location.selectedExpression,
-                      selectedMorphTerm: isResearch ? null : location.selectedMorphTerm,
-                      selectedMorphWord: isResearch ? null : location.selectedMorphWord,
-                      selectedLink: isResearch ? null : location.selectedLink,
-                      rangeEnd: isResearch ? null : location.rangeEnd,
-                    });
-                  }}
-                >
-                  {view === 'arcs'
-                    ? 'Arcs'
-                    : view === 'threads'
-                      ? 'Threads & Reader'
-                      : view === 'analytics'
-                        ? 'Analytics'
-                        : view === 'network'
-                          ? 'Network'
-                          : view === 'themes'
-                            ? 'Themes'
-                            : 'Emotions'}
-                </button>
-              ),
-            )}
-          </div>
+            <div className={styles.viewTabs} role="group" aria-label="Visualization">
+              {(['arcs', 'threads', 'analytics', 'network', 'themes', 'emotions'] as const).map(
+                (view) => (
+                  <button
+                    key={view}
+                    type="button"
+                    className={location.view === view ? styles.activeTab : styles.tab}
+                    aria-pressed={location.view === view}
+                    onClick={() => {
+                      if (view === location.view) return;
+                      const isResearch =
+                        view === 'network' || view === 'themes' || view === 'emotions';
+                      navigate({
+                        ...location,
+                        view,
+                        selectedTheme: view === 'emotions' ? null : location.selectedTheme,
+                        themeAnalysis: view === 'themes' ? 'browse' : location.themeAnalysis,
+                        selectedPattern: null,
+                        evidence: isResearch ? 'curated' : location.evidence,
+                        selectedExpression: isResearch ? null : location.selectedExpression,
+                        selectedMorphTerm: isResearch ? null : location.selectedMorphTerm,
+                        selectedMorphWord: isResearch ? null : location.selectedMorphWord,
+                        selectedLink: isResearch ? null : location.selectedLink,
+                        rangeEnd: isResearch ? null : location.rangeEnd,
+                      });
+                    }}
+                  >
+                    {view === 'arcs'
+                      ? 'Arcs'
+                      : view === 'threads'
+                        ? 'Threads & Reader'
+                        : view === 'analytics'
+                          ? 'Analytics'
+                          : view === 'network'
+                            ? 'Network'
+                            : view === 'themes'
+                              ? 'Themes'
+                              : 'Emotions'}
+                  </button>
+                ),
+              )}
+            </div>
           )}
           <div className={styles.toolbarFields}>
             {!readingMode &&
@@ -728,7 +728,9 @@ export function QuranApp() {
             )}
             {readingMode && (
               <div className={styles.readingHeading}>
-                <h1>{activeSurah.name} · {formatAyahId(location.reference)}</h1>
+                <h1>
+                  {activeSurah.name} · {formatAyahId(location.reference)}
+                </h1>
                 <div className={styles.stepper}>
                   <button
                     type="button"
@@ -745,9 +747,14 @@ export function QuranApp() {
                   <button
                     type="button"
                     aria-label="Next ayah"
-                    disabled={activeIndex === undefined || activeIndex === data.relationships.ayahCount - 1}
+                    disabled={
+                      activeIndex === undefined || activeIndex === data.relationships.ayahCount - 1
+                    }
                     onClick={() => {
-                      if (activeIndex !== undefined && activeIndex < data.relationships.ayahCount - 1) {
+                      if (
+                        activeIndex !== undefined &&
+                        activeIndex < data.relationships.ayahCount - 1
+                      ) {
                         focus(data.relationships.versification.refAt(activeIndex + 1));
                       }
                     }}
@@ -846,12 +853,14 @@ export function QuranApp() {
                   )}
                   {activeIndex !== undefined && (
                     <>
-                      {(location.view !== 'threads' || readingPreferences.language !== 'english') && (
+                      {(location.view !== 'threads' ||
+                        readingPreferences.language !== 'english') && (
                         <p className={styles.focusArabic} lang="ar" dir="rtl">
                           {data.text.arabic[activeIndex]}
                         </p>
                       )}
-                      {(location.view !== 'threads' || readingPreferences.language !== 'arabic') && (
+                      {(location.view !== 'threads' ||
+                        readingPreferences.language !== 'arabic') && (
                         <p className={styles.focusEnglish} lang="en" dir="ltr">
                           {data.text.english[activeIndex]}
                         </p>
