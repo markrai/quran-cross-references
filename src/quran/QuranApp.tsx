@@ -14,6 +14,9 @@ import { QuranExpressionGraph } from './QuranExpressionGraph.tsx';
 import { QuranExpressions } from './QuranExpressions.tsx';
 import { QuranMorphology } from './QuranMorphology.tsx';
 import { QuranThemes } from './QuranThemes.tsx';
+import { QuranEmotions } from './QuranEmotions.tsx';
+import { loadQuranEmotions } from './emotions.ts';
+import type { QuranEmotionIndex } from '../core/quran/emotion-index.ts';
 import { loadQuranThemes } from './themes.ts';
 import type { QuranThemeIndex } from '../core/quran/theme-index.ts';
 import { loadQacMorphology } from './qac.ts';
@@ -55,6 +58,11 @@ type ThemeLoadState =
   | { readonly status: 'idle' | 'loading' }
   | { readonly status: 'error'; readonly message: string }
   | { readonly status: 'ready'; readonly index: QuranThemeIndex };
+
+type EmotionLoadState =
+  | { readonly status: 'idle' | 'loading' }
+  | { readonly status: 'error'; readonly message: string }
+  | { readonly status: 'ready'; readonly index: QuranEmotionIndex };
 
 type ExpressionLoadState =
   | { readonly status: 'idle' | 'loading' }
@@ -117,6 +125,10 @@ export function QuranApp() {
   const [themesState, setThemesState] = useState<ThemeLoadState>({ status: 'idle' });
   const [themesAttempt, setThemesAttempt] = useState(0);
   const themesCache = useRef<QuranThemeIndex | null>(null);
+  const [comparisonRequested, setComparisonRequested] = useState(false);
+  const [emotionsState, setEmotionsState] = useState<EmotionLoadState>({ status: 'idle' });
+  const [emotionsAttempt, setEmotionsAttempt] = useState(0);
+  const emotionsCache = useRef<QuranEmotionIndex | null>(null);
 
   useEffect(() => {
     const update = () => {
@@ -173,6 +185,7 @@ export function QuranApp() {
       location.view === 'analytics' ||
       location.view === 'network' ||
       location.view === 'themes' ||
+      location.view === 'emotions' ||
       location.evidence !== 'exact'
     )
       return;
@@ -252,6 +265,7 @@ export function QuranApp() {
       location.view === 'analytics' ||
       location.view === 'network' ||
       location.view === 'themes' ||
+      location.view === 'emotions' ||
       location.evidence !== 'morphology'
     )
       return;
@@ -280,7 +294,11 @@ export function QuranApp() {
   }, [data, location.view, location.evidence, morphologyAttempt]);
 
   useEffect(() => {
-    if (!data || location.view !== 'themes') return;
+    if (
+      !data ||
+      (location.view !== 'themes' &&
+        !(location.view === 'emotions' && (comparisonRequested || location.selectedTheme !== null)))
+    ) return;
     if (themesCache.current) {
       setThemesState({ status: 'ready', index: themesCache.current });
       return;
@@ -303,7 +321,33 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.view, themesAttempt]);
+  }, [data, location.view, location.selectedTheme, comparisonRequested, themesAttempt]);
+
+  useEffect(() => {
+    if (!data || location.view !== 'emotions') return;
+    if (emotionsCache.current) {
+      setEmotionsState({ status: 'ready', index: emotionsCache.current });
+      return;
+    }
+    const controller = new AbortController();
+    setEmotionsState({ status: 'loading' });
+    void loadQuranEmotions(controller.signal)
+      .then((index) => {
+        if (controller.signal.aborted) return;
+        emotionsCache.current = index;
+        setEmotionsState({ status: 'ready', index });
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        setEmotionsState({
+          status: 'error',
+          message: error instanceof Error ? error.message : 'Unable to verify ELQV annotations.',
+        });
+      });
+    return () => {
+      controller.abort();
+    };
+  }, [data, location.view, emotionsAttempt]);
 
   const expressionIndex = expressionState.status === 'ready' ? expressionState.index : null;
   const candidate =
@@ -368,27 +412,25 @@ export function QuranApp() {
       <main id="quran-main" className={styles.main}>
         <div className={styles.toolbar}>
           <div className={styles.viewTabs} role="group" aria-label="Visualization">
-            {(['arcs', 'threads', 'analytics', 'network', 'themes'] as const).map((view) => (
+            {(['arcs', 'threads', 'analytics', 'network', 'themes', 'emotions'] as const).map((view) => (
               <button
                 key={view}
                 type="button"
                 className={location.view === view ? styles.activeTab : styles.tab}
                 aria-pressed={location.view === view}
                 onClick={() => {
+                  if (view === location.view) return;
+                  const isResearch = view === 'network' || view === 'themes' || view === 'emotions';
                   navigate({
                     ...location,
                     view,
-                    evidence:
-                      view === 'network' || view === 'themes' ? 'curated' : location.evidence,
-                    selectedExpression:
-                      view === 'network' || view === 'themes' ? null : location.selectedExpression,
-                    selectedMorphTerm:
-                      view === 'network' || view === 'themes' ? null : location.selectedMorphTerm,
-                    selectedMorphWord:
-                      view === 'network' || view === 'themes' ? null : location.selectedMorphWord,
-                    selectedLink:
-                      view === 'network' || view === 'themes' ? null : location.selectedLink,
-                    rangeEnd: view === 'network' || view === 'themes' ? null : location.rangeEnd,
+                    selectedTheme: view === 'emotions' ? null : location.selectedTheme,
+                    evidence: isResearch ? 'curated' : location.evidence,
+                    selectedExpression: isResearch ? null : location.selectedExpression,
+                    selectedMorphTerm: isResearch ? null : location.selectedMorphTerm,
+                    selectedMorphWord: isResearch ? null : location.selectedMorphWord,
+                    selectedLink: isResearch ? null : location.selectedLink,
+                    rangeEnd: isResearch ? null : location.rangeEnd,
                   });
                 }}
               >
@@ -400,14 +442,17 @@ export function QuranApp() {
                       ? 'Analytics'
                       : view === 'network'
                         ? 'Network'
-                        : 'Themes'}
+                        : view === 'themes'
+                          ? 'Themes'
+                          : 'Emotions'}
               </button>
             ))}
           </div>
           <div className={styles.toolbarFields}>
             {location.view !== 'analytics' &&
               location.view !== 'network' &&
-              location.view !== 'themes' && (
+              location.view !== 'themes' &&
+              location.view !== 'emotions' && (
                 <label className={styles.field}>
                   <span>Evidence type</span>
                   <select
@@ -518,6 +563,7 @@ export function QuranApp() {
             {location.view !== 'analytics' &&
               location.view !== 'network' &&
               location.view !== 'themes' &&
+              location.view !== 'emotions' &&
               location.evidence === 'curated' && (
                 <label className={styles.field}>
                   <span>Relationships</span>
@@ -592,7 +638,8 @@ export function QuranApp() {
           <>
             {location.view !== 'analytics' &&
               location.view !== 'network' &&
-              location.view !== 'themes' && (
+              location.view !== 'themes' &&
+              location.view !== 'emotions' && (
                 <section className={styles.focusCard} aria-label="Selected ayah">
                   <div className={styles.focusHeading}>
                     <div>
@@ -777,6 +824,68 @@ export function QuranApp() {
                 )}
               </>
             )}
+            {location.view === 'emotions' && (
+              <>
+                {(emotionsState.status === 'idle' || emotionsState.status === 'loading') && (
+                  <p className={styles.loading} role="status">
+                    Loading independently verified ELQV research annotations…
+                  </p>
+                )}
+                {emotionsState.status === 'error' && (
+                  <section className={styles.analyticsPanel} role="alert">
+                    <p className={styles.empty}>{emotionsState.message}</p>
+                    <button
+                      type="button"
+                      className={styles.goButton}
+                      onClick={() => {
+                        setEmotionsState({ status: 'loading' });
+                        setEmotionsAttempt((value) => value + 1);
+                      }}
+                    >
+                      Retry emotion data
+                    </button>
+                  </section>
+                )}
+                {emotionsState.status === 'ready' && (
+                  <QuranEmotions
+                    index={emotionsState.index}
+                    data={data}
+                    filter={location.selectedEmotion}
+                    selectedTheme={location.selectedTheme}
+                    themeIndex={themesState.status === 'ready' ? themesState.index : null}
+                    themeLoading={themesState.status === 'loading'}
+                    themeError={themesState.status === 'error' ? themesState.message : null}
+                    focusSurah={location.reference.surah}
+                    onRequestThemes={() => {
+                      setComparisonRequested(true);
+                      if (themesState.status === 'error') {
+                        setThemesState({ status: 'loading' });
+                        setThemesAttempt((value) => value + 1);
+                      }
+                    }}
+                    onChangeFilter={(selectedEmotion) => {
+                      navigate({ ...location, selectedEmotion });
+                    }}
+                    onChangeTheme={(selectedTheme) => {
+                      navigate({ ...location, selectedTheme });
+                    }}
+                    onOpenAyah={(ayah) => {
+                      navigate({
+                        ...location,
+                        view: 'threads',
+                        evidence: 'curated',
+                        reference: data.relationships.versification.refAt(ayah),
+                        rangeEnd: null,
+                        selectedLink: null,
+                        selectedExpression: null,
+                        selectedMorphTerm: null,
+                        selectedMorphWord: null,
+                      });
+                    }}
+                  />
+                )}
+              </>
+            )}
             {location.view === 'network' && (
               <>
                 {(topologyState.status === 'loading' || topologyState.status === 'idle') && (
@@ -901,6 +1010,7 @@ export function QuranApp() {
             {location.view !== 'analytics' &&
               location.view !== 'network' &&
               location.view !== 'themes' &&
+              location.view !== 'emotions' &&
               location.evidence === 'morphology' && (
                 <>
                   {(morphologyState.status === 'idle' || morphologyState.status === 'loading') && (
@@ -964,6 +1074,7 @@ export function QuranApp() {
             {location.view !== 'analytics' &&
               location.view !== 'network' &&
               location.view !== 'themes' &&
+              location.view !== 'emotions' &&
               location.evidence === 'exact' && (
                 <>
                   {(expressionState.status === 'idle' || expressionState.status === 'loading') && (
@@ -1003,6 +1114,7 @@ export function QuranApp() {
             {location.view !== 'analytics' &&
               location.view !== 'network' &&
               location.view !== 'themes' &&
+              location.view !== 'emotions' &&
               (location.evidence === 'morphology' ? (
                 location.view === 'threads' ? (
                   <QuranThreads
