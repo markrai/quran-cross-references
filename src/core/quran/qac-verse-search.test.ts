@@ -58,7 +58,7 @@ describe('Phase 3C.1 Quranic Arabic Corpus verse discovery', () => {
   });
 
   it('fails closed on unknown or unbounded queries and invalid surah IDs', () => {
-    for (const query of ['', '  ', 'x'.repeat(121), 'rHm\n', 'rHm\u007f', 'imagined']) {
+    for (const query of ['', '  ', 'x'.repeat(121), 'r\nHm', 'rHm\u007f', 'imagined']) {
       expect(searchQacVerses(index, 'root', query, null).hits).toEqual([]);
     }
     for (const surah of [-1, 0, 115, 1.2, NaN]) {
