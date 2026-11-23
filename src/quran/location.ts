@@ -68,7 +68,7 @@ export function parseQuranLocation(url: URL): QuranLocation {
   const scope = params.get('scope');
   const requestedEvidence = params.get('evidence');
   const evidence: QuranEvidenceMode =
-    view === 'network'
+    view === 'network' || view === 'themes'
       ? 'curated'
       : requestedEvidence === 'exact' || requestedEvidence === 'morphology'
         ? requestedEvidence
