@@ -10,9 +10,9 @@ vi.mock('./model.ts', () => ({ loadQuranReaderData: vi.fn() }));
 vi.mock('./qac.ts', () => ({ loadQacMorphology: vi.fn() }));
 
 const qacIndex = {
-  resolve: (_grouping: string, query: string) =>
-    query === 'rHm' || query === 'رحم' ? 'rHm' : null,
-  occurrences: (_grouping: string, _term: string) => [
+  resolve: (grouping: string, query: string) =>
+    grouping === 'root' && (query === 'rHm' || query === 'رحم') ? 'rHm' : null,
+  occurrences: () => [
     { ayah: 0, word: 2, form: 'الرَّحْمَٰنِ', pos: 'ADJ' },
     { ayah: 0, word: 3, form: 'الرَّحِيمِ', pos: 'ADJ' },
   ],
