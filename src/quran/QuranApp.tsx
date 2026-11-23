@@ -322,6 +322,7 @@ export function QuranApp() {
       (!reader && !themeAnalysis) ||
       (!themeAnalysis &&
         location.evidence !== 'morphology' &&
+        location.verseSearch?.morphology === undefined &&
         location.inspector !== 'morphology' &&
         location.inspector !== 'all')
     )
@@ -353,6 +354,7 @@ export function QuranApp() {
     location.view,
     location.evidence,
     location.inspector,
+    location.verseSearch?.morphology,
     location.themeAnalysis,
     location.patternKind,
     morphologyAttempt,
@@ -784,6 +786,25 @@ export function QuranApp() {
                 data={data}
                 search={location.verseSearch}
                 selectedAyah={activeIndex ?? null}
+                morphology={morphologyState}
+                onRetryMorphology={() => {
+                  setMorphologyState({ status: 'loading' });
+                  setMorphologyAttempt((value) => value + 1);
+                }}
+                onInspectMorphology={(reference, grouping, term, word) => {
+                  navigate({
+                    ...location,
+                    evidence: 'morphology',
+                    morphologyGrouping: grouping,
+                    selectedMorphTerm: term,
+                    selectedMorphWord: word,
+                    reference,
+                    rangeEnd: null,
+                    inspector: null,
+                    selectedLink: null,
+                    selectedExpression: null,
+                  });
+                }}
                 onSearch={(verseSearch) => {
                   navigate({ ...location, verseSearch });
                 }}
