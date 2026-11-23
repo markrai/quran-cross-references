@@ -14,6 +14,8 @@ import { QuranExpressionGraph } from './QuranExpressionGraph.tsx';
 import { QuranExpressions } from './QuranExpressions.tsx';
 import { QuranMorphology } from './QuranMorphology.tsx';
 import { QuranThemes } from './QuranThemes.tsx';
+import { QuranThemeLanguage } from './QuranThemeLanguage.tsx';
+import type { ThemeLanguageFeature } from '../core/quran/theme-language.ts';
 import { QuranEmotions } from './QuranEmotions.tsx';
 import { loadQuranEmotions } from './emotions.ts';
 import type { QuranEmotionIndex } from '../core/quran/emotion-index.ts';
@@ -184,10 +186,12 @@ export function QuranApp() {
 
   useEffect(() => {
     const reader = location.view === 'arcs' || location.view === 'threads';
+    const themeAnalysis = location.view === 'themes' &&
+      location.themeAnalysis === 'language' && location.patternKind === 'exact';
     if (
       !data ||
-      !reader ||
-      (location.evidence !== 'exact' &&
+      (!reader && !themeAnalysis) ||
+      (!themeAnalysis && location.evidence !== 'exact' &&
         location.inspector !== 'exact' &&
         location.inspector !== 'all')
     )
@@ -214,7 +218,7 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.evidence, location.view, location.inspector, expressionAttempt]);
+  }, [data, location.evidence, location.view, location.inspector, location.themeAnalysis, location.patternKind, expressionAttempt]);
 
   useEffect(() => {
     if (!data || location.view !== 'analytics') return;
@@ -270,10 +274,12 @@ export function QuranApp() {
 
   useEffect(() => {
     const reader = location.view === 'arcs' || location.view === 'threads';
+    const themeAnalysis = location.view === 'themes' &&
+      location.themeAnalysis === 'language' && location.patternKind !== 'exact';
     if (
       !data ||
-      !reader ||
-      (location.evidence !== 'morphology' &&
+      (!reader && !themeAnalysis) ||
+      (!themeAnalysis && location.evidence !== 'morphology' &&
         location.inspector !== 'morphology' &&
         location.inspector !== 'all')
     )
@@ -300,7 +306,7 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.view, location.evidence, location.inspector, morphologyAttempt]);
+  }, [data, location.view, location.evidence, location.inspector, location.themeAnalysis, location.patternKind, morphologyAttempt]);
 
   useEffect(() => {
     const inspecting =
@@ -451,6 +457,8 @@ export function QuranApp() {
                       ...location,
                       view,
                       selectedTheme: view === 'emotions' ? null : location.selectedTheme,
+                      themeAnalysis: view === 'themes' ? 'browse' : location.themeAnalysis,
+                      selectedPattern: null,
                       evidence: isResearch ? 'curated' : location.evidence,
                       selectedExpression: isResearch ? null : location.selectedExpression,
                       selectedMorphTerm: isResearch ? null : location.selectedMorphTerm,
@@ -924,30 +932,101 @@ export function QuranApp() {
                     </button>
                   </section>
                 )}
-                {themesState.status === 'ready' && (
-                  <QuranThemes
-                    index={themesState.index}
-                    data={data}
-                    selectedName={location.selectedTheme}
-                    focusSurah={location.reference.surah}
-                    onSelect={(selectedTheme) => {
-                      navigate({ ...location, selectedTheme });
-                    }}
-                    onOpenAyah={(ayah) => {
-                      navigate({
-                        ...location,
-                        view: 'threads',
-                        evidence: 'curated',
-                        reference: data.relationships.versification.refAt(ayah),
-                        rangeEnd: null,
-                        selectedLink: null,
-                        selectedExpression: null,
-                        selectedMorphTerm: null,
-                        selectedMorphWord: null,
-                      });
-                    }}
-                  />
-                )}
+                {themesState.status === 'ready' &&
+                  (location.themeAnalysis === 'language' ? (
+                    <QuranThemeLanguage
+                      themes={themesState.index}
+                      data={data}
+                      selectedTheme={location.selectedTheme}
+                      kind={location.patternKind}
+                      featureId={location.selectedPattern}
+                      morphology={morphologyState}
+                      expressions={expressionState}
+                      onTheme={(selectedTheme) => {
+                        navigate({ ...location, selectedTheme, selectedPattern: null });
+                      }}
+                      onKind={(patternKind) => {
+                        navigate({ ...location, patternKind, selectedPattern: null });
+                      }}
+                      onFeature={(selectedPattern) => {
+                        navigate({ ...location, selectedPattern });
+                      }}
+                      onOpenSource={(feature: ThemeLanguageFeature, ayah: number) => {
+                        const exact = location.patternKind === 'exact';
+                        navigate({
+                          ...location,
+                          view: exact ? 'arcs' : 'threads',
+                          evidence: exact ? 'exact' : 'morphology',
+                          inspector: null,
+                          reference: data.relationships.versification.refAt(ayah),
+                          rangeEnd: null,
+                          selectedLink: null,
+                          selectedExpression: exact ? feature.id : null,
+                          morphologyGrouping: location.patternKind === 'root' ? 'root' : 'lemma',
+                          selectedMorphTerm: exact ? null : feature.id,
+                          selectedMorphWord: null,
+                        });
+                      }}
+                      onOpenAyah={(ayah) => {
+                        navigate({
+                          ...location,
+                          view: 'threads',
+                          evidence: 'curated',
+                          inspector: null,
+                          reference: data.relationships.versification.refAt(ayah),
+                          rangeEnd: null,
+                          selectedLink: null,
+                          selectedExpression: null,
+                          selectedMorphTerm: null,
+                          selectedMorphWord: null,
+                        });
+                      }}
+                      onBack={() => {
+                        navigate({ ...location, themeAnalysis: 'browse', selectedPattern: null });
+                      }}
+                      onRetry={() => {
+                        if (location.patternKind === 'exact') {
+                          setExpressionState({ status: 'loading' });
+                          setExpressionAttempt((value) => value + 1);
+                        } else {
+                          setMorphologyState({ status: 'loading' });
+                          setMorphologyAttempt((value) => value + 1);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <QuranThemes
+                      index={themesState.index}
+                      data={data}
+                      selectedName={location.selectedTheme}
+                      focusSurah={location.reference.surah}
+                      onSelect={(selectedTheme) => {
+                        navigate({ ...location, selectedTheme });
+                      }}
+                      onAnalyze={(selectedTheme) => {
+                        navigate({
+                          ...location,
+                          selectedTheme,
+                          themeAnalysis: 'language',
+                          patternKind: 'root',
+                          selectedPattern: null,
+                        });
+                      }}
+                      onOpenAyah={(ayah) => {
+                        navigate({
+                          ...location,
+                          view: 'threads',
+                          evidence: 'curated',
+                          reference: data.relationships.versification.refAt(ayah),
+                          rangeEnd: null,
+                          selectedLink: null,
+                          selectedExpression: null,
+                          selectedMorphTerm: null,
+                          selectedMorphWord: null,
+                        });
+                      }}
+                    />
+                  ))}
               </>
             )}
             {location.view === 'emotions' && (
