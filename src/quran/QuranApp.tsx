@@ -695,10 +695,13 @@ export function QuranApp() {
           <>
             {location.view === 'threads' && (
               <QuranVerseSearch
+                key={location.verseSearch ? JSON.stringify(location.verseSearch) : 'empty'}
                 data={data}
                 search={location.verseSearch}
                 selectedAyah={activeIndex ?? null}
-                onSearch={(verseSearch) => navigate({ ...location, verseSearch })}
+                onSearch={(verseSearch) => {
+                  navigate({ ...location, verseSearch });
+                }}
                 onNavigate={focus}
               />
             )}
