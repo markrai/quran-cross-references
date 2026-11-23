@@ -122,11 +122,13 @@ writeDataset('morphology.json', importQacMorphology(readPinned(qacPin.id), qacPi
 const themeSource = pins.find((pin) => pin.id === 'qsac-verse-tags-v1');
 const ontologySource = pins.find((pin) => pin.id === 'qsac-ontology-v1');
 if (!themeSource || !ontologySource) throw new Error('Missing pinned QSAC source.');
-writeDataset('themes.json', importQsacThemes(
-  readPinned(themeSource.id),
-  readPinned(ontologySource.id),
-  { annotations: themeSource.sha256, ontology: ontologySource.sha256 },
-));
+writeDataset(
+  'themes.json',
+  importQsacThemes(readPinned(themeSource.id), readPinned(ontologySource.id), {
+    annotations: themeSource.sha256,
+    ontology: ontologySource.sha256,
+  }),
+);
 writeDataset('manifest.json', {
   format: 'quran-foundation-manifest',
   schemaVersion: 1,

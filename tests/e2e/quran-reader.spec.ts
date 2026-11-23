@@ -838,7 +838,6 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
   });
 });
 
-
 test.describe('Quran Phase 2D.1 independently annotated themes', () => {
   test('loads experimental theme annotations on demand, with integrity and no separate translation shipping', async ({
     page,
@@ -853,7 +852,9 @@ test.describe('Quran Phase 2D.1 independently annotated themes', () => {
     expect(requests).toEqual([]);
     await page.getByRole('button', { name: 'Themes', exact: true }).click();
     await expect(page).toHaveURL(/view=themes/);
-    await expect(page.getByRole('heading', { name: 'Thematic exploration across the Quran' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Thematic exploration across the Quran' }),
+    ).toBeVisible();
     expect(requests).toHaveLength(1);
     const response = await request.get('data/quran/themes.json');
     expect(response.ok()).toBe(true);
@@ -877,9 +878,14 @@ test.describe('Quran Phase 2D.1 independently annotated themes', () => {
     page,
   }) => {
     await page.goto('./?ref=1%3A1&view=themes');
-    await expect(page.getByRole('heading', { name: 'Thematic exploration across the Quran' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Thematic exploration across the Quran' }),
+    ).toBeVisible();
     await page.getByRole('searchbox', { name: 'Search Quran topics' }).fill('Divine Mercy');
-    await page.getByRole('button', { name: /Divine Mercy/ }).first().click();
+    await page
+      .getByRole('button', { name: /Divine Mercy/ })
+      .first()
+      .click();
     await expect(page).toHaveURL(/view=themes&theme=Divine\+Mercy/);
     await expect(page.getByRole('heading', { name: 'Divine Mercy' })).toBeVisible();
     await expect(page.getByLabel('Theme distribution by surah')).toBeVisible();
@@ -889,7 +895,10 @@ test.describe('Quran Phase 2D.1 independently annotated themes', () => {
     await expect(page.getByRole('button', { name: 'Next labeled verses' })).toBeEnabled();
     await page.getByRole('button', { name: 'Next labeled verses' }).click();
     await expect(page.getByText(/Page 2 of/)).toBeVisible();
-    await page.getByRole('button', { name: /Read tagged Quran ayah/ }).first().click();
+    await page
+      .getByRole('button', { name: /Read tagged Quran ayah/ })
+      .first()
+      .click();
     await expect(page).toHaveURL(/view=threads/);
     await expect(page.getByRole('heading', { name: /Threads from/ })).toBeVisible();
     await page.goBack();
@@ -901,7 +910,9 @@ test.describe('Quran Phase 2D.1 independently annotated themes', () => {
     page,
   }) => {
     await page.goto('./?view=themes');
-    await expect(page.getByRole('heading', { name: 'Thematic exploration across the Quran' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Thematic exploration across the Quran' }),
+    ).toBeVisible();
     const cached = await page.evaluate(async () => {
       const registration = await navigator.serviceWorker.ready;
       const names = await caches.keys();

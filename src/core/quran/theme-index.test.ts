@@ -50,8 +50,12 @@ describe('QSAC client-side annotation validation', () => {
   it('rejects forged totals, duplicate IDs and changed tag semantics', () => {
     const dataset = fixture();
     expect(() => new QuranThemeIndex({ ...dataset, annotationCount: 1 }, hashes)).toThrow('total');
-    expect(() => new QuranThemeIndex({ ...dataset, authority: 'authoritative' }, hashes)).toThrow('classification');
-    expect(() => new QuranThemeIndex(dataset, { ...hashes, annotations: 'f'.repeat(64) })).toThrow('provenance');
+    expect(() => new QuranThemeIndex({ ...dataset, authority: 'authoritative' }, hashes)).toThrow(
+      'classification',
+    );
+    expect(() => new QuranThemeIndex(dataset, { ...hashes, annotations: 'f'.repeat(64) })).toThrow(
+      'provenance',
+    );
     const ayahs = [...dataset.ayahs];
     ayahs[0] = [0, 0];
     expect(() => new QuranThemeIndex({ ...dataset, ayahs }, hashes)).toThrow('numeric tag');

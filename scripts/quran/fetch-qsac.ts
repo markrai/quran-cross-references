@@ -46,7 +46,9 @@ for (const [id, filename, limit] of [
   } else {
     const response = await fetch(pin.url);
     if (!response.ok) {
-      throw new Error('QSAC download failed (' + String(response.status) + ') for ' + filename + '.');
+      throw new Error(
+        'QSAC download failed (' + String(response.status) + ') for ' + filename + '.',
+      );
     }
     const body = Buffer.from(await response.arrayBuffer());
     verify(body);

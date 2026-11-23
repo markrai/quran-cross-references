@@ -378,11 +378,16 @@ export function QuranApp() {
                   navigate({
                     ...location,
                     view,
-                    evidence: view === 'network' || view === 'themes' ? 'curated' : location.evidence,
-                    selectedExpression: view === 'network' || view === 'themes' ? null : location.selectedExpression,
-                    selectedMorphTerm: view === 'network' || view === 'themes' ? null : location.selectedMorphTerm,
-                    selectedMorphWord: view === 'network' || view === 'themes' ? null : location.selectedMorphWord,
-                    selectedLink: view === 'network' || view === 'themes' ? null : location.selectedLink,
+                    evidence:
+                      view === 'network' || view === 'themes' ? 'curated' : location.evidence,
+                    selectedExpression:
+                      view === 'network' || view === 'themes' ? null : location.selectedExpression,
+                    selectedMorphTerm:
+                      view === 'network' || view === 'themes' ? null : location.selectedMorphTerm,
+                    selectedMorphWord:
+                      view === 'network' || view === 'themes' ? null : location.selectedMorphWord,
+                    selectedLink:
+                      view === 'network' || view === 'themes' ? null : location.selectedLink,
                     rangeEnd: view === 'network' || view === 'themes' ? null : location.rangeEnd,
                   });
                 }}
@@ -400,38 +405,40 @@ export function QuranApp() {
             ))}
           </div>
           <div className={styles.toolbarFields}>
-            {location.view !== 'analytics' && location.view !== 'network' && location.view !== 'themes' && (
-              <label className={styles.field}>
-                <span>Evidence type</span>
-                <select
-                  aria-label="Evidence type"
-                  value={location.evidence}
-                  onChange={(event) => {
-                    const evidence = event.target.value;
-                    if (
-                      evidence === 'curated' ||
-                      evidence === 'exact' ||
-                      evidence === 'morphology'
-                    ) {
-                      setExpressionState({ status: 'idle' });
-                      navigate({
-                        ...location,
-                        evidence,
-                        selectedLink: null,
-                        selectedExpression: null,
-                        selectedMorphTerm: null,
-                        selectedMorphWord: null,
-                        morphologyGrouping: 'lemma',
-                      });
-                    }
-                  }}
-                >
-                  <option value="curated">Curated similar passages</option>
-                  <option value="exact">Computed exact Arabic phrases</option>
-                  <option value="morphology">QAC annotated lemmas, roots and grammar</option>
-                </select>
-              </label>
-            )}
+            {location.view !== 'analytics' &&
+              location.view !== 'network' &&
+              location.view !== 'themes' && (
+                <label className={styles.field}>
+                  <span>Evidence type</span>
+                  <select
+                    aria-label="Evidence type"
+                    value={location.evidence}
+                    onChange={(event) => {
+                      const evidence = event.target.value;
+                      if (
+                        evidence === 'curated' ||
+                        evidence === 'exact' ||
+                        evidence === 'morphology'
+                      ) {
+                        setExpressionState({ status: 'idle' });
+                        navigate({
+                          ...location,
+                          evidence,
+                          selectedLink: null,
+                          selectedExpression: null,
+                          selectedMorphTerm: null,
+                          selectedMorphWord: null,
+                          morphologyGrouping: 'lemma',
+                        });
+                      }
+                    }}
+                  >
+                    <option value="curated">Curated similar passages</option>
+                    <option value="exact">Computed exact Arabic phrases</option>
+                    <option value="morphology">QAC annotated lemmas, roots and grammar</option>
+                  </select>
+                </label>
+              )}
             <label className={styles.field}>
               <span>Surah</span>
               <select
@@ -583,89 +590,91 @@ export function QuranApp() {
         )}
         {data && (
           <>
-            {location.view !== 'analytics' && location.view !== 'network' && location.view !== 'themes' && (
-              <section className={styles.focusCard} aria-label="Selected ayah">
-                <div className={styles.focusHeading}>
-                  <div>
-                    <p className={styles.eyebrow}>Selected passage</p>
-                    <h1>
-                      {activeSurah.name} · {formatAyahId(location.reference)}
-                    </h1>
-                  </div>
-                  <div className={styles.focusActions}>
-                    <button
-                      className={styles.shareButton}
-                      type="button"
-                      aria-label="Share ayah"
-                      onClick={() => {
-                        const url = new URL(
-                          quranLocationUrl(location, import.meta.env.BASE_URL),
-                          window.location.origin,
-                        ).href;
-                        void shareQuranReference(
-                          url,
-                          activeSurah.name + ' ' + formatAyahId(location.reference),
-                        ).then((result) => {
-                          if (result === 'cancelled') return;
-                          if (result === 'copied') setShareMessage('Ayah link copied');
-                          else if (result === 'shared') setShareMessage('Ayah link shared');
-                          else setShareMessage('Share this link: ' + url);
-                        });
-                      }}
-                    >
-                      Share ayah
-                    </button>
-                    <div className={styles.stepper}>
+            {location.view !== 'analytics' &&
+              location.view !== 'network' &&
+              location.view !== 'themes' && (
+                <section className={styles.focusCard} aria-label="Selected ayah">
+                  <div className={styles.focusHeading}>
+                    <div>
+                      <p className={styles.eyebrow}>Selected passage</p>
+                      <h1>
+                        {activeSurah.name} · {formatAyahId(location.reference)}
+                      </h1>
+                    </div>
+                    <div className={styles.focusActions}>
                       <button
+                        className={styles.shareButton}
                         type="button"
-                        aria-label="Previous ayah"
-                        disabled={activeIndex === 0}
+                        aria-label="Share ayah"
                         onClick={() => {
-                          if (activeIndex !== undefined && activeIndex > 0) {
-                            focus(data.relationships.versification.refAt(activeIndex - 1));
-                          }
+                          const url = new URL(
+                            quranLocationUrl(location, import.meta.env.BASE_URL),
+                            window.location.origin,
+                          ).href;
+                          void shareQuranReference(
+                            url,
+                            activeSurah.name + ' ' + formatAyahId(location.reference),
+                          ).then((result) => {
+                            if (result === 'cancelled') return;
+                            if (result === 'copied') setShareMessage('Ayah link copied');
+                            else if (result === 'shared') setShareMessage('Ayah link shared');
+                            else setShareMessage('Share this link: ' + url);
+                          });
                         }}
                       >
-                        ‹
+                        Share ayah
                       </button>
-                      <button
-                        type="button"
-                        aria-label="Next ayah"
-                        disabled={
-                          activeIndex === undefined ||
-                          activeIndex === data.relationships.ayahCount - 1
-                        }
-                        onClick={() => {
-                          if (
-                            activeIndex !== undefined &&
-                            activeIndex < data.relationships.ayahCount - 1
-                          ) {
-                            focus(data.relationships.versification.refAt(activeIndex + 1));
+                      <div className={styles.stepper}>
+                        <button
+                          type="button"
+                          aria-label="Previous ayah"
+                          disabled={activeIndex === 0}
+                          onClick={() => {
+                            if (activeIndex !== undefined && activeIndex > 0) {
+                              focus(data.relationships.versification.refAt(activeIndex - 1));
+                            }
+                          }}
+                        >
+                          ‹
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Next ayah"
+                          disabled={
+                            activeIndex === undefined ||
+                            activeIndex === data.relationships.ayahCount - 1
                           }
-                        }}
-                      >
-                        ›
-                      </button>
+                          onClick={() => {
+                            if (
+                              activeIndex !== undefined &&
+                              activeIndex < data.relationships.ayahCount - 1
+                            ) {
+                              focus(data.relationships.versification.refAt(activeIndex + 1));
+                            }
+                          }}
+                        >
+                          ›
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                {shareMessage && (
-                  <p className={styles.shareStatus} role="status">
-                    {shareMessage}
-                  </p>
-                )}
-                {activeIndex !== undefined && (
-                  <>
-                    <p className={styles.focusArabic} lang="ar" dir="rtl">
-                      {data.text.arabic[activeIndex]}
+                  {shareMessage && (
+                    <p className={styles.shareStatus} role="status">
+                      {shareMessage}
                     </p>
-                    <p className={styles.focusEnglish} lang="en" dir="ltr">
-                      {data.text.english[activeIndex]}
-                    </p>
-                  </>
-                )}
-              </section>
-            )}
+                  )}
+                  {activeIndex !== undefined && (
+                    <>
+                      <p className={styles.focusArabic} lang="ar" dir="rtl">
+                        {data.text.arabic[activeIndex]}
+                      </p>
+                      <p className={styles.focusEnglish} lang="en" dir="ltr">
+                        {data.text.english[activeIndex]}
+                      </p>
+                    </>
+                  )}
+                </section>
+              )}
             {location.view === 'analytics' && (
               <>
                 {(analyticsState.status === 'loading' || analyticsState.status === 'idle') && (

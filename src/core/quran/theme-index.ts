@@ -113,10 +113,7 @@ export class QuranThemeIndex {
         total += 1;
       }
     }
-    if (
-      !Number.isSafeInteger(dataset['annotationCount']) ||
-      dataset['annotationCount'] !== total
-    ) {
+    if (!Number.isSafeInteger(dataset['annotationCount']) || dataset['annotationCount'] !== total) {
       invalid('Tag assignment total differs from per-ayah evidence.');
     }
     for (const [id, raw] of tags.entries()) {
@@ -130,7 +127,7 @@ export class QuranThemeIndex {
 
   find(name: string): QuranThemeTag | null {
     const id = this.#ids.get(name);
-    return id === undefined ? null : this.dataset.tags[id] ?? null;
+    return id === undefined ? null : (this.dataset.tags[id] ?? null);
   }
 
   forAyah(ayah: number): readonly QuranThemeTag[] {
@@ -144,7 +141,7 @@ export class QuranThemeIndex {
 
   occurrences(name: string): readonly number[] {
     const id = this.#ids.get(name);
-    return id === undefined ? [] : this.#postings[id] ?? [];
+    return id === undefined ? [] : (this.#postings[id] ?? []);
   }
 
   frequencyBySurah(name: string): readonly { surah: number; count: number }[] {

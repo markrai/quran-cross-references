@@ -88,10 +88,7 @@ export function importQsacThemes(
   ontology: string,
   hashes: { readonly annotations: string; readonly ontology: string },
 ): QuranThemeDataset {
-  if (
-    !/^[a-f0-9]{64}$/.test(hashes.annotations) ||
-    !/^[a-f0-9]{64}$/.test(hashes.ontology)
-  ) {
+  if (!/^[a-f0-9]{64}$/.test(hashes.annotations) || !/^[a-f0-9]{64}$/.test(hashes.ontology)) {
     fail('Input checksum pins are missing.');
   }
   const root: unknown = JSON.parse(ontology);
@@ -142,7 +139,9 @@ export function importQsacThemes(
       !row[2]?.trim() ||
       !row[3]?.trim()
     ) {
-      fail('Unaligned source verse or empty excluded Arabic/translation column at ' + String(index));
+      fail(
+        'Unaligned source verse or empty excluded Arabic/translation column at ' + String(index),
+      );
     }
     const rawTags = row[4]?.split('|') ?? [];
     if (rawTags.length < 1 || rawTags.length > 5) {
@@ -170,7 +169,8 @@ export function importQsacThemes(
       ontologySha256: hashes.ontology,
       revision,
       license: 'CC BY 4.0',
-      attribution: 'QSAC (2026), Ahmad Bilal, CC BY 4.0; LLM-assisted and human-reviewed thematic annotations. https://github.com/dev-ahmadbilal/quran-semantic-annotation-corpus',
+      attribution:
+        'QSAC (2026), Ahmad Bilal, CC BY 4.0; LLM-assisted and human-reviewed thematic annotations. https://github.com/dev-ahmadbilal/quran-semantic-annotation-corpus',
     },
     annotationCount: assignmentCount,
     tags: tags.map((tag, index) => ({ ...tag, count: counts[index] ?? 0 })),

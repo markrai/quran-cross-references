@@ -84,9 +84,10 @@ describe('Quran-first canonical route', () => {
     expect(
       parseQuranLocation(new URL('https://example.test/?view=arcs&theme=Divine+Mercy')),
     ).toEqual(DEFAULT_QURAN_LOCATION);
-    expect(
-      parseQuranLocation(new URL('https://example.test/?view=themes&theme=%20')),
-    ).toEqual({ ...DEFAULT_QURAN_LOCATION, view: 'themes' });
+    expect(parseQuranLocation(new URL('https://example.test/?view=themes&theme=%20'))).toEqual({
+      ...DEFAULT_QURAN_LOCATION,
+      view: 'themes',
+    });
   });
 
   it('round-trips analytics URLs while preserving their selected ayah', () => {

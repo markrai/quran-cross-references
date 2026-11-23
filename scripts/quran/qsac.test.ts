@@ -48,22 +48,46 @@ describe('Phase 2D.1 external QSAC thematic evidence importer', () => {
     const hits = index.occurrences('Divine Mercy');
     expect(hits[0]).toBe(0);
     expect(hits).toContain(2);
-    expect(index.frequencyBySurah('Divine Mercy').reduce((sum, row) => sum + row.count, 0)).toBe(hits.length);
+    expect(index.frequencyBySurah('Divine Mercy').reduce((sum, row) => sum + row.count, 0)).toBe(
+      hits.length,
+    );
     expect(index.rankedTags()[0]?.count).toBeGreaterThan(300);
     expect(() => index.forAyah(6236)).toThrow('ayah');
   });
 
   it('rejects missing verses, changed labels, malformed translations, or forged provenance', () => {
-    expect(() => importQsacThemes(csv.replace('1,1,', '1,2,'), ontologyText, hashes)).toThrow('Unaligned');
-    expect(() => importQsacThemes(csv.replace('Names and Attributes of Allah|Divine Mercy', 'not a real tag'), ontologyText, hashes)).toThrow('Unknown');
-    expect(() => importQsacThemes(csv.replace('License: Creative Commons Attribution 4.0', 'Missing license'), ontologyText, hashes)).toThrow('attribution');
-    expect(() => importQsacThemes(csv, ontologyText, { ...hashes, ontology: 'invalid' })).toThrow('checksum');
+    expect(() => importQsacThemes(csv.replace('1,1,', '1,2,'), ontologyText, hashes)).toThrow(
+      'Unaligned',
+    );
+    expect(() =>
+      importQsacThemes(
+        csv.replace('Names and Attributes of Allah|Divine Mercy', 'not a real tag'),
+        ontologyText,
+        hashes,
+      ),
+    ).toThrow('Unknown');
+    expect(() =>
+      importQsacThemes(
+        csv.replace('License: Creative Commons Attribution 4.0', 'Missing license'),
+        ontologyText,
+        hashes,
+      ),
+    ).toThrow('attribution');
+    expect(() => importQsacThemes(csv, ontologyText, { ...hashes, ontology: 'invalid' })).toThrow(
+      'checksum',
+    );
     const dataset = importQsacThemes(csv, ontologyText, hashes);
-    expect(() => new QuranThemeIndex({ ...dataset, origin: 'curated' }, hashes)).toThrow('classification');
-    expect(() => new QuranThemeIndex({ ...dataset, ayahs: dataset.ayahs.slice(1) }, hashes)).toThrow('6,236');
+    expect(() => new QuranThemeIndex({ ...dataset, origin: 'curated' }, hashes)).toThrow(
+      'classification',
+    );
+    expect(
+      () => new QuranThemeIndex({ ...dataset, ayahs: dataset.ayahs.slice(1) }, hashes),
+    ).toThrow('6,236');
     const changed = [...dataset.ayahs];
     changed[0] = [999];
-    expect(() => new QuranThemeIndex({ ...dataset, ayahs: changed }, hashes)).toThrow('numeric tag');
+    expect(() => new QuranThemeIndex({ ...dataset, ayahs: changed }, hashes)).toThrow(
+      'numeric tag',
+    );
     const altered = [...dataset.tags];
     const original = altered[0];
     if (!original) throw new Error('Missing fixture tag.');

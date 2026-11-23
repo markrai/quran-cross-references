@@ -63,7 +63,12 @@ export function parseQuranLocation(url: URL): QuranLocation {
       : null;
   const rawView = params.get('view');
   const view: QuranView =
-    rawView === 'threads' || rawView === 'analytics' || rawView === 'network' || rawView === 'themes' ? rawView : 'arcs';
+    rawView === 'threads' ||
+    rawView === 'analytics' ||
+    rawView === 'network' ||
+    rawView === 'themes'
+      ? rawView
+      : 'arcs';
   const direction = params.get('direction');
   const scope = params.get('scope');
   const requestedEvidence = params.get('evidence');

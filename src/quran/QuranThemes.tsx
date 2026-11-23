@@ -60,7 +60,10 @@ export function QuranThemes({
   }, [sorted, search, domain, category]);
   const catalogPages = Math.max(1, Math.ceil(available.length / QSAC_PAGE_SIZE));
   const currentCatalog = Math.min(catalogPage, catalogPages - 1);
-  const listed = available.slice(currentCatalog * QSAC_PAGE_SIZE, (currentCatalog + 1) * QSAC_PAGE_SIZE);
+  const listed = available.slice(
+    currentCatalog * QSAC_PAGE_SIZE,
+    (currentCatalog + 1) * QSAC_PAGE_SIZE,
+  );
   const selected = (selectedName ? index.find(selectedName) : null) ?? sorted[0] ?? null;
   const rawHits = selected ? index.occurrences(selected.name) : [];
   const hits =
@@ -94,13 +97,14 @@ export function QuranThemes({
         <h1>Thematic exploration across the Quran</h1>
         <p>
           Explore {QSAC_DOMAIN_COUNT} ontology domains, {QSAC_CATEGORY_COUNT} categories and{' '}
-          {index.dataset.tags.length} topic labels across {index.dataset.ayahs.length.toLocaleString('en')} ayahs.
-          This is an external LLM-assisted, human-reviewed annotation dataset, not authoritative
-          tafsir, a curated cross-reference or proof that two verses share a meaning.
+          {index.dataset.tags.length} topic labels across{' '}
+          {index.dataset.ayahs.length.toLocaleString('en')} ayahs. This is an external LLM-assisted,
+          human-reviewed annotation dataset, not authoritative tafsir, a curated cross-reference or
+          proof that two verses share a meaning.
         </p>
         <p className={styles.themesCredit}>
-          QSAC © 2026 Ahmad Bilal, CC BY 4.0. Only topic assignments and their ontology
-          are reproduced here. Quran text is from the existing separately attributed reader.
+          QSAC © 2026 Ahmad Bilal, CC BY 4.0. Only topic assignments and their ontology are
+          reproduced here. Quran text is from the existing separately attributed reader.
           <a
             href="https://github.com/dev-ahmadbilal/quran-semantic-annotation-corpus"
             target="_blank"
@@ -185,14 +189,26 @@ export function QuranThemes({
                 <small>{tag.count.toLocaleString('en')} labeled ayahs</small>
               </button>
             ))}
-            {listed.length === 0 && <p className={styles.empty}>No annotations match this search.</p>}
+            {listed.length === 0 && (
+              <p className={styles.empty}>No annotations match this search.</p>
+            )}
           </div>
           <div className={styles.topologyPager}>
-            <button type="button" disabled={currentCatalog === 0} onClick={() => setCatalogPage(currentCatalog - 1)}>
+            <button
+              type="button"
+              disabled={currentCatalog === 0}
+              onClick={() => setCatalogPage(currentCatalog - 1)}
+            >
               Previous topics
             </button>
-            <span>{currentCatalog + 1} / {catalogPages}</span>
-            <button type="button" disabled={currentCatalog + 1 >= catalogPages} onClick={() => setCatalogPage(currentCatalog + 1)}>
+            <span>
+              {currentCatalog + 1} / {catalogPages}
+            </span>
+            <button
+              type="button"
+              disabled={currentCatalog + 1 >= catalogPages}
+              onClick={() => setCatalogPage(currentCatalog + 1)}
+            >
               Next topics
             </button>
           </div>
@@ -227,7 +243,8 @@ export function QuranThemes({
                 </label>
               </div>
               <p className={styles.topologyCaption} role="status">
-                {hits.length} attributed ayah matches · Page {currentOccurrence + 1} of {occurrencePages}
+                {hits.length} attributed ayah matches · Page {currentOccurrence + 1} of{' '}
+                {occurrencePages}
               </p>
               <div className={styles.themesOccurrences} aria-label="Theme tagged Quran verses">
                 {visibleHits.map((ayah) => {
@@ -239,7 +256,9 @@ export function QuranThemes({
                       aria-label={'Read tagged Quran ayah ' + formatAyahId(reference)}
                       onClick={() => onOpenAyah(ayah)}
                     >
-                      <strong>{getSurah(reference.surah).name} · {formatAyahId(reference)}</strong>
+                      <strong>
+                        {getSurah(reference.surah).name} · {formatAyahId(reference)}
+                      </strong>
                       <span>{data.text.english[ayah]}</span>
                       <small>Open in bilingual reader</small>
                     </button>
@@ -260,7 +279,9 @@ export function QuranThemes({
                 >
                   Previous labeled verses
                 </button>
-                <span>{currentOccurrence + 1} / {occurrencePages}</span>
+                <span>
+                  {currentOccurrence + 1} / {occurrencePages}
+                </span>
                 <button
                   type="button"
                   disabled={currentOccurrence + 1 >= occurrencePages}
@@ -278,12 +299,17 @@ export function QuranThemes({
             <section className={styles.analyticsPanel} aria-label="Theme distribution by surah">
               <div className={styles.panelHeading}>
                 <h2>Where this tag appears</h2>
-                <p>Top twelve surahs by number of assigned ayah labels, not normalized similarity scores.</p>
+                <p>
+                  Top twelve surahs by number of assigned ayah labels, not normalized similarity
+                  scores.
+                </p>
               </div>
               <div className={styles.themesDistribution}>
                 {frequencies.map((row) => (
                   <div key={row.surah} className={styles.themesDistributionRow}>
-                    <span>{row.surah}. {getSurah(row.surah).name}</span>
+                    <span>
+                      {row.surah}. {getSurah(row.surah).name}
+                    </span>
                     <span className={styles.analyticsBarTrack}>
                       <span
                         className={styles.analyticsCuratedFill}
@@ -294,7 +320,9 @@ export function QuranThemes({
                   </div>
                 ))}
                 {frequencies.length === 0 && (
-                  <p className={styles.empty}>This topic is in the ontology but has no verse assignments.</p>
+                  <p className={styles.empty}>
+                    This topic is in the ontology but has no verse assignments.
+                  </p>
                 )}
               </div>
             </section>
@@ -302,8 +330,8 @@ export function QuranThemes({
         </div>
       </div>
       <p className={styles.analyticsFootnote}>
-        This explorer groups externally assigned labels. Shared topic labels are not evidence of
-        a direct cross-reference, and may reflect annotation errors or differing interpretation.
+        This explorer groups externally assigned labels. Shared topic labels are not evidence of a
+        direct cross-reference, and may reflect annotation errors or differing interpretation.
         Always check the original ayahs and consult tafsir independently.
       </p>
     </section>
