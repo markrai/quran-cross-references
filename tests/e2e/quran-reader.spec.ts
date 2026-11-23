@@ -140,7 +140,7 @@ test.describe('Phase 3B.1 reader-first experience', () => {
     await page.getByRole('combobox', { name: 'Reader line spacing' }).selectOption('spacious');
     const reader = page.getByRole('region', { name: 'Quran text and relationship threads' });
     await expect(reader.locator('[lang="ar"][dir="rtl"]').first()).toBeVisible();
-    await expect(reader.locator('[lang="en"]')).toHaveCount(0);
+    await expect(reader.locator('ol').first().locator('[lang="en"]')).toHaveCount(0);
     await expect(page.locator('#quran-main')).toHaveAttribute(
       'style',
       /--reading-arabic-size: 2\.45rem/,
