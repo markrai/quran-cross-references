@@ -14,6 +14,7 @@ import { importMutashabihat, importQuranText } from './datasets.ts';
 import { buildQuranAnalytics } from './analytics.ts';
 import { importQacMorphology } from './qac.ts';
 import { importQsacThemes } from './qsac.ts';
+import { importElqvEmotions } from './elqv.ts';
 import { buildQuranTopology } from '../../src/quran/topology-model.ts';
 import { verifyPinnedQuranSource } from './pinned-source.ts';
 
@@ -129,6 +130,9 @@ writeDataset(
     ontology: ontologySource.sha256,
   }),
 );
+const emotionPin = pins.find((pin) => pin.id === 'elqv-2025-expert-emotions');
+if (!emotionPin) throw new Error('Missing pinned ELQV specialist annotations.');
+writeDataset('emotions.json', importElqvEmotions(readPinned(emotionPin.id), emotionPin.sha256));
 writeDataset('manifest.json', {
   format: 'quran-foundation-manifest',
   schemaVersion: 1,
