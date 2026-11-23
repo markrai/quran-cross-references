@@ -140,7 +140,7 @@ Share an exact reader state such as `?ref=26%3A8&view=threads&inspect=emotions` 
 The existing **Themes** tab now offers **Analyze Arabic patterns within this topic** for each experimental QSAC tag. The explorer compares the **fraction of canonical ayahs carrying both a QSAC topic label and a particular linguistic feature** against the fraction of **all other ayahs not carrying that QSAC label**. Results are read-only, computed locally, and sourced exclusively from the existing integrity-verified datasets:
 
 - **QAC roots / lemmas:** original v0.4 linguistic annotations, grouped independently. Word positions are not overlaid onto the separately displayed Tanzil text.
-- **Exact Arabic expressions:** exact diacritic- and order-preserving 3–8-word Tanzil v1.1 repetitions; repeated spans *within the same ayah* count only once.
+- **Exact Arabic expressions:** exact diacritic- and order-preserving 3–8-word Tanzil v1.1 repetitions; repeated spans _within the same ayah_ count only once.
 - **QSAC topics:** 338 independently published LLM-assisted, human-reviewed exploratory annotation labels. A verse without a given tag is **untagged in this dataset**, not necessarily absent of that subject.
 
 Each feature displays tagged and untagged **ayah-presence counts, both denominators, percentage rates and a signed percentage-point difference**. Eligible features are sorted descriptively by their difference, with conservative visibility filters but **no statistical-significance or semantic-similarity claims**. You can switch between positive and negative differences, filter source features, explore per-surah numerator/denominator counts, inspect paginated bilingual source ayahs, or open the original morphological or exact-phrase evidence.

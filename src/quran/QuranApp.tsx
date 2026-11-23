@@ -186,12 +186,15 @@ export function QuranApp() {
 
   useEffect(() => {
     const reader = location.view === 'arcs' || location.view === 'threads';
-    const themeAnalysis = location.view === 'themes' &&
-      location.themeAnalysis === 'language' && location.patternKind === 'exact';
+    const themeAnalysis =
+      location.view === 'themes' &&
+      location.themeAnalysis === 'language' &&
+      location.patternKind === 'exact';
     if (
       !data ||
       (!reader && !themeAnalysis) ||
-      (!themeAnalysis && location.evidence !== 'exact' &&
+      (!themeAnalysis &&
+        location.evidence !== 'exact' &&
         location.inspector !== 'exact' &&
         location.inspector !== 'all')
     )
@@ -218,7 +221,15 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.evidence, location.view, location.inspector, location.themeAnalysis, location.patternKind, expressionAttempt]);
+  }, [
+    data,
+    location.evidence,
+    location.view,
+    location.inspector,
+    location.themeAnalysis,
+    location.patternKind,
+    expressionAttempt,
+  ]);
 
   useEffect(() => {
     if (!data || location.view !== 'analytics') return;
@@ -274,12 +285,15 @@ export function QuranApp() {
 
   useEffect(() => {
     const reader = location.view === 'arcs' || location.view === 'threads';
-    const themeAnalysis = location.view === 'themes' &&
-      location.themeAnalysis === 'language' && location.patternKind !== 'exact';
+    const themeAnalysis =
+      location.view === 'themes' &&
+      location.themeAnalysis === 'language' &&
+      location.patternKind !== 'exact';
     if (
       !data ||
       (!reader && !themeAnalysis) ||
-      (!themeAnalysis && location.evidence !== 'morphology' &&
+      (!themeAnalysis &&
+        location.evidence !== 'morphology' &&
         location.inspector !== 'morphology' &&
         location.inspector !== 'all')
     )
@@ -306,7 +320,15 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.view, location.evidence, location.inspector, location.themeAnalysis, location.patternKind, morphologyAttempt]);
+  }, [
+    data,
+    location.view,
+    location.evidence,
+    location.inspector,
+    location.themeAnalysis,
+    location.patternKind,
+    morphologyAttempt,
+  ]);
 
   useEffect(() => {
     const inspecting =

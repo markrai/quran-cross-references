@@ -127,8 +127,7 @@ export function parseQuranLocation(url: URL): QuranLocation {
     view === 'themes' && params.get('analysis') === 'language' ? 'language' : 'browse';
   const requestedPattern = params.get('pattern');
   const patternKind: ThemeLanguageKind =
-    themeAnalysis === 'language' &&
-    (requestedPattern === 'lemma' || requestedPattern === 'exact')
+    themeAnalysis === 'language' && (requestedPattern === 'lemma' || requestedPattern === 'exact')
       ? requestedPattern
       : 'root';
   const rawFeature = params.get('feature');

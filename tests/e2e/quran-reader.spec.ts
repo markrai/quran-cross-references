@@ -1179,7 +1179,6 @@ test.describe('Quran Phase 2E.1 unified ayah evidence inspector', () => {
   });
 });
 
-
 test.describe('Quran Phase 2E.2 linguistic pattern discovery', () => {
   test('loads QAC on explicit theme-language exploration without requesting exact expressions', async ({
     page,
@@ -1191,14 +1190,20 @@ test.describe('Quran Phase 2E.2 linguistic pattern discovery', () => {
       }
     });
     await page.goto('./?ref=1%3A1&view=themes&theme=Divine+Mercy');
-    await expect(page.getByRole('heading', { name: 'Thematic exploration across the Quran' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Thematic exploration across the Quran' }),
+    ).toBeVisible();
     expect(requested.some((url) => url.endsWith('/morphology.json'))).toBe(false);
     expect(requested.some((url) => url.endsWith('/expressions.json'))).toBe(false);
     await page.getByRole('button', { name: 'Analyze Arabic patterns within this topic' }).click();
     await expect(page).toHaveURL(/view=themes&theme=Divine\+Mercy&analysis=language/);
-    await expect(page.getByRole('heading', { name: 'Language patterns across Quran themes' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Language patterns across Quran themes' }),
+    ).toBeVisible();
     await expect(page.getByLabel('Linguistic feature comparisons')).toContainText('Tagged:');
-    await expect(page.getByLabel('Selected linguistic pattern')).toContainText('Descriptive rate difference');
+    await expect(page.getByLabel('Selected linguistic pattern')).toContainText(
+      'Descriptive rate difference',
+    );
     await expect(page.getByLabel('Surah language distribution')).toBeVisible();
     await expect(page.getByLabel('Theme and language co-occurrence verses')).toBeVisible();
     expect(requested.filter((url) => url.endsWith('/themes.json'))).toHaveLength(1);
@@ -1206,7 +1211,9 @@ test.describe('Quran Phase 2E.2 linguistic pattern discovery', () => {
     expect(requested.some((url) => url.endsWith('/expressions.json'))).toBe(false);
     await page.getByRole('button', { name: '← Back to QSAC topic explorer' }).click();
     await expect(page).not.toHaveURL(/analysis=language/);
-    await expect(page.getByRole('heading', { name: 'Thematic exploration across the Quran' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Thematic exploration across the Quran' }),
+    ).toBeVisible();
     await page.goBack();
     await expect(page).toHaveURL(/analysis=language/);
     expect(requested.filter((url) => url.endsWith('/morphology.json'))).toHaveLength(1);
@@ -1222,7 +1229,9 @@ test.describe('Quran Phase 2E.2 linguistic pattern discovery', () => {
       }
     });
     await page.goto('./?ref=1%3A1&view=themes&theme=Divine+Mercy&analysis=language&pattern=exact');
-    await expect(page.getByRole('heading', { name: 'Language patterns across Quran themes' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Language patterns across Quran themes' }),
+    ).toBeVisible();
     await expect(page.getByLabel('Linguistic feature comparisons')).toContainText('Tagged:');
     expect(requested.filter((url) => url.endsWith('/expressions.json'))).toHaveLength(1);
     expect(requested.some((url) => url.endsWith('/morphology.json'))).toBe(false);
@@ -1232,7 +1241,9 @@ test.describe('Quran Phase 2E.2 linguistic pattern discovery', () => {
     await first.click();
     await expect(page).toHaveURL(/feature=exact%3Av1%3A/);
     await page.reload();
-    await expect(page.getByLabel('Selected linguistic pattern')).toContainText('Original feature ID:');
+    await expect(page.getByLabel('Selected linguistic pattern')).toContainText(
+      'Original feature ID:',
+    );
     const details = page.getByLabel('Selected linguistic pattern');
     await details.getByRole('button', { name: 'Open original exact phrase evidence' }).click();
     await expect(page).toHaveURL(/view=arcs/);
@@ -1258,12 +1269,17 @@ test.describe('Quran Phase 2E.2 linguistic pattern discovery', () => {
     await expect(page).toHaveURL(/view=threads/);
     await expect(page).toHaveURL(/evidence=morphology/);
     await expect(page).toHaveURL(/morph=lemma|term=/);
-    await expect(page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' }),
+    ).toBeVisible();
     await page.goBack();
     await expect(page).toHaveURL(/analysis=language&pattern=lemma/);
     const verses = page.getByLabel('Theme and language co-occurrence verses');
     await expect(verses).toContainText('matching tagged ayahs');
-    await verses.getByRole('button', { name: /Read linguistic evidence at Quran ayah/ }).first().click();
+    await verses
+      .getByRole('button', { name: /Read linguistic evidence at Quran ayah/ })
+      .first()
+      .click();
     await expect(page).toHaveURL(/view=threads/);
     await page.goBack();
     await expect(page).toHaveURL(/analysis=language&pattern=lemma/);

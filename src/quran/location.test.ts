@@ -141,8 +141,9 @@ describe('Quran-first canonical route', () => {
     expect(parseQuranLocation(new URL(exactUrl, 'https://example.test'))).toEqual(exact);
 
     const lemma = { ...root, patternKind: 'lemma' as const, selectedPattern: 'raHm' };
-    expect(parseQuranLocation(new URL(quranLocationUrl(lemma, '/site/'), 'https://example.test')))
-      .toEqual(lemma);
+    expect(
+      parseQuranLocation(new URL(quranLocationUrl(lemma, '/site/'), 'https://example.test')),
+    ).toEqual(lemma);
   });
 
   it('does not leak linguistics into other research tabs or accept untrusted malformed features', () => {

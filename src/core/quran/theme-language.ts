@@ -76,7 +76,8 @@ export function computeThemeLanguage(
     }
     selected.add(ayah);
   }
-  if (selected.size !== theme.count) throw new Error('QSAC topic count differs from validated postings.');
+  if (selected.size !== theme.count)
+    throw new Error('QSAC topic count differs from validated postings.');
   const themeSize = selected.size;
   const outsideSize = CANONICAL_QURAN.ayahCount - themeSize;
   const postings = new Map<
@@ -110,7 +111,14 @@ export function computeThemeLanguage(
       percentagePointDifference: (themeRate - outsideRate) * 100,
     };
   });
-  return { theme: themeName, kind: input.kind, themeSize, outsideSize, themeAyahs: selected, features };
+  return {
+    theme: themeName,
+    kind: input.kind,
+    themeSize,
+    outsideSize,
+    themeAyahs: selected,
+    features,
+  };
 }
 
 export function rankThemeLanguage(
@@ -125,7 +133,8 @@ export function rankThemeLanguage(
         query.length > 0 &&
         !feature.id.toLocaleLowerCase('en').includes(query) &&
         !feature.label.toLocaleLowerCase('en').includes(query)
-      ) return false;
+      )
+        return false;
       if (direction === 'enriched') {
         return (
           feature.percentagePointDifference > 0 &&
@@ -168,8 +177,8 @@ export function themeLanguageSurahs(
     featureOutside[surah] = (featureOutside[surah] ?? 0) + 1;
   }
   return Array.from({ length: CANONICAL_QURAN.surahCount }, (_, index) => {
-    const total = CANONICAL_QURAN.surahRange(index + 1).end -
-      CANONICAL_QURAN.surahRange(index + 1).start + 1;
+    const total =
+      CANONICAL_QURAN.surahRange(index + 1).end - CANONICAL_QURAN.surahRange(index + 1).start + 1;
     const theme = inTheme[index] ?? 0;
     return {
       surah: index + 1,

@@ -3,11 +3,7 @@ import type { QuranThemeIndex } from './theme-index.ts';
 import type { QacMorphologyIndex } from './qac-index.ts';
 import type { QuranExpressionIndex, QuranPublishedExpression } from './expression-browser.ts';
 import { CANONICAL_QURAN } from './quran-versification.ts';
-import {
-  computeThemeLanguage,
-  rankThemeLanguage,
-  themeLanguageSurahs,
-} from './theme-language.ts';
+import { computeThemeLanguage, rankThemeLanguage, themeLanguageSurahs } from './theme-language.ts';
 
 const themeAyahs = [0, 1, 7];
 const fakeThemes = {
@@ -70,7 +66,7 @@ describe('Phase 2E.2 Quran linguistic pattern discovery', () => {
     expect(mercy?.outsideAyahs).toEqual([3]);
     expect(mercy?.themeRate).toBeCloseTo(2 / 3, 7);
     expect(mercy?.outsideRate).toBeCloseTo(1 / 6233, 7);
-    expect(mercy?.percentagePointDifference).toBeCloseTo(((2 / 3) - (1 / 6233)) * 100, 7);
+    expect(mercy?.percentagePointDifference).toBeCloseTo((2 / 3 - 1 / 6233) * 100, 7);
     expect(rankThemeLanguage(report, 'enriched', '')[0]?.id).toBe('rHm');
   });
 
@@ -108,7 +104,14 @@ describe('Phase 2E.2 Quran linguistic pattern discovery', () => {
     if (!mercy) throw new Error('Missing fixture root.');
     const surahs = themeLanguageSurahs(report, mercy);
     expect(surahs).toHaveLength(114);
-    expect(surahs[0]).toMatchObject({ surah: 1, total: 7, theme: 2, outside: 5, both: 2, featureOutside: 1 });
+    expect(surahs[0]).toMatchObject({
+      surah: 1,
+      total: 7,
+      theme: 2,
+      outside: 5,
+      both: 2,
+      featureOutside: 1,
+    });
     expect(surahs[1]).toMatchObject({ surah: 2, theme: 1, both: 0 });
     expect(surahs.reduce((sum, row) => sum + row.both, 0)).toBe(2);
     expect(surahs.reduce((sum, row) => sum + row.featureOutside, 0)).toBe(1);
@@ -116,22 +119,22 @@ describe('Phase 2E.2 Quran linguistic pattern discovery', () => {
   });
 
   it('rejects inconsistent or invalid QSAC source memberships instead of recomputing a misleading rate', () => {
-    expect(() => computeThemeLanguage(fakeThemes, 'Absent', { kind: 'root', index: fakeQac })).toThrow(
-      'Unknown QSAC',
-    );
+    expect(() =>
+      computeThemeLanguage(fakeThemes, 'Absent', { kind: 'root', index: fakeQac }),
+    ).toThrow('Unknown QSAC');
     const incorrect = {
       find: () => ({ count: 4 }),
       occurrences: () => [0, 1, 7],
     } as unknown as Pick<QuranThemeIndex, 'find' | 'occurrences'>;
-    expect(() => computeThemeLanguage(incorrect, 'Mercy', { kind: 'root', index: fakeQac })).toThrow(
-      'differs from validated postings',
-    );
+    expect(() =>
+      computeThemeLanguage(incorrect, 'Mercy', { kind: 'root', index: fakeQac }),
+    ).toThrow('differs from validated postings');
     const duplicated = {
       find: () => ({ count: 2 }),
       occurrences: () => [0, 0],
     } as unknown as Pick<QuranThemeIndex, 'find' | 'occurrences'>;
-    expect(() => computeThemeLanguage(duplicated, 'Mercy', { kind: 'root', index: fakeQac })).toThrow(
-      'duplicate',
-    );
+    expect(() =>
+      computeThemeLanguage(duplicated, 'Mercy', { kind: 'root', index: fakeQac }),
+    ).toThrow('duplicate');
   });
 });

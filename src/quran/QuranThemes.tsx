@@ -236,7 +236,9 @@ export function QuranThemes({
                 <button
                   type="button"
                   className={styles.themeLanguageBack}
-                  onClick={() => { onAnalyze(selected.name); }}
+                  onClick={() => {
+                    onAnalyze(selected.name);
+                  }}
                 >
                   Analyze Arabic patterns within this topic
                 </button>

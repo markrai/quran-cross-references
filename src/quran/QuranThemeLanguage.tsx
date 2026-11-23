@@ -100,7 +100,7 @@ export function QuranThemeLanguage({
       : null;
   }, [themes, selected?.name, kind, morphology, expressions]);
   const ranked = useMemo(
-    () => report === null ? [] : rankThemeLanguage(report, direction, search),
+    () => (report === null ? [] : rankThemeLanguage(report, direction, search)),
     [report, direction, search],
   );
   const rankingKey = (selected?.name ?? '') + ':' + kind + ':' + direction + ':' + search;
@@ -116,21 +116,28 @@ export function QuranThemeLanguage({
     ranked[0] ??
     null;
   const allSurahs = useMemo(
-    () => report && chosen ? themeLanguageSurahs(report, chosen) : [],
+    () => (report && chosen ? themeLanguageSurahs(report, chosen) : []),
     [report, chosen],
   );
   const occupiedSurahs = [...allSurahs]
     .filter((item) => item.theme > 0 || item.featureOutside > 0)
     .sort((a, b) => b.both - a.both || b.theme - a.theme || a.surah - b.surah);
   const listedSurahs = showAllSurahs ? occupiedSurahs : occupiedSurahs.slice(0, 12);
-  const exampleScope = sample === 'outside' || (chosen?.themeAyahs.length === 0);
-  const sourceAyahs = exampleScope ? chosen?.outsideAyahs ?? [] : chosen?.themeAyahs ?? [];
+  const exampleScope = sample === 'outside' || chosen?.themeAyahs.length === 0;
+  const sourceAyahs = exampleScope ? (chosen?.outsideAyahs ?? []) : (chosen?.themeAyahs ?? []);
   const matchingAyahs = sourceAyahs.filter(
     (ayah) => surah === 0 || CANONICAL_QURAN.refAt(ayah).surah === surah,
   );
   const versesKey =
-    (selected?.name ?? '') + ':' + kind + ':' + (chosen?.id ?? '') + ':' +
-    (exampleScope ? 'outside' : 'theme') + ':' + surah;
+    (selected?.name ?? '') +
+    ':' +
+    kind +
+    ':' +
+    (chosen?.id ?? '') +
+    ':' +
+    (exampleScope ? 'outside' : 'theme') +
+    ':' +
+    surah;
   const versePages = Math.max(1, Math.ceil(matchingAyahs.length / PAGE_SIZE));
   const currentVersePage =
     versePage.key === versesKey ? Math.min(versePage.index, versePages - 1) : 0;
@@ -140,7 +147,10 @@ export function QuranThemeLanguage({
   );
 
   return (
-    <section className={styles.themeLanguageExplorer} aria-label="Quran thematic linguistic patterns">
+    <section
+      className={styles.themeLanguageExplorer}
+      aria-label="Quran thematic linguistic patterns"
+    >
       <header className={styles.analyticsIntro}>
         <p className={styles.eyebrow}>Phase 2E.2 · Exploratory language analytics</p>
         <h1>Language patterns across Quran themes</h1>
@@ -214,7 +224,9 @@ export function QuranThemeLanguage({
               aria-label="Search linguistic feature"
               value={search}
               placeholder="رحم or rHm"
-              onChange={(event) => { setSearch(event.target.value); }}
+              onChange={(event) => {
+                setSearch(event.target.value);
+              }}
             />
           </label>
         </div>
@@ -227,8 +239,8 @@ export function QuranThemeLanguage({
         )}
         {source.status === 'loading' || source.status === 'idle' ? (
           <p role="status" className={styles.themeLanguageNotice}>
-            Verifying optional {kind === 'exact' ? 'exact Arabic expression' : 'QAC morphology'} source
-            and original publication hashes…
+            Verifying optional {kind === 'exact' ? 'exact Arabic expression' : 'QAC morphology'}{' '}
+            source and original publication hashes…
           </p>
         ) : source.status === 'error' ? (
           <div role="alert" className={styles.themeLanguageNotice}>
@@ -252,12 +264,13 @@ export function QuranThemeLanguage({
               <p>
                 {direction === 'enriched'
                   ? 'Show features present in at least 2 tagged ayahs and 3 ayahs overall.'
-                  : 'Show features present in at least 12 untagged ayahs.'}
-                {' '}Small groups and selected categories may produce unstable extremes.
+                  : 'Show features present in at least 12 untagged ayahs.'}{' '}
+                Small groups and selected categories may produce unstable extremes.
               </p>
             </div>
             <p className={styles.topologyCaption} role="status">
-              {ranked.length} eligible features · Page {currentFeaturePage + 1} of {totalFeaturePages}
+              {ranked.length} eligible features · Page {currentFeaturePage + 1} of{' '}
+              {totalFeaturePages}
             </p>
             <div className={styles.themeLanguageFeatureList}>
               {visibleFeatures.map((feature) => (
@@ -276,16 +289,16 @@ export function QuranThemeLanguage({
                     <strong>{points(feature.percentagePointDifference)}</strong>
                   </span>
                   <small>
-                    Tagged: {feature.themeAyahs.length}/{report.themeSize} ({percent(feature.themeRate)})
-                    {' · '}Untagged: {feature.outsideAyahs.length}/{report.outsideSize}
-                    {' '}({percent(feature.outsideRate)})
+                    Tagged: {feature.themeAyahs.length}/{report.themeSize} (
+                    {percent(feature.themeRate)}){' · '}Untagged: {feature.outsideAyahs.length}/
+                    {report.outsideSize} ({percent(feature.outsideRate)})
                   </small>
                 </button>
               ))}
               {visibleFeatures.length === 0 && (
                 <p className={styles.empty}>
-                  No features meet the descriptive support threshold and search filter.
-                  Adjust the filter or choose another topic.
+                  No features meet the descriptive support threshold and search filter. Adjust the
+                  filter or choose another topic.
                 </p>
               )}
             </div>
@@ -293,15 +306,21 @@ export function QuranThemeLanguage({
               <button
                 type="button"
                 disabled={currentFeaturePage === 0}
-                onClick={() => { setFeaturePage({ key: rankingKey, index: currentFeaturePage - 1 }); }}
+                onClick={() => {
+                  setFeaturePage({ key: rankingKey, index: currentFeaturePage - 1 });
+                }}
               >
                 Previous features
               </button>
-              <span>{currentFeaturePage + 1} / {totalFeaturePages}</span>
+              <span>
+                {currentFeaturePage + 1} / {totalFeaturePages}
+              </span>
               <button
                 type="button"
                 disabled={currentFeaturePage + 1 >= totalFeaturePages}
-                onClick={() => { setFeaturePage({ key: rankingKey, index: currentFeaturePage + 1 }); }}
+                onClick={() => {
+                  setFeaturePage({ key: rankingKey, index: currentFeaturePage + 1 });
+                }}
               >
                 Next features
               </button>
@@ -313,19 +332,31 @@ export function QuranThemeLanguage({
                 <section className={styles.analyticsPanel} aria-label="Selected linguistic pattern">
                   <div className={styles.panelHeading}>
                     <p className={styles.eyebrow}>
-                      {kind === 'root' ? 'QAC root' : kind === 'lemma' ? 'QAC lemma' : 'Exact orthographic phrase'}
+                      {kind === 'root'
+                        ? 'QAC root'
+                        : kind === 'lemma'
+                          ? 'QAC lemma'
+                          : 'Exact orthographic phrase'}
                     </p>
-                    <h2><FeaturePreview feature={chosen} kind={kind} /></h2>
-                    <p>Original feature ID: <code>{chosen.id}</code></p>
+                    <h2>
+                      <FeaturePreview feature={chosen} kind={kind} />
+                    </h2>
+                    <p>
+                      Original feature ID: <code>{chosen.id}</code>
+                    </p>
                   </div>
                   <div className={styles.themeLanguageRateGrid}>
                     <div>
                       <strong>{percent(chosen.themeRate)}</strong>
-                      <span>{chosen.themeAyahs.length} of {report.themeSize} tagged ayahs</span>
+                      <span>
+                        {chosen.themeAyahs.length} of {report.themeSize} tagged ayahs
+                      </span>
                     </div>
                     <div>
                       <strong>{percent(chosen.outsideRate)}</strong>
-                      <span>{chosen.outsideAyahs.length} of {report.outsideSize} untagged ayahs</span>
+                      <span>
+                        {chosen.outsideAyahs.length} of {report.outsideSize} untagged ayahs
+                      </span>
                     </div>
                     <div>
                       <strong>{points(chosen.percentagePointDifference)}</strong>
@@ -333,9 +364,9 @@ export function QuranThemeLanguage({
                     </div>
                   </div>
                   <p className={styles.themeLanguageNotice}>
-                    Rates describe source annotations, not the probability that a passage
-                    expresses this theme. No p-values, confidence claims or automatic semantic
-                    cross-reference edges are generated.
+                    Rates describe source annotations, not the probability that a passage expresses
+                    this theme. No p-values, confidence claims or automatic semantic cross-reference
+                    edges are generated.
                   </p>
                   <button
                     type="button"
@@ -363,15 +394,28 @@ export function QuranThemeLanguage({
                         type="button"
                         key={row.surah}
                         aria-pressed={surah === row.surah}
-                        onClick={() => { setSurah(row.surah === surah ? 0 : row.surah); }}
+                        onClick={() => {
+                          setSurah(row.surah === surah ? 0 : row.surah);
+                        }}
                       >
-                        <strong>{getSurah(row.surah).name} · {row.surah}</strong>
+                        <strong>
+                          {getSurah(row.surah).name} · {row.surah}
+                        </strong>
                         <span>
-                          Tagged {row.both}/{row.theme} · Untagged {row.featureOutside}/{row.outside}
+                          Tagged {row.both}/{row.theme} · Untagged {row.featureOutside}/
+                          {row.outside}
                         </span>
                         <span className={styles.themeLanguageBars} aria-hidden="true">
-                          <span style={{ width: percent(row.theme === 0 ? 0 : row.both / row.theme) }} />
-                          <span style={{ width: percent(row.outside === 0 ? 0 : row.featureOutside / row.outside) }} />
+                          <span
+                            style={{ width: percent(row.theme === 0 ? 0 : row.both / row.theme) }}
+                          />
+                          <span
+                            style={{
+                              width: percent(
+                                row.outside === 0 ? 0 : row.featureOutside / row.outside,
+                              ),
+                            }}
+                          />
                         </span>
                       </button>
                     ))}
@@ -379,19 +423,26 @@ export function QuranThemeLanguage({
                       <button
                         type="button"
                         className={styles.themeLanguageMore}
-                        onClick={() => { setShowAllSurahs(!showAllSurahs); }}
+                        onClick={() => {
+                          setShowAllSurahs(!showAllSurahs);
+                        }}
                       >
-                        {showAllSurahs ? 'Show first 12 surahs' : 'Show all ' + occupiedSurahs.length + ' represented surahs'}
+                        {showAllSurahs
+                          ? 'Show first 12 surahs'
+                          : 'Show all ' + occupiedSurahs.length + ' represented surahs'}
                       </button>
                     )}
                   </div>
                 </section>
-                <section className={styles.analyticsPanel} aria-label="Theme and language co-occurrence verses">
+                <section
+                  className={styles.analyticsPanel}
+                  aria-label="Theme and language co-occurrence verses"
+                >
                   <div className={styles.panelHeading}>
                     <h2>Original ayah evidence</h2>
                     <p>
-                      Read the canonical Arabic and separately sourced English for each hit.
-                      Only the source annotations establish membership in this list.
+                      Read the canonical Arabic and separately sourced English for each hit. Only
+                      the source annotations establish membership in this list.
                     </p>
                   </div>
                   <div className={styles.themeLanguageSampleControls}>
@@ -417,7 +468,9 @@ export function QuranThemeLanguage({
                       <select
                         aria-label="Linguistic evidence surah"
                         value={surah}
-                        onChange={(event) => { setSurah(Number(event.target.value)); }}
+                        onChange={(event) => {
+                          setSurah(Number(event.target.value));
+                        }}
                       >
                         <option value={0}>All surahs</option>
                         {occupiedSurahs.map((row) => (
@@ -440,31 +493,47 @@ export function QuranThemeLanguage({
                           type="button"
                           key={ayah}
                           aria-label={'Read linguistic evidence at Quran ayah ' + formatAyahId(ref)}
-                          onClick={() => { onOpenAyah(ayah); }}
+                          onClick={() => {
+                            onOpenAyah(ayah);
+                          }}
                         >
-                          <strong>{getSurah(ref.surah).name} · {formatAyahId(ref)}</strong>
-                          <span lang="ar" dir="rtl">{data.text.arabic[ayah]}</span>
-                          <small lang="en" dir="ltr">{data.text.english[ayah]}</small>
+                          <strong>
+                            {getSurah(ref.surah).name} · {formatAyahId(ref)}
+                          </strong>
+                          <span lang="ar" dir="rtl">
+                            {data.text.arabic[ayah]}
+                          </span>
+                          <small lang="en" dir="ltr">
+                            {data.text.english[ayah]}
+                          </small>
                         </button>
                       );
                     })}
                     {visibleAyahs.length === 0 && (
-                      <p className={styles.empty}>No feature occurrences in this surah and source subset.</p>
+                      <p className={styles.empty}>
+                        No feature occurrences in this surah and source subset.
+                      </p>
                     )}
                   </div>
                   <div className={styles.topologyPager}>
                     <button
                       type="button"
                       disabled={currentVersePage === 0}
-                      onClick={() => { setVersePage({ key: versesKey, index: currentVersePage - 1 }); }}
+                      onClick={() => {
+                        setVersePage({ key: versesKey, index: currentVersePage - 1 });
+                      }}
                     >
                       Previous evidence ayahs
                     </button>
-                    <span>{currentVersePage + 1} / {versePages}</span>
+                    <span>
+                      {currentVersePage + 1} / {versePages}
+                    </span>
                     <button
                       type="button"
                       disabled={currentVersePage + 1 >= versePages}
-                      onClick={() => { setVersePage({ key: versesKey, index: currentVersePage + 1 }); }}
+                      onClick={() => {
+                        setVersePage({ key: versesKey, index: currentVersePage + 1 });
+                      }}
                     >
                       Next evidence ayahs
                     </button>
@@ -473,7 +542,9 @@ export function QuranThemeLanguage({
               </>
             ) : (
               <section className={styles.analyticsPanel}>
-                <p className={styles.empty}>No eligible feature is selected. Try another QSAC topic or source.</p>
+                <p className={styles.empty}>
+                  No eligible feature is selected. Try another QSAC topic or source.
+                </p>
               </section>
             )}
           </div>

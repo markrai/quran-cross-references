@@ -8,7 +8,7 @@ In the **Themes** tab, select an experimental topic and click **Analyze Arabic p
 
 ## Exact measures
 
-For a selected QSAC topic T and linguistic feature F, the analysis partitions the **6,236 ayahs** into two *disjoint* and exhaustive groups:
+For a selected QSAC topic T and linguistic feature F, the analysis partitions the **6,236 ayahs** into two _disjoint_ and exhaustive groups:
 
 - **Tagged group:** original QSAC postings for T, size N(T).
 - **Untagged group:** the complement of those postings, size 6,236 − N(T).
@@ -17,7 +17,7 @@ A feature is **present** in an ayah when at least one original QAC annotated tok
 
 The interface reports raw counts a = tagged ayahs with feature and b = untagged ayahs with feature; tagged rate a/N(T); untagged rate b/(6,236 − N(T)); and signed difference **100 × (tagged rate − untagged rate) percentage points**. The denominator is **ayah count**, never word count, occurrences, annotated rows or selected result count.
 
-Positive differences are listed separately from negative differences. To avoid displaying one-off noise as leading discoveries, positive-difference listings require at least **2 tagged ayahs and 3 ayahs overall**; negative-difference listings require at least **12 untagged ayahs**. These are *visibility* thresholds, not statistical tests, quality grades or validity guarantees. All source features remain in the in-memory report, so an explicit feature deep link can retain its underlying evidence when it does not meet a default list threshold. Values are deterministically sorted by rate difference and stable original feature ID tie-breaking.
+Positive differences are listed separately from negative differences. To avoid displaying one-off noise as leading discoveries, positive-difference listings require at least **2 tagged ayahs and 3 ayahs overall**; negative-difference listings require at least **12 untagged ayahs**. These are _visibility_ thresholds, not statistical tests, quality grades or validity guarantees. All source features remain in the in-memory report, so an explicit feature deep link can retain its underlying evidence when it does not meet a default list threshold. Values are deterministically sorted by rate difference and stable original feature ID tie-breaking.
 
 **No statistical significance claim, enrichment p-value, multiple-testing claim, causal inference, semantic similarity model, tafsir inference or automatic edge generation is performed.** QSAC tags were developed with LLM assistance and human review, not authoritative exegesis; nonmembership does not imply a theme is absent. Small topic groups, variable verse lengths, uneven surah sizes, Arabic polysemy and source-selection biases limit interpretation.
 
