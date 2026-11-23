@@ -65,6 +65,7 @@ describe('Quran offline release shell', () => {
       (event: { request?: Request; respondWith?: (promise: Promise<unknown>) => void }) => void
     >();
     let online = true;
+    let denyWrites = false;
     const network = vi.fn(() =>
       online
         ? Promise.resolve(new Response('verified-qac-payload', { status: 200 }))
@@ -74,6 +75,7 @@ describe('Quran offline release shell', () => {
       addAll: () => Promise.resolve(undefined),
       match: (request: Request) => Promise.resolve(stored.get(request.url)?.clone()),
       put: (request: Request, response: Response) => {
+        if (denyWrites) return Promise.reject(new Error('Storage full'));
         stored.set(request.url, response);
         return Promise.resolve(undefined);
       },
@@ -127,7 +129,11 @@ describe('Quran offline release shell', () => {
     online = false;
     const offlineResponse = await fetchCorpus();
     expect(await offlineResponse.text()).toBe('verified-qac-payload');
-    expect(network).toHaveBeenCalledTimes(2);
+    online = true;
+    denyWrites = true;
+    const uncachedResponse = await fetchCorpus();
+    expect(await uncachedResponse.text()).toBe('verified-qac-payload');
+    expect(network).toHaveBeenCalledTimes(3);
     expect(pwaCacheFiles(['data/quran/morphology.json'])).toEqual([]);
   });
 
