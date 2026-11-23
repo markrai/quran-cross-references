@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import type { QacMorphologyIndex } from '../core/quran/qac-index.ts';
 import { searchQacVerses } from '../core/quran/qac-verse-search.ts';
-import type { QacGrouping, QacOccurrence } from '../core/quran/qac-types.ts';
+import type { QacGrouping } from '../core/quran/qac-types.ts';
 import { formatAyahId, type AyahRef } from '../core/quran/ayah-ref.ts';
 import { CANONICAL_QURAN } from '../core/quran/quran-versification.ts';
 import { SURAHS, getSurah } from '../core/quran/surahs.ts';
@@ -254,10 +254,9 @@ export function QuranVerseSearch({
           ) : !morphologyPending ? (
             <>
               <ol className={styles.verseSearchList} start={page * VERSE_SEARCH_PAGE_SIZE + 1}>
-                {visible.map((hit) => {
+                {visible.map((hit, i) => {
                   const reference = CANONICAL_QURAN.refAt(hit.ayahIndex);
-                  const annotations: readonly QacOccurrence[] =
-                    'annotations' in hit ? hit.annotations : [];
+                  const annotations = qacResult?.hits[page * VERSE_SEARCH_PAGE_SIZE + i]?.annotations ?? [];
                   return (
                     <li key={hit.ayahIndex}>
                       <button
@@ -301,12 +300,12 @@ export function QuranVerseSearch({
                               type="button"
                               className={styles.goButton}
                               onClick={() => {
-                                onInspectMorphology(
-                                  reference,
-                                  search.morphology as QacGrouping,
-                                  qacResult.term as string,
-                                  annotations[0].word + 1,
-                                );
+                                const first = annotations[0];
+                                const grouping = search.morphology;
+                                const term = qacResult?.term;
+                                if (first && grouping && term) {
+                                  onInspectMorphology(reference, grouping, term, first.word + 1);
+                                }
                               }}
                             >
                               Inspect QAC annotation
