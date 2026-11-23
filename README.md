@@ -170,3 +170,11 @@ The existing **Threads & Reader** tab now offers local, shareable full-text sear
 English searches are case-insensitive. Arabic searches are literal by default or can optionally ignore combining marks and tatweel for comparison. Unlike morphological or semantic search, this does **not** equate different alif/hamza forms, infer shared roots or rewrite Quran text. Matches highlight original codepoint spans, retaining source edition marks.
 
 Search uses only the verified bilingual text already delivered for the reader, including offline use. No search server, third-party service, additional source file or PWA precache change is introduced. Links such as `?view=threads&q=Allah&qlang=en&qsurah=1` retain the search and canonical verse selection. See [Phase 3A.1 matching rules and acceptance](docs/QURAN_PHASE_3A1.md).
+
+## Reader-first experience (Phase 3B.1)
+
+In **Threads & Reader**, **Enter reading mode** now presents the full surah without verse-search results, evidence inspectors, research filters, or relationship graphics. The canonical surah/reference navigator remains available; exit reading mode to return to all research tools with the selected ayah, evidence parameters and verse query unchanged.
+
+**Reading settings** offer Arabic only, English only or bilingual; independently sized Arabic and English text (90% to 160%); and compact, comfortable or spacious line height. The selected ayah is scrolled into view in the full-surah reader on deep links and navigation. All options remain in versioned local browser storage, not in share links or remote services.
+
+These controls use the existing Quran text and browser fonts, with no new dataset or backend. See [Phase 3B.1 design and verification](docs/QURAN_PHASE_3B1.md). Original source attribution, `noindex`, offline cache and real-device release gates remain unchanged.
