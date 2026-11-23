@@ -34,7 +34,9 @@ describe('canonical bilingual verse search', () => {
     const text = fixture();
     const index = createVerseSearchIndex(text);
     const hits = searchQuranVerses(index, { ...base, query: 'MERCY' });
-    expect(hits).toEqual([{ ayahIndex: 0, spans: [{ start: 0, end: 5 }, { start: 12, end: 17 }] }]);
+    expect(hits).toEqual([
+      { ayahIndex: 0, spans: [{ start: 0, end: 5 }, { start: 12, end: 17 }] },
+    ]);
     expect(text.english[0]).toBe('Mercy, then mercy.');
   });
 
