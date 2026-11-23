@@ -35,6 +35,27 @@ self.addEventListener('fetch', (event) => {
   const root = new URL(scope);
   if (url.origin !== root.origin || !url.pathname.startsWith(root.pathname)) return;
 
+  if (url.pathname === new URL('data/quran/morphology.json', scope).pathname) {
+    event.respondWith(caches.open(CACHE_NAME).then(async (cache) => {
+      try {
+        const response = await fetch(request);
+        if (response.ok) {
+          try {
+            await cache.put(request, response.clone());
+          } catch {
+            return response;
+          }
+        }
+        return response;
+      } catch (error) {
+        const cached = await cache.match(request, { ignoreSearch: true, ignoreVary: true });
+        if (cached) return cached;
+        throw error;
+      }
+    }));
+    return;
+  }
+
   if (request.mode === 'navigate') {
     const alias = url.pathname === root.pathname + 'quran/' ||
       url.pathname === root.pathname + 'quran/index.html';

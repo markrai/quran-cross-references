@@ -73,6 +73,52 @@ describe('Quran-first canonical route', () => {
     expect(quranLocationUrl({ ...search, view: 'arcs' }, '/site/')).not.toContain('q=');
   });
 
+  it('round-trips QAC root and lemma verse search without changing literal links', () => {
+    for (const morphology of ['root', 'lemma'] as const) {
+      const selected = {
+        ...DEFAULT_QURAN_LOCATION,
+        view: 'threads' as const,
+        verseSearch: {
+          query: morphology === 'root' ? 'رحم' : 'raHmAn',
+          language: 'arabic' as const,
+          mode: 'literal' as const,
+          surah: 1,
+          morphology,
+        },
+      };
+      const href = quranLocationUrl(selected, '/site/');
+      expect(href).toContain('view=threads&q=');
+      expect(href).toContain('qlang=ar&qmode=' + morphology + '&qsurah=1');
+      expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(selected);
+      expect(quranLocationUrl({ ...selected, view: 'arcs' }, '/site/')).not.toContain('qmode=');
+    }
+  });
+
+  it('fails closed on unrecognized morphology search modes and language conflicts', () => {
+    for (const query of [
+      'q=rHm&qlang=ar&qmode=unknown',
+      'q=rHm&qlang=en&qmode=root',
+      'q=rHm&qlang=ar&qmode=semantic',
+      'q=%0ArHm&qlang=ar&qmode=lemma',
+    ]) {
+      const parsed = parseQuranLocation(
+        new URL('https://example.test/?ref=2%3A1&view=threads&' + query),
+      );
+      expect(parsed.verseSearch).toBeNull();
+    }
+    const noLanguage = parseQuranLocation(
+      new URL('https://example.test/?view=threads&q=rHm&qmode=root&qmatch=unmarked'),
+    );
+    expect(noLanguage.verseSearch).toEqual({
+      query: 'rHm',
+      language: 'arabic',
+      mode: 'literal',
+      morphology: 'root',
+      surah: null,
+    });
+    expect(quranLocationUrl(noLanguage, '/site/')).toContain('qlang=ar&qmode=root');
+  });
+
   it('drops malformed, unbounded and cross-view search URL parameters', () => {
     for (const raw of ['', '  ', 'x'.repeat(121), 'hello%0Aworld']) {
       const url = new URL('https://example.test/?view=threads&q=' + raw);

@@ -1,4 +1,5 @@
 import { CANONICAL_QURAN } from './quran-versification.ts';
+import type { QacGrouping } from './qac-types.ts';
 
 export type VerseSearchLanguage = 'arabic' | 'english';
 export type VerseSearchMode = 'literal' | 'unmarked';
@@ -8,6 +9,7 @@ export interface VerseSearchOptions {
   readonly language: VerseSearchLanguage;
   readonly mode: VerseSearchMode;
   readonly surah: number | null;
+  readonly morphology?: QacGrouping;
 }
 
 export interface VerseSearchSpan {
@@ -103,6 +105,7 @@ export function searchQuranVerses(
   index: VerseSearchIndex,
   options: VerseSearchOptions,
 ): readonly VerseSearchHit[] {
+  if (options.morphology !== undefined) return [];
   const query = options.query.trim();
   if (!query || query.length > MAX_VERSE_SEARCH_QUERY) return [];
   const unmarked = options.language === 'arabic' && options.mode === 'unmarked';

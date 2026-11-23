@@ -187,7 +187,7 @@ jobs:
             echo '::error::Optional experimental themes must not enter the PWA install precache.'
             exit 1
           fi
-          if grep -q 'data/quran/morphology.json' dist/sw.js; then
+          if grep '^const FILES = ' dist/sw.js | grep -q 'data/quran/morphology.json'; then
             echo '::error::Optional morphology must not enter PWA install precache.'
             exit 1
           fi

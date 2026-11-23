@@ -308,6 +308,10 @@ Preserve current research and shareable ayah navigation while allowing text-only
 
 Introduce roving keyboard focus in the bilingual Quran reader, canonical Up/Down and surah Home/End shortcuts, accessible selected-ayah status, surah-level navigation and improved mobile touch targets. Preserve URLs, explicit Arabic/English direction, the verified source texts and the separate release acceptance gates. See [Phase 3B.2](QURAN_PHASE_3B2.md).
 
+### Phase 3C.1: Morphology-aware Quran verse search
+
+Integrate the independently verified QAC v0.4 root and lemma word families into existing Threads & Reader search. Group annotated occurrences by canonical ayah and show QAC word forms and positions without inventing codepoint offsets in Tanzil text. Keep original literal matching unchanged, share mode/filter links, and reuse the already-verified optional corpus loader. See [Phase 3C.1](QURAN_PHASE_3C1.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

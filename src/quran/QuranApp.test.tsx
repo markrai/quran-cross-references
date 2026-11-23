@@ -1,10 +1,23 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QuranRelationshipIndex } from '../core/quran/relationship-index.ts';
+import type { QacMorphologyIndex } from '../core/quran/qac-index.ts';
+import { loadQacMorphology } from './qac.ts';
 import { QuranApp } from './QuranApp.tsx';
 import { loadQuranReaderData, type QuranReaderData } from './model.ts';
 
 vi.mock('./model.ts', () => ({ loadQuranReaderData: vi.fn() }));
+vi.mock('./qac.ts', () => ({ loadQacMorphology: vi.fn() }));
+
+const qacIndex = {
+  resolve: (grouping: string, query: string) =>
+    grouping === 'root' && (query === 'rHm' || query === 'رحم') ? 'rHm' : null,
+  occurrences: () => [
+    { ayah: 0, word: 2, form: 'الرَّحْمَٰنِ', pos: 'ADJ' },
+    { ayah: 0, word: 3, form: 'الرَّحِيمِ', pos: 'ADJ' },
+  ],
+  wordsAt: () => [],
+} as unknown as QacMorphologyIndex;
 
 const data: QuranReaderData = {
   text: {
@@ -30,6 +43,8 @@ beforeEach(() => {
   window.history.replaceState(null, '', '/?ref=2%3A1');
   vi.mocked(loadQuranReaderData).mockReset();
   vi.mocked(loadQuranReaderData).mockResolvedValue(data);
+  vi.mocked(loadQacMorphology).mockReset();
+  vi.mocked(loadQacMorphology).mockResolvedValue(qacIndex);
 });
 
 function findSelectedVerse(reader: Element): HTMLButtonElement {
@@ -292,6 +307,55 @@ describe('Quran-first reader', () => {
     expect(document.activeElement).toBe(main);
     fireEvent.click(screen.getByRole('button', { name: 'Arcs' }));
     expect(document.activeElement).toBe(main);
+  });
+
+  it('keeps English literal search independent of the optional QAC dataset', async () => {
+    window.history.replaceState(null, '', '/?ref=1%3A1&view=threads&q=Allah&qlang=en');
+    render(<QuranApp />);
+    const verse = await screen.findByRole('region', { name: 'Bilingual Quran verse search' });
+    expect(await screen.findByText(/matching ayahs · English literal/)).toBeTruthy();
+    expect(verse.querySelector('mark')).not.toBeNull();
+    expect(vi.mocked(loadQacMorphology)).not.toHaveBeenCalled();
+    expect(screen.getByRole('combobox', { name: 'Search type' })).toHaveProperty('value', 'text');
+  });
+
+  it('lazily verifies QAC for root search, preserves original Quran text and shows word positions', async () => {
+    window.history.replaceState(
+      null,
+      '',
+      '/?ref=1%3A1&view=threads&q=rHm&qlang=ar&qmode=root&qsurah=1',
+    );
+    render(<QuranApp />);
+    expect(await screen.findByText('QAC v0.4 · 2 annotated words')).toBeTruthy();
+    expect(screen.getByRole('combobox', { name: 'Search type' })).toHaveProperty('value', 'root');
+    expect(screen.getByText('Word 3 · ADJ')).toBeTruthy();
+    expect(screen.getByText('Word 4 · ADJ')).toBeTruthy();
+    const search = screen.getByRole('region', { name: 'Bilingual Quran verse search' });
+    expect(search.querySelector('mark')).toBeNull();
+    expect(search.querySelector('[lang="ar"][dir="rtl"]')?.textContent).toContain('بِسْمِ');
+    expect(vi.mocked(loadQacMorphology)).toHaveBeenCalledTimes(1);
+    expect(window.location.search).toContain('qmode=root');
+  });
+
+  it('supports Arabic root query submission and verified QAC retry', async () => {
+    window.history.replaceState(null, '', '/?ref=1%3A1&view=threads');
+    vi.mocked(loadQacMorphology).mockRejectedValueOnce(new Error('pinned mismatch'));
+    render(<QuranApp />);
+    await screen.findByRole('heading', { name: 'Threads from 1:1' });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Search type' }), {
+      target: { value: 'root' },
+    });
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Verse text' }), {
+      target: { value: 'رحم' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Search verses' }));
+    expect(window.location.search).toContain('qmode=root');
+    expect(
+      await screen.findByText(/Unable to verify Quranic Arabic Corpus: pinned mismatch/),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Retry QAC data' }));
+    expect(await screen.findByText('QAC v0.4 · 2 annotated words')).toBeTruthy();
+    expect(vi.mocked(loadQacMorphology)).toHaveBeenCalledTimes(2);
   });
 
   it('offers a retry if the dataset load fails', async () => {
