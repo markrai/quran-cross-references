@@ -32,6 +32,12 @@ beforeEach(() => {
   vi.mocked(loadQuranReaderData).mockResolvedValue(data);
 });
 
+function findSelectedVerse(reader: Element): HTMLButtonElement {
+  const selected = reader.querySelector<HTMLButtonElement>('ol button[aria-current="true"]');
+  if (selected === null) throw new Error('Selected ayah button not found');
+  return selected;
+}
+
 describe('Quran-first reader', () => {
   it('renders verified Arabic and English text with an isolated Quran header', async () => {
     render(<QuranApp />);
@@ -203,8 +209,7 @@ describe('Quran-first reader', () => {
     window.history.replaceState(null, '', '/?ref=1%3A7&view=threads');
     render(<QuranApp />);
     const reader = await screen.findByRole('region', { name: 'Quran text and relationship threads' });
-    const selected = () =>
-      reader.querySelector<HTMLButtonElement>('ol button[aria-current="true"]')!;
+    const selected = () => findSelectedVerse(reader);
     expect(reader.querySelectorAll('ol button[tabindex="0"]')).toHaveLength(1);
     expect(reader.querySelectorAll('ol button[tabindex="-1"]')).toHaveLength(6);
     expect(reader.querySelector('#quran-verse-keyboard-help')?.textContent).toContain('Up/Down');
@@ -234,7 +239,7 @@ describe('Quran-first reader', () => {
     window.history.replaceState(null, '', '/?ref=2%3A1&view=threads');
     render(<QuranApp />);
     const reader = await screen.findByRole('region', { name: 'Quran text and relationship threads' });
-    const selected = reader.querySelector<HTMLButtonElement>('ol button[aria-current="true"]')!;
+    const selected = findSelectedVerse(reader);
     const original = window.location.search;
     fireEvent.keyDown(selected, { key: 'ArrowDown', ctrlKey: true });
     fireEvent.keyDown(selected, { key: 'ArrowUp', shiftKey: true });
