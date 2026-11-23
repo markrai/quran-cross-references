@@ -254,13 +254,24 @@ See [Phase 2B.4](QURAN_PHASE_2B4.md).
 ### Phase 2D.1: Independent experimental thematic annotations
 
 - Import QSAC v1.0 at an immutable revision with SHA-256 pinned source CSV and ontology, identifying it explicitly as LLM-assisted and human-reviewed third-party annotations.
-- Validate canonical 6,236 ayah positions, 18 domains, 70 categories, 338 tags, 1–5 assignments per ayah and dataset integrity. Do not ship upstream Arabic or Saheeh International translation columns.
+- Validate canonical 6,236 ayah positions, 18 domains, 70 categories, 338 tags, 1–6 assignments per ayah (one audited exception) and dataset integrity. Do not ship upstream Arabic or Saheeh International translation columns.
 - Publish a separate deterministic and checksum-pinned `themes.json` sidecar, with source attribution and ontology hierarchy; keep it out of the default offline PWA installation cache.
 - Add an independent Themes tab with topic search, domain/category filtering, paginated 24-ayah results, surah distributions, shareable topic links and drill-through to the bilingual Quran reader.
 - Never recast experimental topic membership as curated cross-references, theological consensus or a similarity-weighted graph.
 - Retain all current Quran data products and release gates, with Linux/Windows reproducibility and desktop/phone acceptance tests.
 
 See [Phase 2D.1](QURAN_PHASE_2D1.md).
+
+### Phase 2D.2: Independently verified emotion sample and topic intersections
+
+- Import the independently published ELQV 2025 dataset at a pinned Git SHA and exact SHA-256 original CSV checksum, recording specialist human annotation, LLM-assisted research context and CC0 provenance.
+- Validate all 2,100 source rows against the canonical 6,236-ayah reference scheme. Distinguish 2,087 unique ayahs, 2,092 unique label memberships, eight repeated identical rows, and four verses with conflicting labels. Never vote away or infer a preferred emotion.
+- Publish a small, separately classified `emotions.json` research sidecar containing only numeric ayah IDs, up to three distinct emotion labels, counts and original source provenance. Do not republish the source's distinct Arabic text or translations.
+- Add an Emotions tab with optional per-label and conflict filtering, paginated original ayahs, surah sample distributions and shareable `emotion=` routes. Lazy-load and SHA-verify evidence; keep it out of the core PWA offline cache.
+- Optionally intersect ELQV with the independently imported QSAC themes. The cross-tab is deliberately limited to ELQV-annotated ayahs and reports raw counts only. Different taxonomies and selection bias prohibit interpreting an intersection as annotator agreement, scholarly interpretation or Quran-wide prevalence.
+- Keep existing Quran text and 2,445 curated link IDs stable. Maintain strict Linux/Windows source checks, deterministic byte reproduction, and desktop/phone acceptance.
+
+See [Phase 2D.2](QURAN_PHASE_2D2.md).
 
 ### CI and Windows source integrity
 

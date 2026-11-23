@@ -137,7 +137,7 @@ jobs:
       - name: Generate exact-expression evidence on Windows
         run: npm run data:expressions
       - name: Test Quran source integrity, importers and graph
-        run: npx vitest run scripts/quran/qac.test.ts scripts/quran/pinned-source.test.ts scripts/quran/datasets.test.ts scripts/quran/graph.test.ts scripts/quran/raw-ignore.test.ts src/core/quran/relationship-evidence.test.ts
+        run: npx vitest run scripts/quran/elqv.test.ts scripts/quran/qac.test.ts scripts/quran/pinned-source.test.ts scripts/quran/datasets.test.ts scripts/quran/graph.test.ts scripts/quran/raw-ignore.test.ts src/core/quran/relationship-evidence.test.ts
       - name: Confirm Quran datasets were published
         shell: pwsh
         run: |

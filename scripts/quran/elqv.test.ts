@@ -100,7 +100,7 @@ describe('Independent ELQV 2025 specialist annotation source', () => {
     assertBad(raw.replace('سورة ق,50,37,', 'سورة ق,150,37,'), 'boundaries');
     assertBad(raw.replace('سورة ق,50,37,', 'سورة ق,050,37,'), 'Noncanonical');
     assertBad(raw.replace(',fear\n', ',unknown\n'), 'Unrecognized');
-    assertBad(raw.replace('سورة ق,50,37,', 'سورة ق,50,37,,'), 'histogram');
+    assertBad(raw.replace('سورة ق,50,37,', 'سورة ق,50,37,,'), 'malformed fields');
     assertBad(raw.substring(0, raw.lastIndexOf('\n', raw.length - 2)), '2,100');
     expect(() => importElqvEmotions(raw, 'invalid')).toThrow('SHA-256');
   });
