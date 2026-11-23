@@ -182,7 +182,9 @@ export function QuranThemes({
                 type="button"
                 key={tag.name}
                 aria-pressed={selected?.name === tag.name}
-                onClick={() => { handleSelect(tag); }}
+                onClick={() => {
+                  handleSelect(tag);
+                }}
               >
                 <strong>{tag.name}</strong>
                 <span>{tag.category}</span>
@@ -197,7 +199,9 @@ export function QuranThemes({
             <button
               type="button"
               disabled={currentCatalog === 0}
-              onClick={() => { setCatalogPage(currentCatalog - 1); }}
+              onClick={() => {
+                setCatalogPage(currentCatalog - 1);
+              }}
             >
               Previous topics
             </button>
@@ -207,7 +211,9 @@ export function QuranThemes({
             <button
               type="button"
               disabled={currentCatalog + 1 >= catalogPages}
-              onClick={() => { setCatalogPage(currentCatalog + 1); }}
+              onClick={() => {
+                setCatalogPage(currentCatalog + 1);
+              }}
             >
               Next topics
             </button>
@@ -254,7 +260,9 @@ export function QuranThemes({
                       key={ayah}
                       type="button"
                       aria-label={'Read tagged Quran ayah ' + formatAyahId(reference)}
-                      onClick={() => { onOpenAyah(ayah); }}
+                      onClick={() => {
+                        onOpenAyah(ayah);
+                      }}
                     >
                       <strong>
                         {getSurah(reference.surah).name} · {formatAyahId(reference)}
