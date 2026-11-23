@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { AyahRef } from '../core/quran/ayah-ref.ts';
 import { collectQuranConnections, type QuranConnection } from '../core/quran/graph-adapters.ts';
 import { formatIndexRange } from '../core/quran/reference.ts';
@@ -6,6 +6,7 @@ import type { QuranRelationshipScope } from '../core/quran/relationship-filter.t
 import { getSurah } from '../core/quran/surahs.ts';
 import type { QuranReaderData } from './model.ts';
 import type { QuranDirection } from './location.ts';
+import type { ReadingLanguage } from './reading-preferences.ts';
 import styles from './QuranApp.module.css';
 
 interface QuranThreadsProps {
@@ -15,6 +16,8 @@ interface QuranThreadsProps {
   readonly direction: QuranDirection;
   readonly onNavigate: (reference: AyahRef) => void;
   readonly showCurated?: boolean;
+  readonly readerOnly?: boolean;
+  readonly displayLanguage?: ReadingLanguage;
 }
 
 function connectionLabel(connection: QuranConnection, data: QuranReaderData): string {
@@ -32,11 +35,21 @@ export function QuranThreads({
   direction,
   onNavigate,
   showCurated = true,
+  readerOnly = false,
+  displayLanguage = 'bilingual',
 }: QuranThreadsProps) {
   const { relationships: index, text } = data;
   const surah = getSurah(reference.surah);
   const range = index.versification.surahRange(reference.surah);
   const focused = index.versification.indexOf(reference) ?? range.start;
+  const selectedRef = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    const element = selectedRef.current;
+    if (element && typeof element.scrollIntoView === 'function') {
+      element.scrollIntoView({ block: 'center', behavior: 'auto' });
+    }
+  }, [reference.surah, reference.ayah]);
   const connections = useMemo(
     () => collectQuranConnections(index, { start: focused, end: focused }, { scope, surahs: null }),
     [index, focused, scope],
@@ -49,9 +62,19 @@ export function QuranThreads({
 
   return (
     <section
-      className={showCurated ? styles.threadsLayout : styles.expressionsReaderLayout}
+      className={
+        readerOnly
+          ? styles.readingOnlyLayout
+          : showCurated
+            ? styles.threadsLayout
+            : styles.expressionsReaderLayout
+      }
       aria-label={
-        showCurated ? 'Quran text and relationship threads' : 'Quran text and exact expressions'
+        readerOnly
+          ? 'Distraction-free Quran reader'
+          : showCurated
+            ? 'Quran text and relationship threads'
+            : 'Quran text and exact expressions'
       }
     >
       <div className={styles.reader}>
@@ -70,7 +93,12 @@ export function QuranThreads({
             const position = range.start + offset;
             const active = ayah === reference.ayah;
             return (
-              <li key={ayah} className={active ? styles.selectedAyah : styles.ayah}>
+              <li
+                key={ayah}
+                ref={active ? selectedRef : null}
+                id={'quran-ayah-' + String(reference.surah) + '-' + String(ayah)}
+                className={active ? styles.selectedAyah : styles.ayah}
+              >
                 <button
                   type="button"
                   aria-current={active ? 'true' : undefined}
@@ -82,19 +110,24 @@ export function QuranThreads({
                   <span className={styles.ayahNumber}>
                     {reference.surah}:{ayah}
                   </span>
-                  <span lang="ar" dir="rtl" className={styles.arabic}>
-                    {text.arabic[position]}
-                  </span>
-                  <span lang="en" dir="ltr" className={styles.english}>
-                    {text.english[position]}
-                  </span>
+                  {displayLanguage !== 'english' && (
+                    <span lang="ar" dir="rtl" className={styles.arabic}>
+                      {text.arabic[position]}
+                    </span>
+                  )}
+                  {displayLanguage !== 'arabic' && (
+                    <span lang="en" dir="ltr" className={styles.english}>
+                      {text.english[position]}
+                    </span>
+                  )}
                 </button>
               </li>
             );
           })}
         </ol>
       </div>
-      <aside
+      {!readerOnly && (
+        <aside
         className={styles.threadPanel}
         aria-label="Selected ayah relationships"
         hidden={!showCurated}
@@ -171,7 +204,8 @@ export function QuranThreads({
             </ol>
           </>
         )}
-      </aside>
+        </aside>
+      )}
     </section>
   );
 }
