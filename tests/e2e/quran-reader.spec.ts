@@ -82,10 +82,14 @@ test.describe('Phase 3A.1 bilingual verse search', () => {
   });
 
   test('restores Arabic search deep links and highlights original Uthmani marks on phone and desktop', async ({ page }) => {
-    await page.goto('./?ref=2%3A1&view=threads&q=%D8%A8%D8%B3%D9%85&qlang=ar&qmatch=unmarked&qsurah=1');
+    await page.goto(
+      './?ref=2%3A1&view=threads&q=%D8%A8%D8%B3%D9%85&qlang=ar&qmatch=unmarked&qsurah=1',
+    );
     const search = page.getByRole('region', { name: 'Bilingual Quran verse search' });
     await expect(search.getByRole('searchbox', { name: 'Verse text' })).toHaveValue('بسم');
-    await expect(search.getByRole('combobox', { name: 'Arabic matching' })).toHaveValue('unmarked');
+    await expect(search.getByRole('combobox', { name: 'Arabic matching' })).toHaveValue(
+      'unmarked',
+    );
     await expect(search.getByText(/matching ayah/)).toBeVisible();
     await expect(search.locator('mark').first()).toContainText('بِسْم');
     await search.getByRole('button', { name: /Al-Fatiha.*1:1/ }).click();
