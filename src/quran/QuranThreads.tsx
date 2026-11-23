@@ -49,7 +49,7 @@ export function QuranThreads({
     if (element && typeof element.scrollIntoView === 'function') {
       element.scrollIntoView({ block: 'center', behavior: 'auto' });
     }
-  }, [reference.surah, reference.ayah]);
+  }, [reference.surah, reference.ayah, readerOnly]);
   const connections = useMemo(
     () => collectQuranConnections(index, { start: focused, end: focused }, { scope, surahs: null }),
     [index, focused, scope],
