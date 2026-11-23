@@ -1673,6 +1673,241 @@
   cursor: default;
 }
 
+.qacFrequencyPanel {
+  display: grid;
+  gap: 1.15rem;
+  margin: 0 1.3rem 1.1rem;
+  padding: clamp(0.8rem, 2vw, 1.25rem);
+  border: 1px solid var(--color-border);
+  border-radius: 0.8rem;
+  background: var(--color-surface);
+}
+
+.qacFrequencyHeading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.qacFrequencyHeading h3 {
+  margin: 0.3rem 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.qacFrequencyHeading p,
+.qacFrequencySummary p,
+.qacFrequencySection > p,
+.qacFrequencyFootnote {
+  margin: 0.3rem 0;
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.qacFrequencyHeading .field {
+  flex: 0 1 13rem;
+}
+
+.qacFrequencyHeading .field select {
+  max-width: none;
+  width: 100%;
+  min-height: 44px;
+}
+
+.qacFrequencySummary {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+  background: var(--color-surface-muted);
+}
+
+.qacFrequencySummary progress {
+  width: 100%;
+  height: 0.8rem;
+  accent-color: var(--color-accent);
+}
+
+.qacFrequencyMilestones {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.qacFrequencyMilestones > div {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface-muted);
+}
+
+.qacFrequencyMilestones span {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.qacFrequencyMilestones strong {
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.qacFrequencyTrack {
+  display: block;
+  width: 100%;
+  height: 0.4rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-border);
+}
+
+.qacFrequencyTrack > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+}
+
+.qacFrequencyColumns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.qacFrequencySection {
+  min-width: 0;
+}
+
+.qacFrequencySection h4 {
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
+}
+
+.qacFrequencySection > .goButton {
+  margin-top: 0.65rem;
+  min-height: 44px;
+}
+
+.qacFrequencyRanking,
+.qacSurahDistribution {
+  display: grid;
+  gap: 0.4rem;
+  max-height: 26rem;
+  overflow-y: auto;
+  padding: 0.2rem;
+  margin: 0.65rem 0 0;
+  list-style: none;
+}
+
+.qacFrequencyRanking button,
+.qacSurahDistribution button {
+  display: grid;
+  width: 100%;
+  min-height: 50px;
+  align-items: center;
+  gap: 0.3rem 0.65rem;
+  padding: 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.qacFrequencyRanking button {
+  grid-template-columns: auto minmax(2.4rem, 0.45fr) minmax(0, 1fr) auto;
+}
+
+.qacFrequencyRanking button > .qacFrequencyTrack {
+  grid-column: 2 / -1;
+}
+
+.qacFrequencyRanking button:hover,
+.qacFrequencyRanking button[aria-pressed='true'],
+.qacSurahDistribution button:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.qacFrequencyRank {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.qacFrequencyArabic {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  unicode-bidi: isolate;
+}
+
+.qacFrequencyFamily {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.qacFrequencyFamily code {
+  overflow-wrap: anywhere;
+}
+
+.qacFrequencyFamily small {
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+}
+
+.qacSurahDistribution button {
+  grid-template-columns: minmax(0, 1fr) auto;
+  font-size: 0.8rem;
+}
+
+.qacSurahDistribution button > .qacFrequencyTrack {
+  grid-column: 1 / -1;
+}
+
+.qacSurahDistribution button > span:nth-child(2) {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.qacFrequencyFootnote {
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--color-border);
+}
+
+@media (max-width: 65rem) {
+  .qacFrequencyColumns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 36rem) {
+  .qacFrequencyPanel {
+    margin-inline: 0.7rem;
+    padding: 0.75rem;
+  }
+
+  .qacFrequencyMilestones {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .qacFrequencyHeading .field {
+    flex-basis: 100%;
+  }
+
+  .qacFrequencyRanking button {
+    grid-template-columns: auto minmax(2.2rem, 0.3fr) minmax(0, 1fr) auto;
+    gap: 0.3rem;
+  }
+}
+
 .qacNotes,
 .qacNote {
   padding: 0 1.3rem;
