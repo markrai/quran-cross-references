@@ -29,6 +29,8 @@ jobs:
         run: npm run typecheck
       - name: Enforce type coverage
         run: npm run typecoverage
+      - name: Retrieve verified QAC corpus for importer tests
+        run: npm run data:qac:fetch
       - name: Enforce unit-test coverage
         run: npm run test:coverage
       - name: Archive unit coverage detail
@@ -73,6 +75,16 @@ jobs:
             echo "::error::Curated graph topology changed between identical builds."
             exit 1
           fi
+      - name: Verify byte-identical morphology regeneration
+        shell: bash
+        run: |
+          first="$(sha256sum data/quran/generated/morphology.json | cut -d' ' -f1)"
+          npm run data:quran
+          second="$(sha256sum data/quran/generated/morphology.json | cut -d' ' -f1)"
+          if [ "$first" != "$second" ]; then
+            echo "::error::Morphology projection changed between identical source builds."
+            exit 1
+          fi
       - name: Archive exact-expression corpus statistics
         if: always()
         uses: actions/upload-artifact@v7
@@ -101,11 +113,11 @@ jobs:
       - name: Generate exact-expression evidence on Windows
         run: npm run data:expressions
       - name: Test Quran source integrity, importers and graph
-        run: npx vitest run scripts/quran/pinned-source.test.ts scripts/quran/datasets.test.ts scripts/quran/graph.test.ts scripts/quran/raw-ignore.test.ts src/core/quran/relationship-evidence.test.ts
+        run: npx vitest run scripts/quran/qac.test.ts scripts/quran/pinned-source.test.ts scripts/quran/datasets.test.ts scripts/quran/graph.test.ts scripts/quran/raw-ignore.test.ts src/core/quran/relationship-evidence.test.ts
       - name: Confirm Quran datasets were published
         shell: pwsh
         run: |
-          foreach ($file in @("public/quran-only/data/quran/text.json", "public/quran-only/data/quran/relationships.json", "public/quran-only/data/quran/evidence.json", "public/quran-only/data/quran/expressions.json", "public/quran-only/data/quran/analytics.json", "public/quran-only/data/quran/topology.json", "public/quran-only/data/quran/manifest.json")) {
+          foreach ($file in @("public/quran-only/data/quran/text.json", "public/quran-only/data/quran/relationships.json", "public/quran-only/data/quran/evidence.json", "public/quran-only/data/quran/expressions.json", "public/quran-only/data/quran/analytics.json", "public/quran-only/data/quran/topology.json", "public/quran-only/data/quran/morphology.json", "public/quran-only/data/quran/manifest.json")) {
             if (-not (Test-Path $file)) { throw "Missing Quran dataset: $file" }
           }
 
@@ -129,6 +141,7 @@ jobs:
           test -s dist/data/quran/evidence.json
           test -s dist/data/quran/analytics.json
           test -s dist/data/quran/topology.json
+          test -s dist/data/quran/morphology.json
           test -s dist/data/quran/manifest.json
           test -s dist/data/quran/expressions.json
           test -s dist/manifest.webmanifest
@@ -140,6 +153,10 @@ jobs:
           grep -q 'Quran Cross-References' dist/index.html
           grep -q 'og:image' dist/index.html
           grep -q 'quran-cross-references-shell-' dist/sw.js
+          if grep -q 'data/quran/morphology.json' dist/sw.js; then
+            echo '::error::Optional morphology must not enter PWA install precache.'
+            exit 1
+          fi
           if grep -q 'data/quran/expressions.json' dist/sw.js; then
             echo '::error::On-demand exact expressions must not enter the PWA install precache.'
             exit 1

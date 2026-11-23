@@ -29,6 +29,16 @@
       "retrievedAt": "2026-11-01",
       "license": "CC0 1.0 Universal",
       "attribution": "Quran Mutashabihat Data, Waqar144, drawing on Qari Idrees Al Asim; https://github.com/Waqar144/Quran_Mutashabihat_Data"
+    },
+    {
+      "id": "qac-morphology-v04",
+      "description": "Quranic Arabic Corpus morphology v0.4, original verbatim 2011 annotation, mirrored at immutable taziksh/quran-frequencies commit 079cdc74cd494ec1b35011363288d80cae047c51",
+      "url": "https://raw.githubusercontent.com/taziksh/quran-frequencies/079cdc74cd494ec1b35011363288d80cae047c51/data/quranic-corpus-morphology-0.4.txt",
+      "fileName": "quranic-corpus-morphology-0.4.txt",
+      "sha256": "a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
+      "retrievedAt": "2026-11-22",
+      "license": "GNU General Public License and verbatim-copy conditions in unmodified source header",
+      "attribution": "Quranic Arabic Corpus © 2011 Kais Dukes, https://corpus.quran.com; Quran text copyright © Tanzil Project, https://tanzil.net. The original source file is downloaded verbatim and its copyright header is preserved."
     }
   ]
 }

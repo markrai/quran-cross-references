@@ -240,6 +240,17 @@ See [Phase 2C.1](QURAN_PHASE_2C1.md).
 
 See [Phase 2C.2](QURAN_PHASE_2C2.md).
 
+### Phase 2B.4: Original Quranic Arabic Corpus morphology
+
+- Use QAC v0.4 as the primary annotated source for segment-level word morphology; keep later annotation corpora as possible independent validation.
+- SHA-pin the immutable original download, conserve all 128,219 segments and 77,429 word positions, and validate canonical ayah and segment order.
+- Publish a separate deterministic `morphology.json` artifact with source attribution and output checksum.
+- Offer a third evidence class for root, lemma, POS, prefix/stem/suffix and grammar inspection, including exact Arabic or Buckwalter lookup and paginated linked occurrences.
+- Keep QAC's historical text token boundaries separate from the current Tanzil Uthmani v1.1 reader and preserve the original Quran text.
+- Lazy-load morphological evidence; do not inflate the offline PWA installation cache or mix derivational families with curated or exact-expression edges.
+
+See [Phase 2B.4](QURAN_PHASE_2B4.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

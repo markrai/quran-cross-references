@@ -12,6 +12,7 @@ import {
 } from './expression-evidence.ts';
 import { importMutashabihat, importQuranText } from './datasets.ts';
 import { buildQuranAnalytics } from './analytics.ts';
+import { importQacMorphology } from './qac.ts';
 import { buildQuranTopology } from '../../src/quran/topology-model.ts';
 import { verifyPinnedQuranSource } from './pinned-source.ts';
 
@@ -114,6 +115,9 @@ const analytics = buildQuranAnalytics(
 );
 writeDataset('analytics.json', analytics);
 writeDataset('topology.json', buildQuranTopology(relationshipIndex, curatedPin.sha256));
+const qacPin = pins.find((pin) => pin.id === 'qac-morphology-v04');
+if (!qacPin) throw new Error('Missing pinned QAC v0.4 morphology.');
+writeDataset('morphology.json', importQacMorphology(readPinned(qacPin.id), qacPin, tanzilNotice));
 writeDataset('manifest.json', {
   format: 'quran-foundation-manifest',
   schemaVersion: 1,

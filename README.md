@@ -95,6 +95,14 @@ The graph is descriptive: connectivity is not a measure of religious significanc
 
 The deterministic `data/quran/topology.json` report is SHA-256 pinned in the Quran manifest and verified against the loaded curated source relationships in the browser before rendering. Its compact footprint is included in the offline PWA; the full `expressions.json` remains on demand. The `view=network&network=ayah&depth=2` route is shareable. See [Phase 2C.2](docs/QURAN_PHASE_2C2.md).
 
+## Arabic morphology and grammar (Phase 2B.4)
+
+The reader's **Evidence type** selector now includes the original **Quranic Arabic Corpus (QAC) v0.4**, with actual prefix, stem, suffix, root, lemma, and grammatical-feature annotations. Explore individual Arabic source words, switch between root and lemma families, search exact Arabic or Buckwalter annotations, and follow each occurrence to its original verse and word position.
+
+This segment-level evidence is different from curated similar passages and computed exact 3–8-word phrase repetitions. The QAC source's older word tokenization is **not** assumed to match the newer Tanzil display text position-for-position; canonical verse references are preserved. The verified QAC dataset is downloaded and indexed on demand, not precached as part of the offline PWA, and the original copyright notices accompany its derived publication.
+
+See [Phase 2B.4: QAC morphology](docs/QURAN_PHASE_2B4.md).
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).

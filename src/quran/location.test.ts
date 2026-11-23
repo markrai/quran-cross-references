@@ -24,6 +24,9 @@ describe('Quran-first canonical route', () => {
       selectedLink: null,
       evidence: 'curated',
       selectedExpression: null,
+      morphologyGrouping: 'lemma',
+      selectedMorphTerm: null,
+      selectedMorphWord: null,
       networkMode: 'surah',
       networkDepth: 1,
     });
@@ -31,6 +34,40 @@ describe('Quran-first canonical route', () => {
     expect(parseQuranLocation(named).reference).toEqual({ surah: 2, ayah: 255 });
     const invalid = new URL('https://example.test/?ref=2%3A287');
     expect(parseQuranLocation(invalid).reference).toEqual(DEFAULT_QURAN_LOCATION.reference);
+  });
+
+  it('round-trips QAC root and word-position links without mixing evidence classes', () => {
+    const location = {
+      ...DEFAULT_QURAN_LOCATION,
+      reference: { surah: 1, ayah: 3 },
+      evidence: 'morphology' as const,
+      morphologyGrouping: 'root' as const,
+      selectedMorphTerm: 'rHm',
+      selectedMorphWord: 2,
+    };
+    const href = quranLocationUrl(location, '/site/');
+    expect(href).toContain('evidence=morphology');
+    expect(href).toContain('morph=root');
+    expect(href).toContain('term=rHm');
+    expect(href).toContain('word=2');
+    expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(location);
+    const wrong = parseQuranLocation(
+      new URL('https://example.test/?view=network&evidence=morphology&term=rHm&word=2'),
+    );
+    expect(wrong.evidence).toBe('curated');
+    expect(wrong.selectedMorphTerm).toBeNull();
+    expect(wrong.selectedMorphWord).toBeNull();
+  });
+
+  it('discards noncanonical morphology word selectors and incomplete terms', () => {
+    for (const bad of ['0', '0004', '301', '1.5', '-1']) {
+      const url = new URL('https://example.test/?evidence=morphology&word=' + bad);
+      expect(parseQuranLocation(url).selectedMorphWord).toBeNull();
+    }
+    expect(
+      parseQuranLocation(new URL('https://example.test/?evidence=morphology&term=%20'))
+        .selectedMorphTerm,
+    ).toBeNull();
   });
 
   it('round-trips analytics URLs while preserving their selected ayah', () => {

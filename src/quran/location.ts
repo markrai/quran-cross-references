@@ -5,7 +5,8 @@ import type { QuranRelationshipScope } from '../core/quran/relationship-filter.t
 export type QuranView = 'arcs' | 'threads' | 'analytics' | 'network';
 export type QuranNetworkMode = 'surah' | 'ayah';
 export type QuranDirection = 'outgoing' | 'incoming' | 'both';
-export type QuranEvidenceMode = 'curated' | 'exact';
+export type QuranEvidenceMode = 'curated' | 'exact' | 'morphology';
+export type QuranMorphGrouping = 'lemma' | 'root';
 
 export interface QuranLocation {
   readonly view: QuranView;
@@ -16,6 +17,9 @@ export interface QuranLocation {
   readonly selectedLink: number | null;
   readonly evidence: QuranEvidenceMode;
   readonly selectedExpression: string | null;
+  readonly morphologyGrouping: QuranMorphGrouping;
+  readonly selectedMorphTerm: string | null;
+  readonly selectedMorphWord: number | null;
   readonly networkMode: QuranNetworkMode;
   readonly networkDepth: 1 | 2;
 }
@@ -29,6 +33,9 @@ export const DEFAULT_QURAN_LOCATION: QuranLocation = {
   selectedLink: null,
   evidence: 'curated',
   selectedExpression: null,
+  morphologyGrouping: 'lemma',
+  selectedMorphTerm: null,
+  selectedMorphWord: null,
   networkMode: 'surah',
   networkDepth: 1,
 };
@@ -57,13 +64,40 @@ export function parseQuranLocation(url: URL): QuranLocation {
     rawView === 'threads' || rawView === 'analytics' || rawView === 'network' ? rawView : 'arcs';
   const direction = params.get('direction');
   const scope = params.get('scope');
+  const requestedEvidence = params.get('evidence');
   const evidence: QuranEvidenceMode =
-    view !== 'network' && params.get('evidence') === 'exact' ? 'exact' : 'curated';
+    view === 'network'
+      ? 'curated'
+      : requestedEvidence === 'exact' || requestedEvidence === 'morphology'
+        ? requestedEvidence
+        : 'curated';
+  const morphologyGrouping: QuranMorphGrouping =
+    evidence === 'morphology' && params.get('morph') === 'root' ? 'root' : 'lemma';
+  const rawTerm = params.get('term');
+  const selectedMorphTerm =
+    evidence === 'morphology' &&
+    rawTerm !== null &&
+    rawTerm.length > 0 &&
+    rawTerm.length <= 128 &&
+    rawTerm.trim() === rawTerm &&
+    !Array.from(rawTerm).some((character) => character.charCodeAt(0) < 32)
+      ? rawTerm
+      : null;
+  const rawWord = params.get('word');
+  const selectedMorphWord =
+    evidence === 'morphology' &&
+    rawWord !== null &&
+    /^(?:[1-9]|[1-9][0-9]|[12][0-9][0-9]|300)$/u.test(rawWord)
+      ? Number(rawWord)
+      : null;
   const expression = params.get('expression');
   return {
     reference,
     rangeEnd,
     selectedLink: evidence === 'curated' ? parseSelectedLink(params.get('link')) : null,
+    morphologyGrouping,
+    selectedMorphTerm,
+    selectedMorphWord,
     evidence,
     selectedExpression:
       evidence === 'exact' && expression !== null && /^exact:v1:[a-f0-9]{64}$/.test(expression)
@@ -84,6 +118,12 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
   if (location.rangeEnd !== null) params.set('end', formatAyahId(location.rangeEnd));
   if (location.evidence === 'curated' && location.selectedLink !== null) {
     params.set('link', String(location.selectedLink));
+  }
+  if (location.evidence === 'morphology') {
+    params.set('evidence', 'morphology');
+    if (location.morphologyGrouping === 'root') params.set('morph', 'root');
+    if (location.selectedMorphTerm !== null) params.set('term', location.selectedMorphTerm);
+    if (location.selectedMorphWord !== null) params.set('word', String(location.selectedMorphWord));
   }
   if (location.evidence === 'exact') {
     params.set('evidence', 'exact');
