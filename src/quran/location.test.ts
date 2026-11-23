@@ -35,11 +35,55 @@ describe('Quran-first canonical route', () => {
       selectedMorphWord: null,
       networkMode: 'surah',
       networkDepth: 1,
+      verseSearch: null,
     });
     const named = new URL('https://example.test/?ref=Al-Baqarah+255');
     expect(parseQuranLocation(named).reference).toEqual({ surah: 2, ayah: 255 });
     const invalid = new URL('https://example.test/?ref=2%3A287');
     expect(parseQuranLocation(invalid).reference).toEqual(DEFAULT_QURAN_LOCATION.reference);
+  });
+
+  it('round-trips bilingual search filters only within Threads and preserves Unicode text', () => {
+    const search = {
+      ...DEFAULT_QURAN_LOCATION,
+      view: 'threads' as const,
+      verseSearch: { query: 'رَحْمَة', language: 'arabic' as const, mode: 'unmarked' as const, surah: 2 },
+    };
+    const href = quranLocationUrl(search, '/site/');
+    expect(href).toContain('q=%D8%B1');
+    expect(href).toContain('qlang=ar&qmatch=unmarked&qsurah=2');
+    expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(search);
+    const english = {
+      ...search,
+      verseSearch: { query: 'Mercy', language: 'english' as const, mode: 'literal' as const, surah: null },
+    };
+    expect(
+      parseQuranLocation(new URL(quranLocationUrl(english, '/site/'), 'https://example.test')),
+    ).toEqual(english);
+    expect(quranLocationUrl({ ...search, view: 'arcs' }, '/site/')).not.toContain('q=');
+  });
+
+  it('drops malformed, unbounded and cross-view search URL parameters', () => {
+    for (const raw of ['', '  ', 'x'.repeat(121), 'hello%0Aworld']) {
+      const url = new URL('https://example.test/?view=threads&q=' + raw);
+      expect(parseQuranLocation(url).verseSearch).toBeNull();
+    }
+    expect(
+      parseQuranLocation(new URL('https://example.test/?view=threads&q=mercy&qlang=other')).verseSearch,
+    ).toBeNull();
+    for (const view of ['arcs', 'analytics', 'network', 'themes', 'emotions']) {
+      const url = new URL('https://example.test/?view=' + view + '&q=mercy&qlang=en');
+      expect(parseQuranLocation(url).verseSearch).toBeNull();
+    }
+    const invalidSurah = parseQuranLocation(
+      new URL('https://example.test/?view=threads&q=mercy&qsurah=115&qmatch=unmarked'),
+    );
+    expect(invalidSurah.verseSearch).toEqual({
+      query: 'mercy',
+      language: 'english',
+      mode: 'literal',
+      surah: null,
+    });
   });
 
   it('round-trips each independent ayah inspector section under a deployment base', () => {
