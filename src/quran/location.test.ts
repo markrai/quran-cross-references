@@ -47,7 +47,12 @@ describe('Quran-first canonical route', () => {
     const search = {
       ...DEFAULT_QURAN_LOCATION,
       view: 'threads' as const,
-      verseSearch: { query: 'رَحْمَة', language: 'arabic' as const, mode: 'unmarked' as const, surah: 2 },
+      verseSearch: {
+        query: 'رَحْمَة',
+        language: 'arabic' as const,
+        mode: 'unmarked' as const,
+        surah: 2,
+      },
     };
     const href = quranLocationUrl(search, '/site/');
     expect(href).toContain('q=%D8%B1');
@@ -55,7 +60,12 @@ describe('Quran-first canonical route', () => {
     expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(search);
     const english = {
       ...search,
-      verseSearch: { query: 'Mercy', language: 'english' as const, mode: 'literal' as const, surah: null },
+      verseSearch: {
+        query: 'Mercy',
+        language: 'english' as const,
+        mode: 'literal' as const,
+        surah: null,
+      },
     };
     expect(
       parseQuranLocation(new URL(quranLocationUrl(english, '/site/'), 'https://example.test')),
@@ -69,7 +79,8 @@ describe('Quran-first canonical route', () => {
       expect(parseQuranLocation(url).verseSearch).toBeNull();
     }
     expect(
-      parseQuranLocation(new URL('https://example.test/?view=threads&q=mercy&qlang=other')).verseSearch,
+      parseQuranLocation(new URL('https://example.test/?view=threads&q=mercy&qlang=other'))
+        .verseSearch,
     ).toBeNull();
     for (const view of ['arcs', 'analytics', 'network', 'themes', 'emotions']) {
       const url = new URL('https://example.test/?view=' + view + '&q=mercy&qlang=en');
