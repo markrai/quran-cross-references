@@ -174,7 +174,7 @@ test.describe('Phase 3B.2 reading navigation and accessibility', () => {
     await page.keyboard.press('ArrowDown');
     await expect(page).toHaveURL(/ref=2%3A1&view=threads/);
     await expect(current).toBeFocused();
-    await expect(reader.getByRole('status')).toContainText('Selected Al-Baqarah 2:1');
+    await expect(page.getByRole('status').filter({ hasText: 'Selected Al-Baqarah 2:1' })).toHaveCount(1);
 
     await page.keyboard.press('End');
     await expect(page).toHaveURL(/ref=2%3A286&view=threads/);

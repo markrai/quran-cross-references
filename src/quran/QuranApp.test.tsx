@@ -204,7 +204,7 @@ describe('Quran-first reader', () => {
     render(<QuranApp />);
     const reader = await screen.findByRole('region', { name: 'Quran text and relationship threads' });
     const selected = () =>
-      reader.querySelector('ol button[aria-current="true"]') as HTMLButtonElement;
+      reader.querySelector<HTMLButtonElement>('ol button[aria-current="true"]')!;
     expect(reader.querySelectorAll('ol button[tabindex="0"]')).toHaveLength(1);
     expect(reader.querySelectorAll('ol button[tabindex="-1"]')).toHaveLength(6);
     expect(reader.querySelector('#quran-verse-keyboard-help')?.textContent).toContain('Up/Down');
@@ -234,7 +234,7 @@ describe('Quran-first reader', () => {
     window.history.replaceState(null, '', '/?ref=2%3A1&view=threads');
     render(<QuranApp />);
     const reader = await screen.findByRole('region', { name: 'Quran text and relationship threads' });
-    const selected = reader.querySelector('ol button[aria-current="true"]') as HTMLButtonElement;
+    const selected = reader.querySelector<HTMLButtonElement>('ol button[aria-current="true"]')!;
     const original = window.location.search;
     fireEvent.keyDown(selected, { key: 'ArrowDown', ctrlKey: true });
     fireEvent.keyDown(selected, { key: 'ArrowUp', shiftKey: true });
@@ -261,7 +261,7 @@ describe('Quran-first reader', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Enter reading mode' }));
     const nav = screen.getByRole('navigation', { name: 'Surah navigation' });
     expect(nav.querySelectorAll('button')).toHaveLength(3);
-    expect((screen.getByRole('button', { name: 'Previous surah' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByRole('button', { name: 'Previous surah' }).hasAttribute('disabled')).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Next surah' }));
     expect(window.location.search).toContain('ref=2%3A1');
     fireEvent.click(screen.getByRole('button', { name: 'Focus selected ayah' }));
