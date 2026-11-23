@@ -117,6 +117,6 @@ describe('canonical bilingual verse search', () => {
         language: 'arabic',
         mode: 'unmarked',
       }),
-    ).toEqual([{ ayahIndex: 0, spans: [{ start: 0, end: arabic[0]?.length ?? 0 }] }]);
+    ).toEqual([{ ayahIndex: 0, spans: [{ start: 0, end: arabic[0].length }] }]);
   });
 });
