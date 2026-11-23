@@ -16,7 +16,7 @@
     "typecoverage": "node scripts/type-coverage.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --write src/quran/QuranApp.test.tsx src/quran/QuranApp.tsx src/quran/QuranThreads.tsx src/quran/reading-preferences.test.ts src/quran/reading-preferences.ts && git diff -- src/quran/QuranApp.test.tsx src/quran/QuranApp.tsx src/quran/QuranThreads.tsx src/quran/reading-preferences.test.ts src/quran/reading-preferences.ts && exit 1",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
