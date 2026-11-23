@@ -190,8 +190,8 @@
 
 .focusArabic {
   font-family: 'Amiri', 'Noto Naskh Arabic', 'Traditional Arabic', 'Scheherazade New', serif;
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
-  line-height: 2.1;
+  font-size: var(--reading-focus-arabic-size, clamp(1.5rem, 3vw, 2.25rem));
+  line-height: var(--reading-arabic-leading, 2.1);
   text-align: right;
   margin: 1rem 0;
   unicode-bidi: isolate;
@@ -199,8 +199,8 @@
 
 .focusEnglish {
   font-family: var(--font-serif);
-  font-size: clamp(1rem, 1.7vw, 1.23rem);
-  line-height: 1.7;
+  font-size: var(--reading-focus-english-size, clamp(1rem, 1.7vw, 1.23rem));
+  line-height: var(--reading-english-leading, 1.7);
   margin: 0;
 }
 
@@ -526,17 +526,17 @@
 .arabic {
   display: block;
   font-family: 'Amiri', 'Noto Naskh Arabic', 'Traditional Arabic', 'Scheherazade New', serif;
-  font-size: 1.75rem;
-  line-height: 2.05;
+  font-size: var(--reading-arabic-size, 1.75rem);
+  line-height: var(--reading-arabic-leading, 2.05);
   text-align: right;
   unicode-bidi: isolate;
 }
 
 .english {
   display: block;
-  line-height: 1.65;
+  line-height: var(--reading-english-leading, 1.65);
   font-family: var(--font-serif);
-  font-size: 1.02rem;
+  font-size: var(--reading-english-size, 1.02rem);
 }
 
 .threadMap {
@@ -2587,5 +2587,130 @@
   .verseSearchForm .field,
   .verseSearchForm > button {
     grid-column: 1 / -1;
+  }
+}
+
+.readingControls {
+  display: flex;
+  align-items: start;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 1.2rem;
+}
+
+.readingControls > button[aria-pressed='true'] {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.readingSettings {
+  flex: 1 1 12rem;
+  min-width: 11rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+  background: var(--color-surface);
+}
+
+.readingSettings summary {
+  min-height: 2.7rem;
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.readingSettings summary::before {
+  content: '▸';
+  margin-inline-end: 0.55rem;
+}
+
+.readingSettings[open] summary::before {
+  content: '▾';
+}
+
+.readingSettingsFields {
+  display: flex;
+  align-items: end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.8rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.readingSettingsFields .field {
+  flex: 1 1 9rem;
+}
+
+.readingSettingsFields .field select {
+  width: 100%;
+  max-width: none;
+}
+
+.readingHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  max-width: 58rem;
+  margin: 0 auto 1rem;
+}
+
+.readingHeading h1 {
+  margin: 0;
+  font: 500 clamp(1.3rem, 3vw, 1.8rem)/1.4 var(--font-serif);
+}
+
+.readingOnlyLayout {
+  width: 100%;
+  max-width: 58rem;
+  margin-inline: auto;
+}
+
+.readingOnlyLayout .reader {
+  overflow: visible;
+}
+
+.readingOnlyLayout .ayahButton {
+  padding-block: 1.5rem;
+  padding-inline: clamp(0.85rem, 3vw, 2rem);
+}
+
+.readingOnlyLayout .ayahNumber {
+  font-size: 0.85rem;
+}
+
+.readingOnlyLayout .panelHeading {
+  padding: 1.5rem clamp(0.85rem, 3vw, 2rem);
+}
+
+@media (max-width: 40rem) {
+  .readingControls > button {
+    flex: 1 1 100%;
+  }
+
+  .readingSettings {
+    flex-basis: 100%;
+  }
+
+  .readingSettingsFields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .readingSettingsFields .field {
+    min-width: 0;
+  }
+
+  .readingSettingsFields > button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 24rem) {
+  .readingSettingsFields {
+    grid-template-columns: 1fr;
   }
 }
