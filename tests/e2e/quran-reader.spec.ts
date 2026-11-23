@@ -1070,18 +1070,21 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
     });
     await page.reload();
     await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated');
-    const checkCache = async () => page.evaluate(async () => {
-      const registration = await navigator.serviceWorker.ready;
-      const names = await caches.keys();
-      const name = names.find((candidate) => candidate.startsWith('quran-cross-references-shell-'));
-      if (!name) return { morphology: false, text: false };
-      const cache = await caches.open(name);
-      const morphology = await cache.match(
-        new URL('data/quran/morphology.json', registration.scope),
-      );
-      const text = await cache.match(new URL('data/quran/text.json', registration.scope));
-      return { morphology: morphology !== undefined, text: text !== undefined };
-    });
+    const checkCache = async () =>
+      page.evaluate(async () => {
+        const registration = await navigator.serviceWorker.ready;
+        const names = await caches.keys();
+        const name = names.find((candidate) =>
+          candidate.startsWith('quran-cross-references-shell-'),
+        );
+        if (!name) return { morphology: false, text: false };
+        const cache = await caches.open(name);
+        const morphology = await cache.match(
+          new URL('data/quran/morphology.json', registration.scope),
+        );
+        const text = await cache.match(new URL('data/quran/text.json', registration.scope));
+        return { morphology: morphology !== undefined, text: text !== undefined };
+      });
     expect(await checkCache()).toEqual({ morphology: false, text: true });
     await page.getByRole('combobox', { name: 'Evidence type' }).selectOption('morphology');
     await expect(
