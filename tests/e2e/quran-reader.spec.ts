@@ -788,7 +788,7 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
     await expect(occurrences.first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Next occurrences' })).toBeEnabled();
     await page.getByRole('button', { name: 'Next occurrences' }).click();
-    await expect(page.getByText(/2 \/ \d+/).last()).toBeVisible();
+    await expect(page.getByText(/Page 2 of/)).toBeVisible();
     await occurrences.first().click();
     await expect(page).toHaveURL(/word=\d+/);
     await expect(
@@ -894,7 +894,7 @@ test.describe('Quran Phase 2D.1 independently annotated themes', () => {
     await page.getByRole('combobox', { name: 'Theme verse scope' }).selectOption('all');
     await expect(page.getByRole('button', { name: 'Next labeled verses' })).toBeEnabled();
     await page.getByRole('button', { name: 'Next labeled verses' }).click();
-    await expect(page.getByText(/Page 2 of/)).toBeVisible();
+    await expect(page.getByText(/2 \/ \d+/).last()).toBeVisible();
     await page
       .getByRole('button', { name: /Read tagged Quran ayah/ })
       .first()
