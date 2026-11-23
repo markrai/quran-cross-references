@@ -224,7 +224,9 @@ export function QuranVerseSearch({
                   >
                     Previous matches
                   </button>
-                  <span>Page {page + 1} of {pages}</span>
+                  <span>
+                    Page {page + 1} of {pages}
+                  </span>
                   <button
                     type="button"
                     className={styles.goButton}
