@@ -113,6 +113,21 @@ describe('canonical bilingual verse search', () => {
     ).toEqual([]);
   });
 
+  it('tracks original UTF-16 spans across supplementary characters and following marks', () => {
+    const text = fixture();
+    const arabic = [...text.arabic];
+    arabic[0] = '🌙َبِ';
+    const index = createVerseSearchIndex({ arabic, english: text.english });
+    expect(
+      searchQuranVerses(index, {
+        ...base,
+        query: '🌙ب',
+        language: 'arabic',
+        mode: 'unmarked',
+      }),
+    ).toEqual([{ ayahIndex: 0, spans: [{ start: 0, end: arabic[0].length }] }]);
+  });
+
   it('handles searchable Arabic supplement marks and tatweel without damaging highlight offsets', () => {
     const text = fixture();
     const arabic = [...text.arabic];
