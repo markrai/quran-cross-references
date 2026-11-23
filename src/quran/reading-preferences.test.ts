@@ -75,7 +75,9 @@ describe('Phase 3B.1 reader preferences', () => {
       },
     });
     expect(readReadingPreferences()).toEqual(DEFAULT_READING_PREFERENCES);
-    expect(() => saveReadingPreferences(DEFAULT_READING_PREFERENCES)).not.toThrow();
+    expect(() => {
+      saveReadingPreferences(DEFAULT_READING_PREFERENCES);
+    }).not.toThrow();
   });
 
   it('generates bounded rem-based typography values for each spacing mode', () => {
