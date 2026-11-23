@@ -22,13 +22,7 @@ interface Props {
 const number = (value: number) => value.toLocaleString('en');
 const percentage = (value: number) => value.toFixed(1) + '%';
 
-export function QuranMorphologyFrequency({
-  index,
-  grouping,
-  term,
-  onSelect,
-  onOccurrence,
-}: Props) {
+export function QuranMorphologyFrequency({ index, grouping, term, onSelect, onOccurrence }: Props) {
   const report = useMemo(() => buildQacFrequencyReport(index, grouping), [index, grouping]);
   const [familyCount, setFamilyCount] = useState<number>(25);
   const [visibleFamilies, setVisibleFamilies] = useState(15);
@@ -77,7 +71,13 @@ export function QuranMorphologyFrequency({
           positions, or <strong>{percentage(coverage.percent)}</strong>.
         </p>
         <progress
-          aria-label={'QAC word-position coverage by top ' + String(coverage.families) + ' ' + grouping + ' families'}
+          aria-label={
+            'QAC word-position coverage by top ' +
+            String(coverage.families) +
+            ' ' +
+            grouping +
+            ' families'
+          }
           max={report.totalWords}
           value={coverage.words}
         />
@@ -88,7 +88,10 @@ export function QuranMorphologyFrequency({
           included in the denominator.
         </p>
       </div>
-      <div className={styles.qacFrequencyMilestones} aria-label="Potential coverage by family count">
+      <div
+        className={styles.qacFrequencyMilestones}
+        aria-label="Potential coverage by family count"
+      >
         {QAC_COVERAGE_SIZES.map((count) => {
           const point = qacFrequencyCoverage(report, count);
           return (
@@ -114,7 +117,9 @@ export function QuranMorphologyFrequency({
               <li key={family.term}>
                 <button
                   type="button"
-                  aria-label={'Explore ' + grouping + ' ' + family.term + ' rank ' + String(rank + 1)}
+                  aria-label={
+                    'Explore ' + grouping + ' ' + family.term + ' rank ' + String(rank + 1)
+                  }
                   aria-pressed={family.term === term}
                   onClick={() => {
                     onSelect(family.term);
@@ -151,7 +156,10 @@ export function QuranMorphologyFrequency({
             </button>
           )}
         </section>
-        <section className={styles.qacFrequencySection} aria-label="Selected QAC family distribution">
+        <section
+          className={styles.qacFrequencySection}
+          aria-label="Selected QAC family distribution"
+        >
           <h4>Distribution across surahs</h4>
           {term === null || selectedFamily === undefined ? (
             <p>Select an annotated family to see its canonical surah distribution.</p>
@@ -178,8 +186,12 @@ export function QuranMorphologyFrequency({
                         if (first) onOccurrence(first.ayah, first.word + 1);
                       }}
                     >
-                      <span>{entry.surah}. {getSurah(entry.surah).name}</span>
-                      <span>{number(entry.words)} words · {number(entry.ayahs)} ayahs</span>
+                      <span>
+                        {entry.surah}. {getSurah(entry.surah).name}
+                      </span>
+                      <span>
+                        {number(entry.words)} words · {number(entry.ayahs)} ayahs
+                      </span>
                       <span className={styles.qacFrequencyTrack} aria-hidden="true">
                         <span style={{ width: percentage((entry.words / largest) * 100) }} />
                       </span>
@@ -204,10 +216,10 @@ export function QuranMorphologyFrequency({
         </section>
       </div>
       <p className={styles.qacFrequencyFootnote}>
-        Potential word-position coverage is not a measure of Arabic fluency or learned vocabulary.
-        A word can carry multiple annotations and belong to more than one family; cumulative
-        coverage counts each canonical QAC word position once. Roots and lemmas are evaluated
-        separately. Source: Quranic Arabic Corpus v0.4, © 2011 Kais Dukes.
+        Potential word-position coverage is not a measure of Arabic fluency or learned vocabulary. A
+        word can carry multiple annotations and belong to more than one family; cumulative coverage
+        counts each canonical QAC word position once. Roots and lemmas are evaluated separately.
+        Source: Quranic Arabic Corpus v0.4, © 2011 Kais Dukes.
       </p>
     </section>
   );

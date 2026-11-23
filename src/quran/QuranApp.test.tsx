@@ -364,11 +364,7 @@ describe('Quran-first reader', () => {
   });
 
   it('opens QAC frequency analytics from the existing morphology panel and shares selected roots', async () => {
-    window.history.replaceState(
-      null,
-      '',
-      '/?ref=1%3A1&evidence=morphology&morph=root&term=rHm',
-    );
+    window.history.replaceState(null, '', '/?ref=1%3A1&evidence=morphology&morph=root&term=rHm');
     render(<QuranApp />);
     const analytics = await screen.findByRole('region', {
       name: 'QAC vocabulary frequency analytics',
@@ -380,8 +376,9 @@ describe('Quran-first reader', () => {
       '25',
     );
     expect(analytics.querySelector('progress')).not.toBeNull();
-    expect(screen.getByRole('region', { name: 'Selected QAC family distribution' }).textContent)
-      .toContain('2 annotated word');
+    expect(
+      screen.getByRole('region', { name: 'Selected QAC family distribution' }).textContent,
+    ).toContain('2 annotated word');
     fireEvent.change(screen.getByRole('combobox', { name: 'Coverage family count' }), {
       target: { value: '10' },
     });
