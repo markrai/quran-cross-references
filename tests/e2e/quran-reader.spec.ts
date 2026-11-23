@@ -1151,9 +1151,8 @@ test.describe('Quran Phase 2E.1 unified ayah evidence inspector', () => {
   }) => {
     const requested = new Set<string>();
     page.on('request', (event) => {
-      const match = event
-        .url()
-        .match(/\/data\/quran\/(expressions|morphology|themes|emotions)\.json$/);
+      const source = /\/data\/quran\/(expressions|morphology|themes|emotions)\.json$/;
+      const match = source.exec(event.url());
       if (match?.[1]) requested.add(match[1]);
     });
     await page.goto('./?ref=2%3A255&view=threads');
