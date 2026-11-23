@@ -3,6 +3,7 @@ import { parseReference } from '../core/quran/reference.ts';
 import type { QuranRelationshipScope } from '../core/quran/relationship-filter.ts';
 import { ELQV_LABELS, type QuranEmotionFilter } from '../core/quran/emotion-types.ts';
 import type { ThemeLanguageKind } from '../core/quran/theme-language.ts';
+import type { VerseSearchOptions } from '../core/quran/verse-search.ts';
 
 export type QuranView = 'arcs' | 'threads' | 'analytics' | 'network' | 'themes' | 'emotions';
 export type QuranNetworkMode = 'surah' | 'ayah';
@@ -32,6 +33,7 @@ export interface QuranLocation {
   readonly selectedMorphWord: number | null;
   readonly networkMode: QuranNetworkMode;
   readonly networkDepth: 1 | 2;
+  readonly verseSearch: VerseSearchOptions | null;
 }
 
 export const DEFAULT_QURAN_LOCATION: QuranLocation = {
@@ -54,6 +56,7 @@ export const DEFAULT_QURAN_LOCATION: QuranLocation = {
   selectedMorphWord: null,
   networkMode: 'surah',
   networkDepth: 1,
+  verseSearch: null,
 };
 
 function parseSelectedLink(raw: string | null): number | null {
@@ -159,6 +162,34 @@ export function parseQuranLocation(url: URL): QuranLocation {
     (rawEmotion === 'conflicts' || ELQV_LABELS.some((label) => label === rawEmotion))
       ? (rawEmotion as QuranEmotionFilter)
       : 'all';
+  const rawVerseQuery = params.get('q');
+  const rawVerseLanguage = params.get('qlang');
+  const rawVerseSurah = params.get('qsurah');
+  const validVerseSurah =
+    rawVerseSurah !== null && /^(?:[1-9]|[1-9][0-9]|10[0-9]|11[0-4])$/.test(rawVerseSurah)
+      ? Number(rawVerseSurah)
+      : null;
+  const verseSearch: VerseSearchOptions | null =
+    view === 'threads' &&
+    rawVerseQuery !== null &&
+    rawVerseQuery.length > 0 &&
+    rawVerseQuery.length <= 120 &&
+    rawVerseQuery.trim() === rawVerseQuery &&
+    !Array.from(rawVerseQuery).some((character) => {
+      const code = character.charCodeAt(0);
+      return code < 32 || code === 127;
+    }) &&
+    (rawVerseLanguage === null || rawVerseLanguage === 'en' || rawVerseLanguage === 'ar')
+      ? {
+          query: rawVerseQuery,
+          language: rawVerseLanguage === 'ar' ? 'arabic' : 'english',
+          mode:
+            rawVerseLanguage === 'ar' && params.get('qmatch') === 'unmarked'
+              ? 'unmarked'
+              : 'literal',
+          surah: validVerseSurah,
+        }
+      : null;
   return {
     reference,
     rangeEnd,
@@ -182,6 +213,7 @@ export function parseQuranLocation(url: URL): QuranLocation {
     networkMode: view === 'network' && params.get('network') === 'ayah' ? 'ayah' : 'surah',
     networkDepth:
       view === 'network' && params.get('network') === 'ayah' && params.get('depth') === '2' ? 2 : 1,
+    verseSearch,
     direction: direction === 'incoming' || direction === 'outgoing' ? direction : 'both',
     scope: scope === 'same-surah' || scope === 'cross-surah' ? scope : 'all',
   };
@@ -225,6 +257,16 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
   }
   if (location.view === 'emotions' && location.selectedEmotion !== 'all') {
     params.set('emotion', location.selectedEmotion);
+  }
+  if (location.view === 'threads' && location.verseSearch !== null) {
+    params.set('q', location.verseSearch.query);
+    params.set('qlang', location.verseSearch.language === 'arabic' ? 'ar' : 'en');
+    if (location.verseSearch.language === 'arabic' && location.verseSearch.mode === 'unmarked') {
+      params.set('qmatch', 'unmarked');
+    }
+    if (location.verseSearch.surah !== null) {
+      params.set('qsurah', String(location.verseSearch.surah));
+    }
   }
   if (location.view === 'network' && location.networkMode === 'ayah') {
     params.set('network', 'ayah');
