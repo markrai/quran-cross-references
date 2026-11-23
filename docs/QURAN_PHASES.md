@@ -284,6 +284,18 @@ See [Phase 2D.2](QURAN_PHASE_2D2.md).
 
 See [Phase 2E.1](QURAN_PHASE_2E1.md).
 
+### Phase 2E.2: Comparative theme-to-language discovery
+
+- Add topic-to-language analytics as an opt-in mode within the existing QSAC **Themes** tab, with no additional primary navigation tab and no changes to the Quran text or source identities.
+- Compare per-ayah **binary presence** of QAC root, QAC lemma, or computed exact Tanzil phrase against the QSAC target-label subset and its disjoint complement of all other canonical ayahs. Count a feature once per ayah, not once per token or repeated span.
+- Show the exact counts, denominators, per-group percentages and signed percentage-point rate difference, never an inferred agreement score, significance test, interpretation, similar passage or ranked theological authority.
+- Supply descriptive thresholds for exploring features with limited support and allow positive- or negative-difference views with source-ID/Arabic filtering. Note small counts and topic selection bias.
+- Provide per-surah both/topic-only and outside-label feature counts with correctly scoped denominators. Preserve direct drilldowns into original bilingual ayahs, source QAC morphology or computed exact-expression evidence.
+- Reuse SHA-256 verified QSAC/QAC/exact loaders and session caches; load only the selected optional language source, preserve offline-install cache size and isolate failures with retry.
+- Deep-link topic, analysis mode, source type and original feature ID without leaking language state into other application views. Verify browser back/forward, phone views, source counts and testable pure statistical computation.
+
+See [Phase 2E.2](QURAN_PHASE_2E2.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

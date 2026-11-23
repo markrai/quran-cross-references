@@ -1178,3 +1178,114 @@ test.describe('Quran Phase 2E.1 unified ayah evidence inspector', () => {
     expect(requested.size).toBe(4);
   });
 });
+
+test.describe('Quran Phase 2E.2 linguistic pattern discovery', () => {
+  test('loads QAC on explicit theme-language exploration without requesting exact expressions', async ({
+    page,
+  }) => {
+    const requested: string[] = [];
+    page.on('request', (request) => {
+      if (/\/data\/quran\/(?:themes|morphology|expressions)\.json$/.test(request.url())) {
+        requested.push(request.url());
+      }
+    });
+    await page.goto('./?ref=1%3A1&view=themes&theme=Divine+Mercy');
+    await expect(
+      page.getByRole('heading', { name: 'Thematic exploration across the Quran' }),
+    ).toBeVisible();
+    expect(requested.some((url) => url.endsWith('/morphology.json'))).toBe(false);
+    expect(requested.some((url) => url.endsWith('/expressions.json'))).toBe(false);
+    await page.getByRole('button', { name: 'Analyze Arabic patterns within this topic' }).click();
+    await expect(page).toHaveURL(/view=themes&theme=Divine\+Mercy&analysis=language/);
+    await expect(
+      page.getByRole('heading', { name: 'Language patterns across Quran themes' }),
+    ).toBeVisible();
+    await expect(page.getByLabel('Linguistic feature comparisons')).toContainText('Tagged:');
+    await expect(page.getByLabel('Selected linguistic pattern')).toContainText(
+      'Descriptive rate difference',
+    );
+    await expect(page.getByLabel('Surah language distribution')).toBeVisible();
+    await expect(page.getByLabel('Theme and language co-occurrence verses')).toBeVisible();
+    expect(requested.filter((url) => url.endsWith('/themes.json'))).toHaveLength(1);
+    expect(requested.filter((url) => url.endsWith('/morphology.json'))).toHaveLength(1);
+    expect(requested.some((url) => url.endsWith('/expressions.json'))).toBe(false);
+    await page.getByRole('button', { name: '← Back to QSAC topic explorer' }).click();
+    await expect(page).not.toHaveURL(/analysis=language/);
+    await expect(
+      page.getByRole('heading', { name: 'Thematic exploration across the Quran' }),
+    ).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/analysis=language/);
+    expect(requested.filter((url) => url.endsWith('/morphology.json'))).toHaveLength(1);
+  });
+
+  test('compares exact phrases in separate tagged and untagged ayah samples with original drilldown', async ({
+    page,
+  }) => {
+    const requested: string[] = [];
+    page.on('request', (request) => {
+      if (/\/data\/quran\/(?:themes|morphology|expressions)\.json$/.test(request.url())) {
+        requested.push(request.url());
+      }
+    });
+    await page.goto('./?ref=1%3A1&view=themes&theme=Divine+Mercy&analysis=language&pattern=exact');
+    await expect(
+      page.getByRole('heading', { name: 'Language patterns across Quran themes' }),
+    ).toBeVisible();
+    await expect(page.getByLabel('Linguistic feature comparisons')).toContainText('Tagged:');
+    expect(requested.filter((url) => url.endsWith('/expressions.json'))).toHaveLength(1);
+    expect(requested.some((url) => url.endsWith('/morphology.json'))).toBe(false);
+    const comparisons = page.getByLabel('Linguistic feature comparisons');
+    const first = comparisons.locator('button[aria-pressed]').first();
+    await expect(first).toBeVisible();
+    await first.click();
+    await expect(page).toHaveURL(/feature=exact%3Av1%3A/);
+    await page.reload();
+    await expect(page.getByLabel('Selected linguistic pattern')).toContainText(
+      'Original feature ID:',
+    );
+    const details = page.getByLabel('Selected linguistic pattern');
+    await details.getByRole('button', { name: 'Open original exact phrase evidence' }).click();
+    await expect(page).not.toHaveURL(/view=themes/);
+    await expect(page.getByRole('button', { name: 'Arcs' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(page).toHaveURL(/evidence=exact/);
+    await expect(page).toHaveURL(/expression=exact%3Av1%3A/);
+    await page.goBack();
+    await expect(page).toHaveURL(/analysis=language&pattern=exact&feature=exact%3Av1%3A/);
+  });
+
+  test('switches QAC roots and lemmas and exposes surah-aware evidence without fabricated relationships', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=1%3A1&view=themes&theme=Divine+Mercy&analysis=language');
+    await expect(page.getByLabel('Linguistic feature comparisons')).toContainText('Tagged:');
+    await page.getByRole('combobox', { name: 'Linguistic feature type' }).selectOption('lemma');
+    await expect(page).toHaveURL(/analysis=language&pattern=lemma/);
+    await expect(page.getByLabel('Linguistic feature comparisons')).toContainText('Tagged:');
+    const distribution = page.getByLabel('Surah language distribution');
+    await expect(distribution).toContainText('Tagged');
+    await expect(distribution).toContainText('Untagged');
+    const selected = page.getByLabel('Selected linguistic pattern');
+    await selected.getByRole('button', { name: 'Open original QAC morphology evidence' }).click();
+    await expect(page).toHaveURL(/view=threads/);
+    await expect(page).toHaveURL(/evidence=morphology/);
+    await expect(page).toHaveURL(/morph=lemma|term=/);
+    await expect(
+      page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' }),
+    ).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/analysis=language&pattern=lemma/);
+    const verses = page.getByLabel('Theme and language co-occurrence verses');
+    await expect(verses).toContainText('matching tagged ayahs');
+    await verses
+      .getByRole('button', { name: /Read linguistic evidence at Quran ayah/ })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/view=threads/);
+    await page.goBack();
+    await expect(page).toHaveURL(/analysis=language&pattern=lemma/);
+  });
+});
