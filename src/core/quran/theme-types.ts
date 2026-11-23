@@ -26,6 +26,8 @@ export interface QuranThemeDataset {
     readonly attribution: string;
   };
   readonly annotationCount: number;
+  readonly sourceAssignmentCount: number;
+  readonly duplicateAssignmentCount: number;
   readonly tags: readonly QuranThemeTag[];
   readonly ayahs: readonly (readonly number[])[];
 }

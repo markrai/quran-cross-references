@@ -130,6 +130,8 @@ export function importQsacThemes(
   const counts = new Uint32Array(tags.length);
   const ayahs: number[][] = [];
   let assignmentCount = 0;
+  let rawAssignmentCount = 0;
+  let duplicateAssignmentCount = 0;
   for (const [index, row] of parsed.entries()) {
     if (row.length !== 5) fail('Unexpected CSV field count in verse ' + String(index));
     const reference = CANONICAL_QURAN.refAt(index);
@@ -148,15 +150,22 @@ export function importQsacThemes(
       fail('Expected 1–6 thematic labels per ayah.');
     }
     const ids: number[] = [];
+    rawAssignmentCount += rawTags.length;
     for (const name of rawTags) {
       const id = byName.get(name);
       if (id === undefined) fail('Unknown source tag: ' + name);
-      if (ids.includes(id)) fail('Duplicate tag in one ayah.');
+      if (ids.includes(id)) {
+        duplicateAssignmentCount += 1;
+        continue;
+      }
       ids.push(id);
       counts[id] = (counts[id] ?? 0) + 1;
       assignmentCount += 1;
     }
     ayahs.push(ids);
+  }
+  if (rawAssignmentCount !== 16309 || assignmentCount !== 16306 || duplicateAssignmentCount !== 3) {
+    fail('The source assignment counts differ from the audited pinned revision.');
   }
   return {
     format: 'quran-external-themes',
@@ -173,6 +182,8 @@ export function importQsacThemes(
         'QSAC (2026), Ahmad Bilal, CC BY 4.0; LLM-assisted and human-reviewed thematic annotations. https://github.com/dev-ahmadbilal/quran-semantic-annotation-corpus',
     },
     annotationCount: assignmentCount,
+    sourceAssignmentCount: rawAssignmentCount,
+    duplicateAssignmentCount,
     tags: tags.map((tag, index) => ({ ...tag, count: counts[index] ?? 0 })),
     ayahs,
   };

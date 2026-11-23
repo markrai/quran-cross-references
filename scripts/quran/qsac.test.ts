@@ -29,13 +29,18 @@ describe('Phase 2D.1 external QSAC thematic evidence importer', () => {
     expect(dataset.tags).toHaveLength(338);
     expect(new Set(dataset.tags.map((tag) => tag.domain)).size).toBe(18);
     expect(new Set(dataset.tags.map((tag) => tag.domain + '/' + tag.category)).size).toBe(70);
-    expect(dataset.annotationCount).toBe(16309);
+    expect(dataset.annotationCount).toBe(16306);
+    expect(dataset.sourceAssignmentCount).toBe(16309);
+    expect(dataset.duplicateAssignmentCount).toBe(3);
     expect(dataset.ayahs[CANONICAL_QURAN.indexOf({ surah: 16, ayah: 36 }) ?? -1]).toHaveLength(6);
     expect(dataset.ayahs[0]?.map((id) => dataset.tags[id]?.name)).toEqual([
       'Names and Attributes of Allah',
       'Divine Mercy',
     ]);
     expect(dataset.ayahs[6235]?.length).toBeGreaterThan(0);
+    expect(dataset.ayahs[CANONICAL_QURAN.indexOf({ surah: 39, ayah: 68 }) ?? -1]).toHaveLength(2);
+    expect(dataset.ayahs[CANONICAL_QURAN.indexOf({ surah: 40, ayah: 72 }) ?? -1]).toHaveLength(1);
+    expect(dataset.ayahs[CANONICAL_QURAN.indexOf({ surah: 54, ayah: 7 }) ?? -1]).toHaveLength(1);
     expect(dataset.tags.reduce((sum, item) => sum + item.count, 0)).toBe(dataset.annotationCount);
     expect(JSON.stringify(dataset)).not.toContain('Sovereign of the Day of Recompense');
     expect(JSON.stringify(dataset)).not.toContain('بِسْمِ اللَّهِ');

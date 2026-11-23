@@ -116,6 +116,14 @@ export class QuranThemeIndex {
     if (!Number.isSafeInteger(dataset['annotationCount']) || dataset['annotationCount'] !== total) {
       invalid('Tag assignment total differs from per-ayah evidence.');
     }
+    if (
+      !Number.isSafeInteger(dataset['sourceAssignmentCount']) ||
+      !Number.isSafeInteger(dataset['duplicateAssignmentCount']) ||
+      (dataset['duplicateAssignmentCount'] as number) < 0 ||
+      dataset['sourceAssignmentCount'] !== total + (dataset['duplicateAssignmentCount'] as number)
+    ) {
+      invalid('Raw source totals must distinguish duplicate annotations from unique verse memberships.');
+    }
     for (const [id, raw] of tags.entries()) {
       const tag = object(raw, 'Tag');
       if (tag['count'] !== this.#postings[id]?.length) {

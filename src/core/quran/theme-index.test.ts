@@ -32,6 +32,8 @@ function fixture(): QuranThemeDataset {
       attribution: 'QSAC, Ahmad Bilal, CC BY 4.0',
     },
     annotationCount: 6236,
+    sourceAssignmentCount: 6236,
+    duplicateAssignmentCount: 0,
     tags,
     ayahs,
   };
