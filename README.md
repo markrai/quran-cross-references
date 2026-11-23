@@ -186,3 +186,11 @@ The full-surah reader now has **one keyboard tab stop on the selected ayah** ins
 Focused reading adds **Previous surah**, **Next surah**, and **Focus selected ayah** actions with 44px touch targets. Switching research views moves focus to the main content landmark; browser history, source evidence, language, and local display preferences are preserved.
 
 See [Phase 3B.2 navigation and accessibility acceptance](docs/QURAN_PHASE_3B2.md). Real-device VoiceOver/TalkBack/NVDA and 200% text-scaling checks remain manual release gates.
+
+## Morphology-aware Quran verse search (Phase 3C.1)
+
+In **Threads & Reader**, the search type selector distinguishes original-text **Literal verse text** from **QAC annotated root** and **QAC annotated lemma** lookup. QAC v0.4 results use the reviewed, pinned morphological index, not substring inference. You can enter the exact Arabic term or its Buckwalter transliteration, filter by surah, open the original Tanzil/Pickthall passage, or follow **Inspect QAC annotation** to the existing morphology panel.
+
+Results list the annotated QAC surface form, original corpus POS and one-based word position, but deliberately **do not highlight QAC positions in Tanzil text**: the separate editions have not been proven codepoint-aligned. Roots and lemmas are linguistic evidence, not theological or semantic equivalence. Search links preserve `qmode=root|lemma`, the normalized Arabic search language and other canonical filters. The QAC dataset loads only for QAC search or existing morphology research.
+
+See [Phase 3C.1 search contract](docs/QURAN_PHASE_3C1.md). Source attribution, published hashes, `noindex` and real-device release gates remain in place.
