@@ -296,6 +296,14 @@ See [Phase 2E.1](QURAN_PHASE_2E1.md).
 
 See [Phase 2E.2](QURAN_PHASE_2E2.md).
 
+### Phase 3A.1: Canonical bilingual verse search
+
+Search existing, verified Uthmani Arabic and Pickthall English text across all 6,236 canonical ayahs inside Threads & Reader with optional Arabic mark-insensitive comparisons, source-offset highlights, surah filters, shareable search URLs and offline-only browser indexing. See [Phase 3A.1](QURAN_PHASE_3A1.md).
+
+### Phase 3B.1: Reader-first experience
+
+Preserve current research and shareable ayah navigation while allowing text-only reading with local language, relative text-size and line-height controls. Keep research evidence classified and recoverable when reading mode exits, and bring linked ayahs into view without altering source text. See [Phase 3B.1](QURAN_PHASE_3B1.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows
