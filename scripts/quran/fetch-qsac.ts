@@ -24,8 +24,7 @@ for (const [id, filename, limit] of [
 ] as const) {
   const pin = records.sources.find((entry) => entry.id === id);
   if (
-    !pin ||
-    pin.url !== origin + filename ||
+    pin?.url !== origin + filename ||
     pin.fileName !== filename ||
     !/^[a-f0-9]{64}$/.test(pin.sha256)
   ) {

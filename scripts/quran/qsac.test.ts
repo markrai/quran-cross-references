@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { QuranThemeIndex } from '../../src/core/quran/theme-index.ts';
 import { importQsacThemes } from './qsac.ts';
+import { CANONICAL_QURAN } from '../../src/core/quran/quran-versification.ts';
 
 const pins = JSON.parse(readFileSync('data/quran/sources.json', 'utf8')) as {
   readonly sources: readonly { readonly id: string; readonly sha256: string }[];
@@ -28,7 +29,8 @@ describe('Phase 2D.1 external QSAC thematic evidence importer', () => {
     expect(dataset.tags).toHaveLength(338);
     expect(new Set(dataset.tags.map((tag) => tag.domain)).size).toBe(18);
     expect(new Set(dataset.tags.map((tag) => tag.domain + '/' + tag.category)).size).toBe(70);
-    expect(dataset.annotationCount).toBeGreaterThan(14000);
+    expect(dataset.annotationCount).toBe(16309);
+    expect(dataset.ayahs[CANONICAL_QURAN.indexOf({ surah: 16, ayah: 36 }) ?? -1]).toHaveLength(6);
     expect(dataset.ayahs[0]?.map((id) => dataset.tags[id]?.name)).toEqual([
       'Names and Attributes of Allah',
       'Divine Mercy',

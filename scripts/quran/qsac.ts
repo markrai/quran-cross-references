@@ -49,7 +49,7 @@ function parseCsv(content: string): readonly (readonly string[])[] {
   let field = '';
   let quoted = false;
   for (let index = 0; index < source.length; index += 1) {
-    const char = source[index];
+    const char = source.charAt(index);
     if (char === '"') {
       if (quoted && source[index + 1] === '"') {
         field += '"';
@@ -144,8 +144,8 @@ export function importQsacThemes(
       );
     }
     const rawTags = row[4]?.split('|') ?? [];
-    if (rawTags.length < 1 || rawTags.length > 5) {
-      fail('Expected 1–5 thematic labels per ayah.');
+    if (rawTags.length < 1 || rawTags.length > 6) {
+      fail('Expected 1–6 thematic labels per ayah.');
     }
     const ids: number[] = [];
     for (const name of rawTags) {

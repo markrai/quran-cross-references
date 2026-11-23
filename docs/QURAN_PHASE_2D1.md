@@ -6,6 +6,8 @@ The primary added source is **QSAC v1.0: Quran Semantic Annotation Corpus**, by 
 
 Unlike the 2,445 separately curated Mutashabihat links, QSAC annotations are classified `external-llm-assisted-annotation` and `exploratory-not-tafsir`. We do not treat sharing a topic as a vetted relationship between two verses; no pairwise links are created from tags. This source is useful for browsing but not for interpreting theological significance.
 
+A source audit measured 16,309 tag assignments: 504 verses with one tag, 2,695 with two, 2,118 with three, 535 with four, 383 with five, and one verse (16:36) with six. The exceptional sixth tag is preserved even though the upstream overview describes a 1–5 range.
+
 The upstream repository makes its annotations and ontology available under CC BY 4.0; this project credits the dataset. The original CSV also contains separate Arabic and Saheeh International English columns. **Neither text column is included in the generated output.** The reader continues to show the previously verified Tanzil Uthmani v1.1 Arabic and Pickthall English editions from independent existing sources.
 
 ## Data contract

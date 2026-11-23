@@ -94,8 +94,8 @@ export class QuranThemeIndex {
     let total = 0;
     for (const [ayah, raw] of ayahs.entries()) {
       const ids = array(raw, 'Ayah labels');
-      if (ids.length < 1 || ids.length > 5) {
-        invalid('Expected 1–5 annotations per canonical ayah.');
+      if (ids.length < 1 || ids.length > 6) {
+        invalid('Expected 1–6 annotations per canonical ayah.');
       }
       const seen = new Set<number>();
       for (const id of ids) {
