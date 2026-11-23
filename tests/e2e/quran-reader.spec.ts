@@ -111,7 +111,7 @@ test.describe('Phase 3B.1 reader-first experience', () => {
     await page.getByRole('button', { name: 'Enter reading mode' }).click();
     await expect(page.getByRole('region', { name: 'Distraction-free Quran reader' })).toBeVisible();
     await expect(search).toHaveCount(0);
-    await expect(page.getByRole('region', { name: 'Selected ayah relationships' })).toHaveCount(0);
+    await expect(page.locator('[aria-label="Selected ayah relationships"]')).toHaveCount(0);
     await expect(page.getByRole('group', { name: 'Visualization' })).toHaveCount(0);
     await expect(page.getByRole('combobox', { name: 'Surah' })).toBeVisible();
     await expect(page.locator('#quran-ayah-2-255')).toBeInViewport();
