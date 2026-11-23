@@ -59,6 +59,16 @@
       "retrievedAt": "2026-11-22",
       "license": "Creative Commons Attribution 4.0 International",
       "attribution": "QSAC ontology © 2026 Ahmad Bilal, https://github.com/dev-ahmadbilal/quran-semantic-annotation-corpus"
+    },
+    {
+      "id": "elqv-2025-expert-emotions",
+      "description": "Emotionally-Labeled Quran Verses (ELQV), 2,100 independently labeled source rows; specialist-reviewed fear, joy, anger and sadness evidence",
+      "url": "https://raw.githubusercontent.com/Arwaalmrzoqi/ELQV/364cdccf6518e35003db51ccf856d9328dbb7ff3/ELQV.csv",
+      "fileName": "ELQV.csv",
+      "sha256": "171eff9be7925f4c21a974d7ac6a5c8a553daf3197ad63b9fddf1217f5f4e445",
+      "retrievedAt": "2026-11-22",
+      "license": "CC0 1.0 Universal, per ELQV GitHub repository; only canonical verse indices and source label memberships republished",
+      "attribution": "Emotionally-Labeled Quran Verses (ELQV), Arwa Almarzoqi and Mohammed Alsuhaibani, Journal of King Saud University Computer and Information Sciences 37, 271 (2025), DOI: 10.1007/s44443-025-00269-y; https://github.com/Arwaalmrzoqi/ELQV. Specialist-annotated, with human-verification and LLM-assisted research methodology."
     }
   ]
 }
