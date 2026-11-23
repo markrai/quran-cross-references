@@ -8,6 +8,8 @@ export type QuranNetworkMode = 'surah' | 'ayah';
 export type QuranDirection = 'outgoing' | 'incoming' | 'both';
 export type QuranEvidenceMode = 'curated' | 'exact' | 'morphology';
 export type QuranMorphGrouping = 'lemma' | 'root';
+export type QuranInspectorSource = 'curated' | 'exact' | 'morphology' | 'themes' | 'emotions';
+export type QuranInspectorSection = QuranInspectorSource | 'all' | null;
 
 export interface QuranLocation {
   readonly view: QuranView;
@@ -20,6 +22,7 @@ export interface QuranLocation {
   readonly selectedExpression: string | null;
   readonly selectedTheme: string | null;
   readonly selectedEmotion: QuranEmotionFilter;
+  readonly inspector: QuranInspectorSection;
   readonly morphologyGrouping: QuranMorphGrouping;
   readonly selectedMorphTerm: string | null;
   readonly selectedMorphWord: number | null;
@@ -38,6 +41,7 @@ export const DEFAULT_QURAN_LOCATION: QuranLocation = {
   selectedExpression: null,
   selectedTheme: null,
   selectedEmotion: 'all',
+  inspector: null,
   morphologyGrouping: 'lemma',
   selectedMorphTerm: null,
   selectedMorphWord: null,
@@ -112,6 +116,17 @@ export function parseQuranLocation(url: URL): QuranLocation {
     !Array.from(rawTheme).some((character) => character.charCodeAt(0) < 32)
       ? rawTheme
       : null;
+  const rawInspector = params.get('inspect');
+  const inspector: QuranInspectorSection =
+    (view === 'arcs' || view === 'threads') &&
+    (rawInspector === 'all' ||
+      rawInspector === 'curated' ||
+      rawInspector === 'exact' ||
+      rawInspector === 'morphology' ||
+      rawInspector === 'themes' ||
+      rawInspector === 'emotions')
+      ? rawInspector
+      : null;
   const rawEmotion = params.get('emotion');
   const selectedEmotion: QuranEmotionFilter =
     view === 'emotions' &&
@@ -129,6 +144,7 @@ export function parseQuranLocation(url: URL): QuranLocation {
     evidence,
     selectedTheme,
     selectedEmotion,
+    inspector,
     selectedExpression:
       evidence === 'exact' && expression !== null && /^exact:v1:[a-f0-9]{64}$/.test(expression)
         ? expression
@@ -164,6 +180,9 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
     if (location.selectedExpression !== null) params.set('expression', location.selectedExpression);
   }
   if (location.view !== 'arcs') params.set('view', location.view);
+  if ((location.view === 'arcs' || location.view === 'threads') && location.inspector !== null) {
+    params.set('inspect', location.inspector);
+  }
   if (
     (location.view === 'themes' || location.view === 'emotions') &&
     location.selectedTheme !== null

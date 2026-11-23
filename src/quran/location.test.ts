@@ -26,6 +26,7 @@ describe('Quran-first canonical route', () => {
       selectedExpression: null,
       selectedTheme: null,
       selectedEmotion: 'all',
+      inspector: null,
       morphologyGrouping: 'lemma',
       selectedMorphTerm: null,
       selectedMorphWord: null,
@@ -36,6 +37,46 @@ describe('Quran-first canonical route', () => {
     expect(parseQuranLocation(named).reference).toEqual({ surah: 2, ayah: 255 });
     const invalid = new URL('https://example.test/?ref=2%3A287');
     expect(parseQuranLocation(invalid).reference).toEqual(DEFAULT_QURAN_LOCATION.reference);
+  });
+
+  it('round-trips each independent ayah inspector section under a deployment base', () => {
+    for (const inspector of [
+      'curated',
+      'exact',
+      'morphology',
+      'themes',
+      'emotions',
+      'all',
+    ] as const) {
+      const location = {
+        ...DEFAULT_QURAN_LOCATION,
+        reference: { surah: 26, ayah: 8 },
+        view: 'threads' as const,
+        inspector,
+      };
+      const href = quranLocationUrl(location, '/quran-cross-references/');
+      expect(href).toContain('ref=26%3A8');
+      expect(href).toContain('view=threads&inspect=' + inspector);
+      expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(location);
+    }
+  });
+
+  it('rejects malformed or irrelevant inspector selections and never leaks one into non-reader tabs', () => {
+    for (const raw of ['unknown', 'Curated', 'all%20', '%0D', 'none', 'curated%26link%3D1']) {
+      expect(
+        parseQuranLocation(new URL('https://example.test/?inspect=' + raw)).inspector,
+      ).toBeNull();
+    }
+    for (const view of ['analytics', 'network', 'themes', 'emotions']) {
+      const location = parseQuranLocation(
+        new URL('https://example.test/?view=' + view + '&inspect=all'),
+      );
+      expect(location.inspector).toBeNull();
+      expect(quranLocationUrl({ ...location, inspector: 'all' }, '/site/')).not.toContain(
+        'inspect=',
+      );
+    }
+    expect(quranLocationUrl(DEFAULT_QURAN_LOCATION, '/site/')).toBe('/site/?ref=2%3A1');
   });
 
   it('round-trips QAC root and word-position links without mixing evidence classes', () => {
