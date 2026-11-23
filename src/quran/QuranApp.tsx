@@ -298,7 +298,8 @@ export function QuranApp() {
       !data ||
       (location.view !== 'themes' &&
         !(location.view === 'emotions' && (comparisonRequested || location.selectedTheme !== null)))
-    ) return;
+    )
+      return;
     if (themesCache.current) {
       setThemesState({ status: 'ready', index: themesCache.current });
       return;
@@ -412,41 +413,44 @@ export function QuranApp() {
       <main id="quran-main" className={styles.main}>
         <div className={styles.toolbar}>
           <div className={styles.viewTabs} role="group" aria-label="Visualization">
-            {(['arcs', 'threads', 'analytics', 'network', 'themes', 'emotions'] as const).map((view) => (
-              <button
-                key={view}
-                type="button"
-                className={location.view === view ? styles.activeTab : styles.tab}
-                aria-pressed={location.view === view}
-                onClick={() => {
-                  if (view === location.view) return;
-                  const isResearch = view === 'network' || view === 'themes' || view === 'emotions';
-                  navigate({
-                    ...location,
-                    view,
-                    selectedTheme: view === 'emotions' ? null : location.selectedTheme,
-                    evidence: isResearch ? 'curated' : location.evidence,
-                    selectedExpression: isResearch ? null : location.selectedExpression,
-                    selectedMorphTerm: isResearch ? null : location.selectedMorphTerm,
-                    selectedMorphWord: isResearch ? null : location.selectedMorphWord,
-                    selectedLink: isResearch ? null : location.selectedLink,
-                    rangeEnd: isResearch ? null : location.rangeEnd,
-                  });
-                }}
-              >
-                {view === 'arcs'
-                  ? 'Arcs'
-                  : view === 'threads'
-                    ? 'Threads & Reader'
-                    : view === 'analytics'
-                      ? 'Analytics'
-                      : view === 'network'
-                        ? 'Network'
-                        : view === 'themes'
-                          ? 'Themes'
-                          : 'Emotions'}
-              </button>
-            ))}
+            {(['arcs', 'threads', 'analytics', 'network', 'themes', 'emotions'] as const).map(
+              (view) => (
+                <button
+                  key={view}
+                  type="button"
+                  className={location.view === view ? styles.activeTab : styles.tab}
+                  aria-pressed={location.view === view}
+                  onClick={() => {
+                    if (view === location.view) return;
+                    const isResearch =
+                      view === 'network' || view === 'themes' || view === 'emotions';
+                    navigate({
+                      ...location,
+                      view,
+                      selectedTheme: view === 'emotions' ? null : location.selectedTheme,
+                      evidence: isResearch ? 'curated' : location.evidence,
+                      selectedExpression: isResearch ? null : location.selectedExpression,
+                      selectedMorphTerm: isResearch ? null : location.selectedMorphTerm,
+                      selectedMorphWord: isResearch ? null : location.selectedMorphWord,
+                      selectedLink: isResearch ? null : location.selectedLink,
+                      rangeEnd: isResearch ? null : location.rangeEnd,
+                    });
+                  }}
+                >
+                  {view === 'arcs'
+                    ? 'Arcs'
+                    : view === 'threads'
+                      ? 'Threads & Reader'
+                      : view === 'analytics'
+                        ? 'Analytics'
+                        : view === 'network'
+                          ? 'Network'
+                          : view === 'themes'
+                            ? 'Themes'
+                            : 'Emotions'}
+                </button>
+              ),
+            )}
           </div>
           <div className={styles.toolbarFields}>
             {location.view !== 'analytics' &&

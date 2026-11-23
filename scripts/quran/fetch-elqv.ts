@@ -15,11 +15,7 @@ const catalog = JSON.parse(readFileSync('data/quran/sources.json', 'utf8')) as {
   readonly sources: readonly SourcePin[];
 };
 const pin = catalog.sources.find((entry) => entry.id === 'elqv-2025-expert-emotions');
-if (
-  pin?.url !== sourceUrl ||
-  pin.fileName !== 'ELQV.csv' ||
-  !/^[a-f0-9]{64}$/.test(pin.sha256)
-) {
+if (pin?.url !== sourceUrl || pin.fileName !== 'ELQV.csv' || !/^[a-f0-9]{64}$/.test(pin.sha256)) {
   throw new Error('ELQV requires the reviewed immutable source revision and SHA-256 pin.');
 }
 const destination = join('data/raw', pin.fileName);

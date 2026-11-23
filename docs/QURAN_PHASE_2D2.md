@@ -2,7 +2,7 @@
 
 ## Research source and classifications
 
-This phase introduces the independent **Emotionally-Labeled Quran Verses (ELQV)** dataset, by Arwa Almarzoqi and Mohammed Alsuhaibani, published alongside a 2025 peer-reviewed study, *Leveraging large language models for detecting and preserving emotions in quran translations* (Journal of King Saud University Computer and Information Sciences, volume 37, article 271). The dataset was annotated and verified by human specialists in Arabic linguistics and Islamic studies; the research methodology also uses language models and translation experiments.
+This phase introduces the independent **Emotionally-Labeled Quran Verses (ELQV)** dataset, by Arwa Almarzoqi and Mohammed Alsuhaibani, published alongside a 2025 peer-reviewed study, _Leveraging large language models for detecting and preserving emotions in quran translations_ (Journal of King Saud University Computer and Information Sciences, volume 37, article 271). The dataset was annotated and verified by human specialists in Arabic linguistics and Islamic studies; the research methodology also uses language models and translation experiments.
 
 Source: https://github.com/Arwaalmrzoqi/ELQV
 Paper: https://doi.org/10.1007/s44443-025-00269-y
@@ -15,21 +15,21 @@ The source is classified `external-specialist-annotated-emotions` and `explorato
 
 Independent inspection of the immutable original CSV established:
 
-| Measure | Audited result |
-| --- | ---: |
-| Original rows | 2,100 |
-| Unique canonical ayahs | 2,087 |
-| Unique verse-emotion memberships | 2,092 |
-| Identical repeated (ayah, label) rows | 8 |
-| Verses assigned conflicting categories | 4 |
-| Unique fear memberships | 672 |
-| Unique joy memberships | 586 |
-| Unique anger memberships | 494 |
-| Unique sadness memberships | 340 |
+| Measure                                | Audited result |
+| -------------------------------------- | -------------: |
+| Original rows                          |          2,100 |
+| Unique canonical ayahs                 |          2,087 |
+| Unique verse-emotion memberships       |          2,092 |
+| Identical repeated (ayah, label) rows  |              8 |
+| Verses assigned conflicting categories |              4 |
+| Unique fear memberships                |            672 |
+| Unique joy memberships                 |            586 |
+| Unique anger memberships               |            494 |
+| Unique sadness memberships             |            340 |
 
 The original rows by label are 675 fear, 589 joy, 495 anger, and 341 sadness. The source counts sum to 2,100 but do **not** imply 2,100 unique ayahs.
 
-Four ayahs carry several *different* source labels: **20:12** (fear and joy); **26:8** (fear, anger and sadness); **26:172** and **79:17** (fear and anger). Repeated same-label assignments at eight other positions are deduplicated. Every original distinct label is preserved, including disagreements. No classifier, voting algorithm, or manual override selects one preferred interpretation.
+Four ayahs carry several _different_ source labels: **20:12** (fear and joy); **26:8** (fear, anger and sadness); **26:172** and **79:17** (fear and anger). Repeated same-label assignments at eight other positions are deduplicated. Every original distinct label is preserved, including disagreements. No classifier, voting algorithm, or manual override selects one preferred interpretation.
 
 The 4-label taxonomy applies only to the selected 2,087-ayah sample. The remaining 4,149 ayahs are **not labeled neutral** or assigned inferred categories. Percentages, if considered, must use the original sample denominator and note multi-label verses.
 
@@ -45,7 +45,7 @@ The original snapshot and per-verse source text columns are deliberately not pub
 
 The Emotions tab optionally loads the separately verified **QSAC v1.0** thematic source (CC BY 4.0). Selecting a QSAC topic intersects its canonical ayah IDs with ELQV's **annotated-only** verse IDs. Each visible count is the number of individual ELQV-labeled ayahs also carrying that QSAC topic. The four class columns count source memberships and may overlap on the four multiply labeled verses.
 
-Because the datasets label *different constructs*, these are descriptive cross-dataset co-occurrences, **not semantic agreement scores**, probabilistic confidence, endorsement of a thematic conclusion, or evidence for additional pairwise Quran relationships. Neither QSAC nor ELQV has been evaluated here for representativeness; sampling/selection bias makes a Quran-wide inference invalid.
+Because the datasets label _different constructs_, these are descriptive cross-dataset co-occurrences, **not semantic agreement scores**, probabilistic confidence, endorsement of a thematic conclusion, or evidence for additional pairwise Quran relationships. Neither QSAC nor ELQV has been evaluated here for representativeness; sampling/selection bias makes a Quran-wide inference invalid.
 
 The browser links every intersection back to its original bilingual reader and supports `view=emotions&emotion=fear&theme=Divine+Mercy`. Core Arabic morphology, curated links, computed exact repeats and graph topology stay independent.
 

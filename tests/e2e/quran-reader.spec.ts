@@ -927,9 +927,11 @@ test.describe('Quran Phase 2D.1 independently annotated themes', () => {
   });
 });
 
-
 test.describe('Quran Phase 2D.2 specialist-reviewed emotion evidence', () => {
-  test('loads optional emotion source without forcing QSAC or republishing source texts', async ({ page, request }) => {
+  test('loads optional emotion source without forcing QSAC or republishing source texts', async ({
+    page,
+    request,
+  }) => {
     const emotionRequests: string[] = [];
     const themeRequests: string[] = [];
     page.on('request', (event) => {
@@ -941,7 +943,9 @@ test.describe('Quran Phase 2D.2 specialist-reviewed emotion evidence', () => {
     expect(emotionRequests).toEqual([]);
     await page.getByRole('button', { name: 'Emotions', exact: true }).click();
     await expect(page).toHaveURL(/view=emotions/);
-    await expect(page.getByRole('heading', { name: 'Emotion labels and thematic intersections' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Emotion labels and thematic intersections' }),
+    ).toBeVisible();
     expect(emotionRequests).toHaveLength(1);
     expect(themeRequests).toEqual([]);
     await expect(page.getByLabel('ELQV source coverage audit')).toContainText('2,087');
@@ -972,10 +976,16 @@ test.describe('Quran Phase 2D.2 specialist-reviewed emotion evidence', () => {
     expect(Object.keys(report)).not.toContain('english');
   });
 
-  test('shows each disputed label instead of collapsing ambiguity, with browser back navigation', async ({ page }) => {
+  test('shows each disputed label instead of collapsing ambiguity, with browser back navigation', async ({
+    page,
+  }) => {
     await page.goto('./?ref=26%3A8&view=emotions&emotion=conflicts');
-    await expect(page.getByRole('heading', { name: 'Emotion labels and thematic intersections' })).toBeVisible();
-    await expect(page.getByLabel('Source-annotated emotion verses')).toContainText('4 distinct matching ayahs');
+    await expect(
+      page.getByRole('heading', { name: 'Emotion labels and thematic intersections' }),
+    ).toBeVisible();
+    await expect(page.getByLabel('Source-annotated emotion verses')).toContainText(
+      '4 distinct matching ayahs',
+    );
     const verse = page.getByRole('button', { name: 'Read emotion-annotated Quran ayah 26:8' });
     await expect(verse).toContainText('fear, anger, sadness');
     await expect(verse).toContainText('Conflicting annotations');
@@ -990,28 +1000,40 @@ test.describe('Quran Phase 2D.2 specialist-reviewed emotion evidence', () => {
     await expect(page.getByRole('button', { name: 'Next annotated verses' })).toBeEnabled();
   });
 
-  test('loads QSAC independently only when requested and allows shareable topic intersections', async ({ page }) => {
+  test('loads QSAC independently only when requested and allows shareable topic intersections', async ({
+    page,
+  }) => {
     const qsac: string[] = [];
     page.on('request', (event) => {
       if (event.url().endsWith('/data/quran/themes.json')) qsac.push(event.url());
     });
     await page.goto('./?ref=1%3A1&view=emotions&emotion=fear');
-    await expect(page.getByRole('heading', { name: 'Emotion labels and thematic intersections' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Emotion labels and thematic intersections' }),
+    ).toBeVisible();
     expect(qsac).toEqual([]);
     await page.getByRole('button', { name: 'Load QSAC topics for comparison' }).click();
     await expect(page.getByRole('combobox', { name: 'Compare with QSAC topic' })).toBeVisible();
     expect(qsac).toHaveLength(1);
-    await page.getByRole('combobox', { name: 'Compare with QSAC topic' }).selectOption('Divine Mercy');
+    await page
+      .getByRole('combobox', { name: 'Compare with QSAC topic' })
+      .selectOption('Divine Mercy');
     await expect(page).toHaveURL(/view=emotions&theme=Divine\+Mercy&emotion=fear/);
     await expect(page.getByLabel('Independent source intersections')).toContainText('Divine Mercy');
-    await expect(page.getByLabel('Source-annotated emotion verses')).toContainText('matching ayahs');
+    await expect(page.getByLabel('Source-annotated emotion verses')).toContainText(
+      'matching ayahs',
+    );
     await page.reload();
-    await expect(page.getByRole('combobox', { name: 'Compare with QSAC topic' })).toHaveValue('Divine Mercy');
+    await expect(page.getByRole('combobox', { name: 'Compare with QSAC topic' })).toHaveValue(
+      'Divine Mercy',
+    );
   });
 
   test('excludes the optional emotion source from installation precache', async ({ page }) => {
     await page.goto('./?view=emotions');
-    await expect(page.getByRole('heading', { name: 'Emotion labels and thematic intersections' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Emotion labels and thematic intersections' }),
+    ).toBeVisible();
     const cached = await page.evaluate(async () => {
       const registration = await navigator.serviceWorker.ready;
       const names = await caches.keys();

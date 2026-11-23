@@ -146,7 +146,11 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
   const params = new URLSearchParams();
   params.set('ref', formatAyahId(location.reference));
   if (location.rangeEnd !== null) params.set('end', formatAyahId(location.rangeEnd));
-  if (location.view !== 'emotions' && location.evidence === 'curated' && location.selectedLink !== null) {
+  if (
+    location.view !== 'emotions' &&
+    location.evidence === 'curated' &&
+    location.selectedLink !== null
+  ) {
     params.set('link', String(location.selectedLink));
   }
   if (location.evidence === 'morphology') {
@@ -160,7 +164,10 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
     if (location.selectedExpression !== null) params.set('expression', location.selectedExpression);
   }
   if (location.view !== 'arcs') params.set('view', location.view);
-  if ((location.view === 'themes' || location.view === 'emotions') && location.selectedTheme !== null) {
+  if (
+    (location.view === 'themes' || location.view === 'emotions') &&
+    location.selectedTheme !== null
+  ) {
     params.set('theme', location.selectedTheme);
   }
   if (location.view === 'emotions' && location.selectedEmotion !== 'all') {

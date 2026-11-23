@@ -1,6 +1,10 @@
 import { useMemo, useState } from 'react';
 import { formatAyahId } from '../core/quran/ayah-ref.ts';
-import { ELQV_LABELS, ELQV_PAGE_SIZE, type QuranEmotionFilter } from '../core/quran/emotion-types.ts';
+import {
+  ELQV_LABELS,
+  ELQV_PAGE_SIZE,
+  type QuranEmotionFilter,
+} from '../core/quran/emotion-types.ts';
 import type { QuranEmotionIndex } from '../core/quran/emotion-index.ts';
 import { CANONICAL_QURAN } from '../core/quran/quran-versification.ts';
 import { getSurah } from '../core/quran/surahs.ts';
@@ -50,12 +54,14 @@ export function QuranEmotions({
   const selected = useMemo(() => {
     return index
       .occurrences(filter)
-      .filter((ayah) =>
-        (!surahOnly || CANONICAL_QURAN.refAt(ayah).surah === focusSurah) &&
-        (topicMatches === null || topicMatches.has(ayah)),
+      .filter(
+        (ayah) =>
+          (!surahOnly || CANONICAL_QURAN.refAt(ayah).surah === focusSurah) &&
+          (topicMatches === null || topicMatches.has(ayah)),
       );
   }, [index, filter, surahOnly, focusSurah, topicMatches]);
-  const activeKey = filter + ':' + (selectedTheme ?? '') + ':' + (surahOnly ? String(focusSurah) : 'all');
+  const activeKey =
+    filter + ':' + (selectedTheme ?? '') + ':' + (surahOnly ? String(focusSurah) : 'all');
   const pageCount = Math.max(1, Math.ceil(selected.length / ELQV_PAGE_SIZE));
   const visiblePage = pageKey === activeKey ? Math.min(page, pageCount - 1) : 0;
   const visible = selected.slice(visiblePage * ELQV_PAGE_SIZE, (visiblePage + 1) * ELQV_PAGE_SIZE);
@@ -86,14 +92,14 @@ export function QuranEmotions({
         <h1>Emotion labels and thematic intersections</h1>
         <p>
           Explore the ELQV research dataset across fear, joy, anger and sadness. Its 2,100 source
-          rows cover 2,087 distinct ayahs, not the entire 6,236-ayah Quran. These labels reflect
-          the research annotation task, not authoritative Quranic interpretation or the emotional
-          state of a reader.
+          rows cover 2,087 distinct ayahs, not the entire 6,236-ayah Quran. These labels reflect the
+          research annotation task, not authoritative Quranic interpretation or the emotional state
+          of a reader.
         </p>
         <p className={styles.themesCredit}>
-          ELQV by Arwa Almarzoqi and Mohammed Alsuhaibani (2025), CC0 1.0. Specialist annotation
-          and human verification informed the research; LLMs were also part of its methodology.
-          Source Arabic and translation columns are not republished here.
+          ELQV by Arwa Almarzoqi and Mohammed Alsuhaibani (2025), CC0 1.0. Specialist annotation and
+          human verification informed the research; LLMs were also part of its methodology. Source
+          Arabic and translation columns are not republished here.
           <a href="https://github.com/Arwaalmrzoqi/ELQV" target="_blank" rel="noreferrer">
             Original ELQV source
           </a>
@@ -104,17 +110,32 @@ export function QuranEmotions({
       </header>
 
       <div className={styles.emotionStats} aria-label="ELQV source coverage audit">
-        <div><strong>2,100</strong><span>Original dataset rows</span></div>
-        <div><strong>2,087</strong><span>Distinct annotated ayahs</span></div>
-        <div><strong>2,092</strong><span>Unique ayah–emotion memberships</span></div>
-        <div><strong>4</strong><span>Ayahs with conflicting labels</span></div>
+        <div>
+          <strong>2,100</strong>
+          <span>Original dataset rows</span>
+        </div>
+        <div>
+          <strong>2,087</strong>
+          <span>Distinct annotated ayahs</span>
+        </div>
+        <div>
+          <strong>2,092</strong>
+          <span>Unique ayah–emotion memberships</span>
+        </div>
+        <div>
+          <strong>4</strong>
+          <span>Ayahs with conflicting labels</span>
+        </div>
       </div>
 
       <div className={styles.emotionColumns}>
         <section className={styles.analyticsPanel} aria-label="Emotion research controls">
           <div className={styles.panelHeading}>
             <h2>Explore the sample</h2>
-            <p>Eight duplicate source rows repeat an identical verse-label pair. They are not double-counted.</p>
+            <p>
+              Eight duplicate source rows repeat an identical verse-label pair. They are not
+              double-counted.
+            </p>
           </div>
           <div className={styles.emotionLabels}>
             {ELQV_LABELS.map((label, id) => (
@@ -129,7 +150,9 @@ export function QuranEmotions({
                 }}
               >
                 <strong>{label.charAt(0).toUpperCase() + label.slice(1)}</strong>
-                <span>{index.dataset.labelCounts[id]?.toLocaleString('en')} unique memberships</span>
+                <span>
+                  {index.dataset.labelCounts[id]?.toLocaleString('en')} unique memberships
+                </span>
               </button>
             ))}
           </div>
@@ -180,19 +203,29 @@ export function QuranEmotions({
           <div className={styles.panelHeading}>
             <h2>Independent QSAC cross-tab</h2>
             <p>
-              Find where a topic label from QSAC appears on the same ayah as an ELQV emotion.
-              This measures overlap between different taxonomies, not annotator agreement or
-              statistical evidence for theological relationships.
+              Find where a topic label from QSAC appears on the same ayah as an ELQV emotion. This
+              measures overlap between different taxonomies, not annotator agreement or statistical
+              evidence for theological relationships.
             </p>
           </div>
           {themeIndex === null && !themeLoading && (
             <div className={styles.emotionCompareAction}>
-              <button type="button" className={styles.goButton} onClick={() => { onRequestThemes(); }}>
+              <button
+                type="button"
+                className={styles.goButton}
+                onClick={() => {
+                  onRequestThemes();
+                }}
+              >
                 Load QSAC topics for comparison
               </button>
             </div>
           )}
-          {themeLoading && <p className={styles.loading} role="status">Verifying independent QSAC source…</p>}
+          {themeLoading && (
+            <p className={styles.loading} role="status">
+              Verifying independent QSAC source…
+            </p>
+          )}
           {themeError !== null && (
             <p className={styles.empty} role="alert">
               Unable to verify QSAC topics: {themeError}
@@ -220,12 +253,17 @@ export function QuranEmotions({
                 </select>
               </label>
               {selectedTheme !== null && topic === null && (
-                <p className={styles.empty} role="alert">This QSAC topic is not present in the verified ontology.</p>
+                <p className={styles.empty} role="alert">
+                  This QSAC topic is not present in the verified ontology.
+                </p>
               )}
             </div>
           )}
           {overlap !== null && (
-            <div className={styles.emotionIntersection} aria-label="Independent source intersections">
+            <div
+              className={styles.emotionIntersection}
+              aria-label="Independent source intersections"
+            >
               <p>
                 <strong>{overlap.distinctAyahs}</strong> of the 2,087 ELQV-annotated ayahs also
                 carry the QSAC topic <strong>{topic?.name}</strong>.
@@ -254,7 +292,8 @@ export function QuranEmotions({
               <p>Every result links to the original bilingual Quran reader for context.</p>
             </div>
             <p className={styles.topologyCaption} role="status">
-              {selected.length.toLocaleString('en')} distinct matching ayahs · Page {visiblePage + 1} of {pageCount}
+              {selected.length.toLocaleString('en')} distinct matching ayahs · Page{' '}
+              {visiblePage + 1} of {pageCount}
             </p>
             <div className={styles.themesOccurrences} aria-label="Emotion evidence verse list">
               {visible.map((ayah) => {
@@ -265,9 +304,13 @@ export function QuranEmotions({
                     type="button"
                     key={ayah}
                     aria-label={'Read emotion-annotated Quran ayah ' + formatAyahId(ref)}
-                    onClick={() => { onOpenAyah(ayah); }}
+                    onClick={() => {
+                      onOpenAyah(ayah);
+                    }}
                   >
-                    <strong>{getSurah(ref.surah).name} · {formatAyahId(ref)}</strong>
+                    <strong>
+                      {getSurah(ref.surah).name} · {formatAyahId(ref)}
+                    </strong>
                     <span>{data.text.english[ayah]}</span>
                     <small>
                       ELQV: {emotions.join(', ')}
@@ -284,21 +327,30 @@ export function QuranEmotions({
               <button
                 type="button"
                 disabled={visiblePage === 0}
-                onClick={() => { changePage(visiblePage - 1); }}
+                onClick={() => {
+                  changePage(visiblePage - 1);
+                }}
               >
                 Previous annotated verses
               </button>
-              <span>{visiblePage + 1} / {pageCount}</span>
+              <span>
+                {visiblePage + 1} / {pageCount}
+              </span>
               <button
                 type="button"
                 disabled={visiblePage + 1 >= pageCount}
-                onClick={() => { changePage(visiblePage + 1); }}
+                onClick={() => {
+                  changePage(visiblePage + 1);
+                }}
               >
                 Next annotated verses
               </button>
             </div>
           </section>
-          <section className={styles.analyticsPanel} aria-label="Emotion sample distribution by surah">
+          <section
+            className={styles.analyticsPanel}
+            aria-label="Emotion sample distribution by surah"
+          >
             <div className={styles.panelHeading}>
               <h2>Sample distribution by surah</h2>
               <p>
@@ -309,14 +361,21 @@ export function QuranEmotions({
             <div className={styles.themesDistribution}>
               {distribution.map((row) => (
                 <div className={styles.themesDistributionRow} key={row.surah}>
-                  <span>{row.surah}. {getSurah(row.surah).name}</span>
+                  <span>
+                    {row.surah}. {getSurah(row.surah).name}
+                  </span>
                   <span className={styles.analyticsBarTrack}>
-                    <span className={styles.analyticsCuratedFill} style={{ width: String((row.count / maxCount) * 100) + '%' }} />
+                    <span
+                      className={styles.analyticsCuratedFill}
+                      style={{ width: String((row.count / maxCount) * 100) + '%' }}
+                    />
                   </span>
                   <strong>{row.count}</strong>
                 </div>
               ))}
-              {distribution.length === 0 && <p className={styles.empty}>No sampled verses for this selection.</p>}
+              {distribution.length === 0 && (
+                <p className={styles.empty}>No sampled verses for this selection.</p>
+              )}
             </div>
           </section>
         </div>

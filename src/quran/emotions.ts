@@ -69,7 +69,9 @@ export async function loadQuranEmotions(signal?: AbortSignal): Promise<QuranEmot
     throw new Error('The optional ELQV evidence exceeds its 128 KiB budget.');
   }
   const hash = await crypto.subtle.digest('SHA-256', bytes);
-  const actual = Array.from(new Uint8Array(hash), (byte) => byte.toString(16).padStart(2, '0')).join('');
+  const actual = Array.from(new Uint8Array(hash), (byte) =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('');
   if (actual !== expected) {
     throw new Error('ELQV evidence failed the published output SHA-256 checksum.');
   }

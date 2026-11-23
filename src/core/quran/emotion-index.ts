@@ -106,7 +106,12 @@ export class QuranEmotionIndex {
       let previousId = -1;
       const emotions: QuranEmotionLabel[] = [];
       for (const id of ids) {
-        if (typeof id !== 'number' || !Number.isInteger(id) || id <= previousId || id >= ELQV_LABELS.length) {
+        if (
+          typeof id !== 'number' ||
+          !Number.isInteger(id) ||
+          id <= previousId ||
+          id >= ELQV_LABELS.length
+        ) {
           invalid('Emotion class IDs must be distinct, ordered and within the vocabulary.');
         }
         const emotion = ELQV_LABELS[id];

@@ -37,8 +37,10 @@ describe('Independent ELQV 2025 specialist annotation source', () => {
       labelCounts: [672, 586, 494, 340],
     });
     expect(dataset.entries).toHaveLength(2087);
-    expect(dataset.entries.reduce((sum, [,labels]) => sum + labels.length, 0)).toBe(2092);
-    expect(dataset.entries.every(([,labels]) => labels.length >= 1 && labels.length <= 3)).toBe(true);
+    expect(dataset.entries.reduce((sum, [, labels]) => sum + labels.length, 0)).toBe(2092);
+    expect(dataset.entries.every(([, labels]) => labels.length >= 1 && labels.length <= 3)).toBe(
+      true,
+    );
     expect(JSON.stringify(dataset)).not.toContain('سورة ق');
     expect(JSON.stringify(dataset)).not.toContain('Verse Diac');
     expect(JSON.stringify(dataset)).not.toContain('Sourah Arabic');
@@ -116,17 +118,24 @@ describe('Independent ELQV 2025 specialist annotation source', () => {
 
   it('fails closed on malformed client evidence, false source claims, and unsorted/duplicate verse IDs', () => {
     const dataset = imported();
-    const build = (input: unknown, sourcePin = pin.sha256) => new QuranEmotionIndex(input, sourcePin);
+    const build = (input: unknown, sourcePin = pin.sha256) =>
+      new QuranEmotionIndex(input, sourcePin);
     expect(() => build(null)).toThrow('object');
     expect(() => build({ ...dataset, source: null })).toThrow('object');
     expect(() => build({ ...dataset, origin: 'curated' })).toThrow('classification');
     expect(() => build(dataset, '0'.repeat(64))).toThrow('provenance');
-    expect(() => build({ ...dataset, source: { ...dataset.source, attribution: 'uncredited' } })).toThrow('attribution');
-    expect(() => build({ ...dataset, labels: ['joy','fear','anger','sadness'] })).toThrow('vocabulary');
-    expect(() => build({ ...dataset, labelCounts: [675,589,495,341] })).toThrow('histogram');
+    expect(() =>
+      build({ ...dataset, source: { ...dataset.source, attribution: 'uncredited' } }),
+    ).toThrow('attribution');
+    expect(() => build({ ...dataset, labels: ['joy', 'fear', 'anger', 'sadness'] })).toThrow(
+      'vocabulary',
+    );
+    expect(() => build({ ...dataset, labelCounts: [675, 589, 495, 341] })).toThrow('histogram');
     expect(() => build({ ...dataset, rowCount: 2087 })).toThrow('totals');
     expect(() => build({ ...dataset, entries: [] })).toThrow('2,087');
-    expect(() => build({ ...dataset, entries: [null, ...dataset.entries.slice(1)] })).toThrow('array');
+    expect(() => build({ ...dataset, entries: [null, ...dataset.entries.slice(1)] })).toThrow(
+      'array',
+    );
     const swapped = [dataset.entries[1], dataset.entries[0], ...dataset.entries.slice(2)];
     expect(() => build({ ...dataset, entries: swapped })).toThrow('sorted');
     const wrong = [...dataset.entries];
