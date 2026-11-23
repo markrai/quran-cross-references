@@ -100,6 +100,62 @@ test.describe('Phase 3A.1 bilingual verse search', () => {
   });
 });
 
+test.describe('Phase 3C.1 QAC morphology-aware verse search', () => {
+  test('loads the optional pinned QAC index and shows root annotations without speculative text highlighting', async ({
+    page,
+  }) => {
+    const qacRequests: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().endsWith('/data/quran/morphology.json')) {
+        qacRequests.push(request.url());
+      }
+    });
+    await page.goto('./?ref=1%3A1&view=threads&q=rHm&qlang=ar&qmode=root&qsurah=1');
+    const search = page.getByRole('region', { name: 'Bilingual Quran verse search' });
+    await expect(search.getByRole('combobox', { name: 'Search type' })).toHaveValue('root');
+    await expect(search.locator('p[role="status"]').filter({ hasText: 'QAC annotated root' }))
+      .toContainText('matching');
+    await expect(search.getByText(/QAC v0.4 · \d+ annotated words?/).first()).toBeVisible();
+    await expect(search.locator('mark')).toHaveCount(0);
+    await expect(search.getByText(/Word \d+ ·/).first()).toBeVisible();
+    expect(qacRequests.length).toBe(1);
+
+    const first = search.getByRole('button', { name: /Al-Fatiha.*1:1/ }).first();
+    await first.click();
+    await expect(page).toHaveURL(/ref=1%3A1/);
+    await expect(page).toHaveURL(/qmode=root/);
+
+    await search.getByRole('button', { name: 'Inspect QAC annotation' }).first().click();
+    await expect(page).toHaveURL(/evidence=morphology/);
+    await expect(page).toHaveURL(/term=rHm/);
+    await expect(page).toHaveURL(/word=\d+/);
+    await expect(page.getByRole('region', { name: 'Quranic Arabic Corpus morphology' }))
+      .toBeVisible();
+  });
+
+  test('keeps lemma searches separately addressable and restores them after reload', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=1%3A1&view=threads');
+    const search = page.getByRole('region', { name: 'Bilingual Quran verse search' });
+    await search.getByRole('combobox', { name: 'Search type' }).selectOption('lemma');
+    await search.getByRole('searchbox', { name: 'Verse text' }).fill('notAnAnnotatedLemma');
+    await search.getByRole('combobox', { name: 'Search surah filter' }).selectOption('1');
+    await search.getByRole('button', { name: 'Search verses' }).click();
+    await expect(page).toHaveURL(/qmode=lemma&qsurah=1/);
+    await expect(search.locator('p[role="status"]').filter({ hasText: 'QAC annotated lemma' }))
+      .toContainText('0 matching ayahs');
+    await page.reload();
+    await expect(search.getByRole('combobox', { name: 'Search type' })).toHaveValue('lemma');
+    await expect(search.getByRole('searchbox', { name: 'Verse text' })).toHaveValue(
+      'notAnAnnotatedLemma',
+    );
+    await expect(search.getByRole('combobox', { name: 'Search surah filter' })).toHaveValue('1');
+    await expect(search.locator('p[role="status"]').filter({ hasText: 'QAC annotated lemma' }))
+      .toContainText('0 matching ayahs');
+  });
+});
+
 test.describe('Phase 3B.1 reader-first experience', () => {
   test('restores research without losing the ayah or verse search after focused reading', async ({
     page,
