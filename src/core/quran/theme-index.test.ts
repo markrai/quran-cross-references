@@ -14,7 +14,8 @@ function fixture(): QuranThemeDataset {
   const tags = Array.from({ length: 338 }, (_, index) => ({
     name: 'Topic ' + String(index),
     description: 'Experimental annotation',
-    domain: 'Domain ' + String(Math.floor((index * 18) / 338)),
+    domain:
+      'Domain ' + String(Math.floor((Math.floor((index * 70) / 338) * 18) / 70)),
     category: 'Category ' + String(Math.floor((index * 70) / 338)),
     count: counts[index] ?? 0,
   }));
