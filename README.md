@@ -121,6 +121,20 @@ Optionally load QSAC topics inside the Emotions tab to examine **cross-dataset i
 
 Share a filter or intersection using `?view=emotions&emotion=fear&theme=Divine+Mercy`. See [Phase 2D.2: expert emotion sample and intersections](docs/QURAN_PHASE_2D2.md) for the audit and limitations.
 
+## Unified per-ayah evidence inspector (Phase 2E.1)
+
+The Quran reader now includes an expandable **Evidence for this ayah** inspector under the selected bilingual passage in both **Arcs** and **Threads & Reader**. It unifies navigation across **five evidence sources** without mixing their classifications:
+
+- **Curated passages:** original directional Mutashabihat link IDs, including source range overlaps, with direct original-link drilldown.
+- **Exact Arabic expressions:** distinct repeated orthographic phrases at this ayah, linked to their source occurrences.
+- **QAC morphology:** original annotated word, lemma and root positions, without assuming historical QAC tokenization aligns to the displayed Tanzil v1.1 word positions.
+- **QSAC themes:** separately sourced, LLM-assisted/human-reviewed exploratory topic labels, linked to their own thematic source explorer.
+- **ELQV emotions:** specialist research annotations, preserving conflicting labels and explicitly identifying ayahs **not covered by its sampled dataset**, never classifying them as neutral.
+
+The inspector is collapsed initially. Opening a category loads only that source's existing SHA-256-verified optional sidecar; curated links are already present in the reader. The **Check all five sources** button explicitly requests all optional data for a compact coverage comparison. Counts indicate **which independently verified sources contain recorded evidence for the selected ayah**, not consensus, religious significance, truth, or similarity rankings. Failed/unchecked sources remain distinct from verified absence and research-sample noncoverage.
+
+Share an exact reader state such as `?ref=26%3A8&view=threads&inspect=emotions` or `?ref=2%3A255&view=threads&inspect=all`. Browser back and forward retain the selected source; switching ayahs recalculates coverage without refetching already verified datasets. This phase introduces **no new corpus**, no new pairwise graph edges, no login infrastructure, and no extra PWA installation data. See [Phase 2E.1](docs/QURAN_PHASE_2E1.md).
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).
