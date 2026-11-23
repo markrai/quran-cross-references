@@ -22,6 +22,8 @@ import type { QuranThemeIndex } from '../core/quran/theme-index.ts';
 import { loadQacMorphology } from './qac.ts';
 import type { QacMorphologyIndex } from '../core/quran/qac-index.ts';
 import { QuranThreads } from './QuranThreads.tsx';
+import { QuranAyahEvidence } from './QuranAyahEvidence.tsx';
+import type { QuranInspectorSource } from './location.ts';
 import {
   DEFAULT_QURAN_LOCATION,
   parseQuranLocation,
@@ -113,6 +115,7 @@ export function QuranApp() {
   const [offline, setOffline] = useState(() => !navigator.onLine);
   const [expressionState, setExpressionState] = useState<ExpressionLoadState>({ status: 'idle' });
   const [expressionAttempt, setExpressionAttempt] = useState(0);
+  const expressionCache = useRef<QuranExpressionIndex | null>(null);
   const [analyticsState, setAnalyticsState] = useState<AnalyticsLoadState>({ status: 'idle' });
   const [analyticsAttempt, setAnalyticsAttempt] = useState(0);
   const analyticsCache = useRef<QuranAnalyticsDataset | null>(null);
@@ -180,32 +183,38 @@ export function QuranApp() {
   const data = loadState.status === 'ready' ? loadState.data : null;
 
   useEffect(() => {
+    const reader = location.view === 'arcs' || location.view === 'threads';
     if (
       !data ||
-      location.view === 'analytics' ||
-      location.view === 'network' ||
-      location.view === 'themes' ||
-      location.view === 'emotions' ||
-      location.evidence !== 'exact'
+      !reader ||
+      (location.evidence !== 'exact' &&
+        location.inspector !== 'exact' &&
+        location.inspector !== 'all')
     )
       return;
+    if (expressionCache.current) {
+      setExpressionState({ status: 'ready', index: expressionCache.current });
+      return;
+    }
     const controller = new AbortController();
+    setExpressionState({ status: 'loading' });
     void loadQuranExpressions(data.text.arabic, controller.signal)
       .then((index) => {
-        if (!controller.signal.aborted) setExpressionState({ status: 'ready', index });
+        if (controller.signal.aborted) return;
+        expressionCache.current = index;
+        setExpressionState({ status: 'ready', index });
       })
       .catch((error: unknown) => {
-        if (!controller.signal.aborted) {
-          setExpressionState({
-            status: 'error',
-            message: error instanceof Error ? error.message : 'Unable to verify expressions.',
-          });
-        }
+        if (controller.signal.aborted) return;
+        setExpressionState({
+          status: 'error',
+          message: error instanceof Error ? error.message : 'Unable to verify expressions.',
+        });
       });
     return () => {
       controller.abort();
     };
-  }, [data, location.evidence, location.view, expressionAttempt]);
+  }, [data, location.evidence, location.view, location.inspector, expressionAttempt]);
 
   useEffect(() => {
     if (!data || location.view !== 'analytics') return;
@@ -260,13 +269,13 @@ export function QuranApp() {
   }, [data, location.view, topologyAttempt]);
 
   useEffect(() => {
+    const reader = location.view === 'arcs' || location.view === 'threads';
     if (
       !data ||
-      location.view === 'analytics' ||
-      location.view === 'network' ||
-      location.view === 'themes' ||
-      location.view === 'emotions' ||
-      location.evidence !== 'morphology'
+      !reader ||
+      (location.evidence !== 'morphology' &&
+        location.inspector !== 'morphology' &&
+        location.inspector !== 'all')
     )
       return;
     if (morphologyCache.current) {
@@ -291,12 +300,16 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.view, location.evidence, morphologyAttempt]);
+  }, [data, location.view, location.evidence, location.inspector, morphologyAttempt]);
 
   useEffect(() => {
+    const inspecting =
+      (location.view === 'arcs' || location.view === 'threads') &&
+      (location.inspector === 'themes' || location.inspector === 'all');
     if (
       !data ||
       (location.view !== 'themes' &&
+        !inspecting &&
         !(location.view === 'emotions' && (comparisonRequested || location.selectedTheme !== null)))
     )
       return;
@@ -322,10 +335,20 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.view, location.selectedTheme, comparisonRequested, themesAttempt]);
+  }, [
+    data,
+    location.view,
+    location.inspector,
+    location.selectedTheme,
+    comparisonRequested,
+    themesAttempt,
+  ]);
 
   useEffect(() => {
-    if (!data || location.view !== 'emotions') return;
+    const inspecting =
+      (location.view === 'arcs' || location.view === 'threads') &&
+      (location.inspector === 'emotions' || location.inspector === 'all');
+    if (!data || (location.view !== 'emotions' && !inspecting)) return;
     if (emotionsCache.current) {
       setEmotionsState({ status: 'ready', index: emotionsCache.current });
       return;
@@ -348,7 +371,7 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.view, emotionsAttempt]);
+  }, [data, location.view, location.inspector, emotionsAttempt]);
 
   const expressionIndex = expressionState.status === 'ready' ? expressionState.index : null;
   const candidate =
@@ -469,7 +492,6 @@ export function QuranApp() {
                         evidence === 'exact' ||
                         evidence === 'morphology'
                       ) {
-                        setExpressionState({ status: 'idle' });
                         navigate({
                           ...location,
                           evidence,
@@ -725,6 +747,106 @@ export function QuranApp() {
                     </>
                   )}
                 </section>
+              )}
+            {(location.view === 'arcs' || location.view === 'threads') &&
+              activeIndex !== undefined && (
+                <QuranAyahEvidence
+                  data={data}
+                  ayahIndex={activeIndex}
+                  section={location.inspector}
+                  expressions={expressionState}
+                  morphology={morphologyState}
+                  themes={themesState}
+                  emotions={emotionsState}
+                  onSection={(inspector) => {
+                    navigate({ ...location, inspector });
+                  }}
+                  onRetry={(source: Exclude<QuranInspectorSource, 'curated'>) => {
+                    if (source === 'exact') {
+                      setExpressionState({ status: 'loading' });
+                      setExpressionAttempt((value) => value + 1);
+                    } else if (source === 'morphology') {
+                      setMorphologyState({ status: 'loading' });
+                      setMorphologyAttempt((value) => value + 1);
+                    } else if (source === 'themes') {
+                      setThemesState({ status: 'loading' });
+                      setThemesAttempt((value) => value + 1);
+                    } else {
+                      setEmotionsState({ status: 'loading' });
+                      setEmotionsAttempt((value) => value + 1);
+                    }
+                  }}
+                  onCuratedLink={(selectedLink) => {
+                    navigate({
+                      ...location,
+                      view: 'arcs',
+                      evidence: 'curated',
+                      inspector: null,
+                      scope: 'all',
+                      rangeEnd: null,
+                      selectedLink,
+                      selectedExpression: null,
+                      selectedMorphTerm: null,
+                      selectedMorphWord: null,
+                    });
+                  }}
+                  onExactExpression={(selectedExpression) => {
+                    navigate({
+                      ...location,
+                      view: 'arcs',
+                      evidence: 'exact',
+                      inspector: null,
+                      rangeEnd: null,
+                      selectedLink: null,
+                      selectedExpression,
+                      selectedMorphTerm: null,
+                      selectedMorphWord: null,
+                    });
+                  }}
+                  onMorphologyWord={(selectedMorphWord, lemma, root) => {
+                    navigate({
+                      ...location,
+                      view: 'arcs',
+                      evidence: 'morphology',
+                      inspector: null,
+                      rangeEnd: null,
+                      selectedLink: null,
+                      selectedExpression: null,
+                      morphologyGrouping: lemma === null && root !== null ? 'root' : 'lemma',
+                      selectedMorphTerm: lemma ?? root,
+                      selectedMorphWord,
+                    });
+                  }}
+                  onTheme={(selectedTheme) => {
+                    navigate({
+                      ...location,
+                      view: 'themes',
+                      evidence: 'curated',
+                      inspector: null,
+                      rangeEnd: null,
+                      selectedLink: null,
+                      selectedExpression: null,
+                      selectedMorphTerm: null,
+                      selectedMorphWord: null,
+                      selectedTheme,
+                    });
+                  }}
+                  onEmotion={(selectedEmotion) => {
+                    navigate({
+                      ...location,
+                      view: 'emotions',
+                      evidence: 'curated',
+                      inspector: null,
+                      rangeEnd: null,
+                      selectedLink: null,
+                      selectedExpression: null,
+                      selectedMorphTerm: null,
+                      selectedMorphWord: null,
+                      selectedTheme: null,
+                      selectedEmotion,
+                    });
+                  }}
+                />
               )}
             {location.view === 'analytics' && (
               <>

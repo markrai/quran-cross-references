@@ -1952,3 +1952,206 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.ayahEvidenceInspector {
+  margin: 0 0 1.2rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  overflow: hidden;
+}
+
+.ayahEvidenceToggle {
+  width: 100%;
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem clamp(1rem, 2vw, 1.5rem);
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ayahEvidenceToggle > span:first-child {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.ayahEvidenceToggle strong {
+  font-weight: 600;
+}
+
+.ayahEvidenceToggle small {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+}
+
+.ayahEvidenceToggle:hover,
+.ayahEvidenceToggle[aria-expanded='true'] {
+  background: var(--color-surface-muted);
+}
+
+.ayahEvidenceContent {
+  padding: 0.85rem clamp(0.8rem, 2vw, 1.5rem) 1.3rem;
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  gap: 0.85rem;
+}
+
+.ayahEvidenceCoverage,
+.ayahEvidenceDisclaimer {
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  font-size: 0.83rem;
+  margin: 0;
+}
+
+.ayahEvidenceSourceGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.ayahEvidenceSourceButton {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  min-height: 6rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ayahEvidenceSourceButton strong {
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.ayahEvidenceSourceButton span,
+.ayahEvidenceSourceButton small {
+  color: var(--color-text-muted);
+  font-size: 0.73rem;
+  line-height: 1.4;
+}
+
+.ayahEvidenceSourceButton[aria-pressed='true'],
+.ayahEvidenceSourceButton:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.ayahEvidenceAll {
+  width: fit-content;
+  min-height: 2.6rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.ayahEvidenceAll[aria-pressed='true'],
+.ayahEvidenceAll:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.ayahEvidencePanel {
+  border: 1px solid var(--color-border);
+  border-radius: 0.7rem;
+  padding: 1rem;
+  min-width: 0;
+}
+
+.ayahEvidencePanel h3 {
+  margin: 0 0 0.5rem;
+  font: 500 1.14rem var(--font-serif);
+}
+
+.ayahEvidencePanel p,
+.ayahEvidenceFailure p {
+  color: var(--color-text-muted);
+  font-size: 0.83rem;
+  line-height: 1.55;
+  margin: 0.3rem 0 0.75rem;
+}
+
+.ayahEvidenceList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin: 0.8rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ayahEvidenceList li {
+  min-width: 0;
+}
+
+.ayahEvidenceList button {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  width: 100%;
+  min-height: 3.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.7rem 0.8rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.ayahEvidenceList button:hover,
+.ayahEvidenceList button:focus-visible {
+  border-color: var(--color-accent);
+}
+
+.ayahEvidenceList button > span,
+.ayahEvidenceList small {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.ayahEvidenceFailure button {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+@media (max-width: 70rem) {
+  .ayahEvidenceSourceGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  .ayahEvidenceSourceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ayahEvidenceList {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ayahEvidenceSourceButton {
+    min-height: 5.5rem;
+  }
+}

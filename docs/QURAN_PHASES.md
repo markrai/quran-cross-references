@@ -273,6 +273,17 @@ See [Phase 2D.1](QURAN_PHASE_2D1.md).
 
 See [Phase 2D.2](QURAN_PHASE_2D2.md).
 
+### Phase 2E.1: Unified per-ayah evidence explorer
+
+- Present a single compact, collapsible "Evidence for this ayah" inspector in the existing Arcs and Threads bilingual readers, without adding another top-level navigation tab.
+- Preserve exact original curated relationship IDs, computed exact phrase occurrences, QAC original source words, QSAC source topic labels, and ELQV labels as independently classified evidence. Never manufacture new cross-reference edges, tafsir, similarity confidence or theological significance from overlap.
+- Load optional evidence only on selecting a specific source, or when the user explicitly requests all five. Reuse existing manifest SHA-256/source checks, shared loader caches, failure/retry handling and PWA optional-data policy.
+- Distinguish "not checked", "source loading", "failed verification", "verified but no recorded match", and "not covered by ELQV" rather than treating missing records as negative evidence.
+- Add a compact five-source coverage count for the current ayah, emphasizing source coverage rather than agreement. Limit visible evidence lists to bounded sections with direct navigation into original source views.
+- Implement `inspect=` deep links, browser history restoration and mobile-friendly keyboard/pointer controls. Retain all existing checks, source licensing/attribution, core offline content, and manual release gates.
+
+See [Phase 2E.1](QURAN_PHASE_2E1.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows
