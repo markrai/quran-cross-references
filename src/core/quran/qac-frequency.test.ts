@@ -55,7 +55,7 @@ describe('Phase 3C.2 QAC vocabulary frequency analytics', () => {
     expect(qacFrequencyCoverage(report, 2)).toEqual({
       families: 2,
       words: 4,
-      percent: 100 / 3,
+      percent: (4 / 12) * 100,
     });
     expect(qacFrequencyCoverage(report, 250)).toEqual({
       families: 3,
