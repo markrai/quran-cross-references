@@ -81,9 +81,11 @@ export function QuranThreads({
         <div className={styles.panelHeading}>
           <h2>
             {surah.name}{' '}
-            <span lang="ar" dir="rtl">
-              {surah.arabicName}
-            </span>
+            {displayLanguage !== 'english' && (
+              <span lang="ar" dir="rtl">
+                {surah.arabicName}
+              </span>
+            )}
           </h2>
           <p>
             {surah.ayahCount} ayahs ·{' '}
