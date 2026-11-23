@@ -1063,7 +1063,7 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
     await expect(page).toHaveURL(/evidence=morphology&morph=root&term=rHm/);
   });
 
-  test('keeps QAC out of install precache and caches it only after morphology use', async ({ page }) => {
+  test('caches QAC only after a morphology request', async ({ page }) => {
     await page.goto('./?ref=2%3A255');
     await page.evaluate(async () => {
       await navigator.serviceWorker.ready;
