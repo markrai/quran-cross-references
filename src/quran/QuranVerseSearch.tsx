@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { formatAyahId, type AyahRef } from '../core/quran/ayah-ref.ts';
 import { CANONICAL_QURAN } from '../core/quran/quran-versification.ts';
 import { SURAHS, getSurah } from '../core/quran/surahs.ts';
@@ -46,13 +46,6 @@ export function QuranVerseSearch({
   const [surah, setSurah] = useState<number | null>(search?.surah ?? null);
   const [page, setPage] = useState(0);
 
-  useEffect(() => {
-    setQuery(search?.query ?? '');
-    setLanguage(search?.language ?? 'english');
-    setMode(search?.mode ?? 'literal');
-    setSurah(search?.surah ?? null);
-    setPage(0);
-  }, [search]);
 
   const index = useMemo(() => createVerseSearchIndex(data.text), [data.text]);
   const hits = useMemo(() => (search ? searchQuranVerses(index, search) : []), [index, search]);
@@ -67,7 +60,9 @@ export function QuranVerseSearch({
           <p>Search the verified Tanzil Arabic or Pickthall English text, then open any matching ayah.</p>
         </div>
         {search && (
-          <button type="button" className={styles.goButton} onClick={() => onSearch(null)}>
+          <button type="button" className={styles.goButton} onClick={() => {
+            onSearch(null);
+          }}>
             Clear search
           </button>
         )}
@@ -91,7 +86,9 @@ export function QuranVerseSearch({
             aria-label="Verse text"
             value={query}
             maxLength={MAX_VERSE_SEARCH_QUERY}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+            }}
             placeholder="Enter Arabic or English words"
             dir="auto"
           />
@@ -134,7 +131,9 @@ export function QuranVerseSearch({
           <select
             aria-label="Search surah filter"
             value={surah ?? ''}
-            onChange={(event) => setSurah(event.target.value === '' ? null : Number(event.target.value))}
+            onChange={(event) => {
+              setSurah(event.target.value === '' ? null : Number(event.target.value));
+            }}
           >
             <option value="">All 114 surahs</option>
             {SURAHS.map((entry) => (
@@ -170,7 +169,9 @@ export function QuranVerseSearch({
                         type="button"
                         className={styles.verseSearchResult}
                         aria-current={selectedAyah === hit.ayahIndex ? 'true' : undefined}
-                        onClick={() => onNavigate(reference)}
+                        onClick={() => {
+                          onNavigate(reference);
+                        }}
                       >
                         <strong>{getSurah(reference.surah).name} · {formatAyahId(reference)}</strong>
                         <span lang="ar" dir="rtl" className={styles.verseSearchArabic}>
@@ -190,9 +191,13 @@ export function QuranVerseSearch({
               </ol>
               {pages > 1 && (
                 <div className={styles.verseSearchPagination}>
-                  <button type="button" className={styles.goButton} disabled={page === 0} onClick={() => setPage((n) => Math.max(0, n - 1))}>Previous matches</button>
+                  <button type="button" className={styles.goButton} disabled={page === 0} onClick={() => {
+                    setPage((n) => Math.max(0, n - 1));
+                  }}>Previous matches</button>
                   <span>Page {page + 1} of {pages}</span>
-                  <button type="button" className={styles.goButton} disabled={page >= pages - 1} onClick={() => setPage((n) => Math.min(pages - 1, n + 1))}>Next matches</button>
+                  <button type="button" className={styles.goButton} disabled={page >= pages - 1} onClick={() => {
+                    setPage((n) => Math.min(pages - 1, n + 1));
+                  }}>Next matches</button>
                 </div>
               )}
             </>
