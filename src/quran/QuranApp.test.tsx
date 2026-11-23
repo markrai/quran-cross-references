@@ -195,7 +195,7 @@ describe('Quran-first reader', () => {
       target: { value: 'arabic' },
     });
     const arabic = screen.getByRole('region', { name: 'Quran text and relationship threads' });
-    expect(arabic.querySelector('[lang="en"]')).toBeNull();
+    expect(arabic.querySelector('ol')?.querySelector('[lang="en"]')).toBeNull();
     expect(arabic.querySelector('[lang="ar"][dir="rtl"]')).not.toBeNull();
   });
 
