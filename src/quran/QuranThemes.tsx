@@ -18,6 +18,7 @@ interface Props {
   readonly selectedName: string | null;
   readonly focusSurah: number;
   readonly onSelect: (name: string) => void;
+  readonly onAnalyze: (name: string) => void;
   readonly onOpenAyah: (ayah: number) => void;
 }
 
@@ -27,6 +28,7 @@ export function QuranThemes({
   selectedName,
   focusSurah,
   onSelect,
+  onAnalyze,
   onOpenAyah,
 }: Props) {
   const [search, setSearch] = useState('');
@@ -231,6 +233,13 @@ export function QuranThemes({
                   {selected.domain} · {selected.category}
                 </p>
                 <p>{selected.count.toLocaleString('en')} labeled ayahs in the full source.</p>
+                <button
+                  type="button"
+                  className={styles.themeLanguageBack}
+                  onClick={() => { onAnalyze(selected.name); }}
+                >
+                  Analyze Arabic patterns within this topic
+                </button>
               </div>
               <div className={styles.themesFilters}>
                 <label className={styles.field}>
