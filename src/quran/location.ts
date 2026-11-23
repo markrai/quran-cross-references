@@ -164,6 +164,9 @@ export function parseQuranLocation(url: URL): QuranLocation {
       : 'all';
   const rawVerseQuery = params.get('q');
   const rawVerseLanguage = params.get('qlang');
+  const rawVerseMode = params.get('qmode');
+  const validVerseMode =
+    rawVerseMode === null || rawVerseMode === 'root' || rawVerseMode === 'lemma';
   const rawVerseSurah = params.get('qsurah');
   const validVerseSurah =
     rawVerseSurah !== null && /^(?:[1-9]|[1-9][0-9]|10[0-9]|11[0-4])$/.test(rawVerseSurah)
@@ -179,15 +182,19 @@ export function parseQuranLocation(url: URL): QuranLocation {
       const code = character.charCodeAt(0);
       return code < 32 || code === 127;
     }) &&
-    (rawVerseLanguage === null || rawVerseLanguage === 'en' || rawVerseLanguage === 'ar')
+    validVerseMode &&
+    (rawVerseMode === null
+      ? rawVerseLanguage === null || rawVerseLanguage === 'en' || rawVerseLanguage === 'ar'
+      : rawVerseLanguage === null || rawVerseLanguage === 'ar')
       ? {
           query: rawVerseQuery,
-          language: rawVerseLanguage === 'ar' ? 'arabic' : 'english',
+          language: rawVerseMode !== null || rawVerseLanguage === 'ar' ? 'arabic' : 'english',
           mode:
-            rawVerseLanguage === 'ar' && params.get('qmatch') === 'unmarked'
+            rawVerseMode === null && rawVerseLanguage === 'ar' && params.get('qmatch') === 'unmarked'
               ? 'unmarked'
               : 'literal',
           surah: validVerseSurah,
+          ...(rawVerseMode === null ? {} : { morphology: rawVerseMode }),
         }
       : null;
   return {
@@ -260,8 +267,20 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
   }
   if (location.view === 'threads' && location.verseSearch !== null) {
     params.set('q', location.verseSearch.query);
-    params.set('qlang', location.verseSearch.language === 'arabic' ? 'ar' : 'en');
-    if (location.verseSearch.language === 'arabic' && location.verseSearch.mode === 'unmarked') {
+    params.set(
+      'qlang',
+      location.verseSearch.morphology !== undefined || location.verseSearch.language === 'arabic'
+        ? 'ar'
+        : 'en',
+    );
+    if (location.verseSearch.morphology !== undefined) {
+      params.set('qmode', location.verseSearch.morphology);
+    }
+    if (
+      location.verseSearch.morphology === undefined &&
+      location.verseSearch.language === 'arabic' &&
+      location.verseSearch.mode === 'unmarked'
+    ) {
       params.set('qmatch', 'unmarked');
     }
     if (location.verseSearch.surah !== null) {
