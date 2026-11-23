@@ -25,6 +25,7 @@ describe('Quran-first canonical route', () => {
       evidence: 'curated',
       selectedExpression: null,
       selectedTheme: null,
+      selectedEmotion: 'all',
       morphologyGrouping: 'lemma',
       selectedMorphTerm: null,
       selectedMorphWord: null,
@@ -88,6 +89,39 @@ describe('Quran-first canonical route', () => {
       ...DEFAULT_QURAN_LOCATION,
       view: 'themes',
     });
+  });
+
+  it('keeps the independent ELQV emotion annotation lens shareable without changing other evidence views', () => {
+    const location = {
+      ...DEFAULT_QURAN_LOCATION,
+      view: 'emotions' as const,
+      reference: { surah: 26, ayah: 8 },
+      selectedEmotion: 'conflicts' as const,
+      selectedTheme: 'Divine Mercy',
+    };
+    const url = quranLocationUrl(location, '/quran-cross-references/');
+    expect(url).toContain('view=emotions');
+    expect(url).toContain('theme=Divine+Mercy');
+    expect(url).toContain('emotion=conflicts');
+    expect(parseQuranLocation(new URL(url, 'https://example.test'))).toEqual(location);
+    const old = parseQuranLocation(
+      new URL('https://example.test/?view=arcs&emotion=fear&theme=Divine+Mercy'),
+    );
+    expect(old).toEqual(DEFAULT_QURAN_LOCATION);
+    const malformed = parseQuranLocation(
+      new URL('https://example.test/?view=emotions&emotion=undocumented&theme=%20'),
+    );
+    expect(malformed).toEqual({
+      ...DEFAULT_QURAN_LOCATION,
+      view: 'emotions',
+    });
+    const evidence = parseQuranLocation(
+      new URL('https://example.test/?view=emotions&evidence=exact&emotion=joy&link=10'),
+    );
+    expect(evidence.evidence).toBe('curated');
+    expect(evidence.selectedExpression).toBeNull();
+    expect(evidence.selectedEmotion).toBe('joy');
+    expect(quranLocationUrl(evidence, '/site/')).not.toContain('evidence=exact');
   });
 
   it('round-trips analytics URLs while preserving their selected ayah', () => {

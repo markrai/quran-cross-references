@@ -1,8 +1,9 @@
 import { formatAyahId, type AyahRef } from '../core/quran/ayah-ref.ts';
 import { parseReference } from '../core/quran/reference.ts';
 import type { QuranRelationshipScope } from '../core/quran/relationship-filter.ts';
+import { ELQV_LABELS, type QuranEmotionFilter } from '../core/quran/emotion-types.ts';
 
-export type QuranView = 'arcs' | 'threads' | 'analytics' | 'network' | 'themes';
+export type QuranView = 'arcs' | 'threads' | 'analytics' | 'network' | 'themes' | 'emotions';
 export type QuranNetworkMode = 'surah' | 'ayah';
 export type QuranDirection = 'outgoing' | 'incoming' | 'both';
 export type QuranEvidenceMode = 'curated' | 'exact' | 'morphology';
@@ -18,6 +19,7 @@ export interface QuranLocation {
   readonly evidence: QuranEvidenceMode;
   readonly selectedExpression: string | null;
   readonly selectedTheme: string | null;
+  readonly selectedEmotion: QuranEmotionFilter;
   readonly morphologyGrouping: QuranMorphGrouping;
   readonly selectedMorphTerm: string | null;
   readonly selectedMorphWord: number | null;
@@ -35,6 +37,7 @@ export const DEFAULT_QURAN_LOCATION: QuranLocation = {
   evidence: 'curated',
   selectedExpression: null,
   selectedTheme: null,
+  selectedEmotion: 'all',
   morphologyGrouping: 'lemma',
   selectedMorphTerm: null,
   selectedMorphWord: null,
@@ -66,14 +69,15 @@ export function parseQuranLocation(url: URL): QuranLocation {
     rawView === 'threads' ||
     rawView === 'analytics' ||
     rawView === 'network' ||
-    rawView === 'themes'
+    rawView === 'themes' ||
+    rawView === 'emotions'
       ? rawView
       : 'arcs';
   const direction = params.get('direction');
   const scope = params.get('scope');
   const requestedEvidence = params.get('evidence');
   const evidence: QuranEvidenceMode =
-    view === 'network' || view === 'themes'
+    view === 'network' || view === 'themes' || view === 'emotions'
       ? 'curated'
       : requestedEvidence === 'exact' || requestedEvidence === 'morphology'
         ? requestedEvidence
@@ -100,7 +104,7 @@ export function parseQuranLocation(url: URL): QuranLocation {
   const expression = params.get('expression');
   const rawTheme = params.get('theme');
   const selectedTheme =
-    view === 'themes' &&
+    (view === 'themes' || view === 'emotions') &&
     rawTheme !== null &&
     rawTheme.length > 0 &&
     rawTheme.length <= 80 &&
@@ -108,6 +112,12 @@ export function parseQuranLocation(url: URL): QuranLocation {
     !Array.from(rawTheme).some((character) => character.charCodeAt(0) < 32)
       ? rawTheme
       : null;
+  const rawEmotion = params.get('emotion');
+  const selectedEmotion: QuranEmotionFilter =
+    view === 'emotions' &&
+    (rawEmotion === 'conflicts' || ELQV_LABELS.some((label) => label === rawEmotion))
+      ? (rawEmotion as QuranEmotionFilter)
+      : 'all';
   return {
     reference,
     rangeEnd,
@@ -117,6 +127,7 @@ export function parseQuranLocation(url: URL): QuranLocation {
     selectedMorphWord,
     evidence,
     selectedTheme,
+    selectedEmotion,
     selectedExpression:
       evidence === 'exact' && expression !== null && /^exact:v1:[a-f0-9]{64}$/.test(expression)
         ? expression
@@ -148,8 +159,11 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
     if (location.selectedExpression !== null) params.set('expression', location.selectedExpression);
   }
   if (location.view !== 'arcs') params.set('view', location.view);
-  if (location.view === 'themes' && location.selectedTheme !== null) {
+  if ((location.view === 'themes' || location.view === 'emotions') && location.selectedTheme !== null) {
     params.set('theme', location.selectedTheme);
+  }
+  if (location.view === 'emotions' && location.selectedEmotion !== 'all') {
+    params.set('emotion', location.selectedEmotion);
   }
   if (location.view === 'network' && location.networkMode === 'ayah') {
     params.set('network', 'ayah');
