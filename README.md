@@ -162,3 +162,11 @@ The Quran implementation was adapted from the open-source Bible Cross-References
 **Pull request checks:** GitHub Actions must be enabled for this fork and the full Linux/Windows browser checks required before merge. See [CI setup and merge gates](docs/CI_GATES.md). Production artifacts are tested automatically, including offline reload and graph drag; a failed or flaky test blocks the CI job once required status checks are configured.
 
 See [docs/QURAN_PHASES.md](docs/QURAN_PHASES.md) for the migration roadmap and outstanding work.
+
+## Bilingual Quran verse search (Phase 3A.1)
+
+The existing **Threads & Reader** tab now offers local, shareable full-text search across all 6,236 canonical Quran ayahs. Search either the pinned Tanzil Uthmani Arabic or Pickthall English text, restrict results to a surah, browse 20 results per page and open each matching ayah in the reader and independent evidence inspector.
+
+English searches are case-insensitive. Arabic searches are literal by default or can optionally ignore combining marks and tatweel for comparison. Unlike morphological or semantic search, this does **not** equate different alif/hamza forms, infer shared roots or rewrite Quran text. Matches highlight original codepoint spans, retaining source edition marks.
+
+Search uses only the verified bilingual text already delivered for the reader, including offline use. No search server, third-party service, additional source file or PWA precache change is introduced. Links such as `?view=threads&q=Allah&qlang=en&qsurah=1` retain the search and canonical verse selection. See [Phase 3A.1 matching rules and acceptance](docs/QURAN_PHASE_3A1.md).

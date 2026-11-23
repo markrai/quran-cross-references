@@ -57,6 +57,49 @@ test.describe('Quran-first application', () => {
   });
 });
 
+test.describe('Phase 3A.1 bilingual verse search', () => {
+  test('searches the existing English Quran offline-friendly dataset and restores query history', async ({
+    page,
+  }) => {
+    const optionalSources: string[] = [];
+    page.on('request', (request) => {
+      if (/\/(?:qac|expressions|themes|emotions)\.json/.test(request.url())) {
+        optionalSources.push(request.url());
+      }
+    });
+    await page.goto('./?ref=2%3A1&view=threads');
+    const search = page.getByRole('region', { name: 'Bilingual Quran verse search' });
+    await search.getByRole('searchbox', { name: 'Verse text' }).fill('ALLAH');
+    await search.getByRole('combobox', { name: 'Search surah filter' }).selectOption('1');
+    await search.getByRole('button', { name: 'Search verses' }).click();
+    await expect(page).toHaveURL(/q=ALLAH&qlang=en&qsurah=1/);
+    await expect(search.locator('p[role="status"]')).toBeVisible();
+    await expect(search.locator('mark').first()).toContainText(/allah/i);
+    await search.getByRole('button', { name: /Al-Fatiha.*1:1/ }).click();
+    await expect(page.getByRole('heading', { name: /Al-Fatiha.*1:1/ })).toBeVisible();
+    await page.goBack();
+    await expect(page.getByRole('heading', { name: /Al-Baqarah.*2:1/ })).toBeVisible();
+    await expect(search.getByRole('searchbox', { name: 'Verse text' })).toHaveValue('ALLAH');
+    expect(optionalSources).toEqual([]);
+  });
+
+  test('restores Arabic search deep links and highlights original Uthmani marks on phone and desktop', async ({
+    page,
+  }) => {
+    await page.goto(
+      './?ref=2%3A1&view=threads&q=%D8%A8%D8%B3%D9%85&qlang=ar&qmatch=unmarked&qsurah=1',
+    );
+    const search = page.getByRole('region', { name: 'Bilingual Quran verse search' });
+    await expect(search.getByRole('searchbox', { name: 'Verse text' })).toHaveValue('بسم');
+    await expect(search.getByRole('combobox', { name: 'Arabic matching' })).toHaveValue('unmarked');
+    await expect(search.locator('p[role="status"]')).toBeVisible();
+    await expect(search.locator('mark').first()).toContainText('بِسْم');
+    await search.getByRole('button', { name: /Al-Fatiha.*1:1/ }).click();
+    await expect(page.getByRole('heading', { name: /Al-Fatiha.*1:1/ })).toBeVisible();
+    await expect(page).toHaveURL(/qmatch=unmarked/);
+  });
+});
+
 test.describe('Quran production readiness', () => {
   test('publishes an installable manifest, generated icons and link preview metadata', async ({
     page,
