@@ -312,6 +312,10 @@ Introduce roving keyboard focus in the bilingual Quran reader, canonical Up/Down
 
 Integrate the independently verified QAC v0.4 root and lemma word families into existing Threads & Reader search. Group annotated occurrences by canonical ayah and show QAC word forms and positions without inventing codepoint offsets in Tanzil text. Keep original literal matching unchanged, share mode/filter links, and reuse the already-verified optional corpus loader. See [Phase 3C.1](QURAN_PHASE_3C1.md).
 
+### Phase 3C.2: QAC root and lemma frequency analytics
+
+Expose ranked QAC v0.4 root and lemma families, unique source word-position coverage for the top 10/25/50/100/250 groups, and canonical surah distribution for each selected term inside the existing morphology evidence panel. Compute results in memory from the verified optional index, deduplicate overlapping word positions, and preserve original corpus rights, evidence classes and URL navigation. See [Phase 3C.2](QURAN_PHASE_3C2.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

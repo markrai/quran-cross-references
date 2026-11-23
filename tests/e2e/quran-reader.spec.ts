@@ -1094,6 +1094,88 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
   });
 });
 
+test.describe('Phase 3C.2 original QAC frequency and vocabulary coverage', () => {
+  test('ranks source roots and presents overlap-safe coverage without a new dataset', async ({
+    page,
+  }) => {
+    const qacRequests: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().endsWith('/data/quran/morphology.json')) {
+        qacRequests.push(request.url());
+      }
+    });
+    await page.goto('./?ref=1%3A1&evidence=morphology&morph=root&term=rHm');
+    const analytics = page.getByRole('region', { name: 'QAC vocabulary frequency analytics' });
+    await expect(analytics).toBeVisible();
+    await expect(
+      analytics.getByRole('heading', { name: 'Vocabulary frequency and coverage' }),
+    ).toBeVisible();
+    await expect(analytics).toContainText('77,429 QAC word positions');
+    await expect(analytics).toContainText('not a measure of Arabic fluency');
+    expect(qacRequests).toHaveLength(1);
+
+    const progress = analytics.getByRole('progressbar', {
+      name: /QAC word-position coverage by top 25 root families/,
+    });
+    await expect
+      .poll(async () => progress.evaluate((element) => (element as HTMLProgressElement).value))
+      .toBeGreaterThan(0);
+
+    await analytics.getByRole('combobox', { name: 'Coverage family count' }).selectOption('100');
+    await expect(
+      analytics.getByRole('progressbar', {
+        name: /QAC word-position coverage by top 100 root families/,
+      }),
+    ).toBeVisible();
+    const ranking = analytics.getByRole('region', { name: 'Ranked QAC families' });
+    await expect(ranking.locator('ol li')).toHaveCount(15);
+    await ranking.getByRole('button', { name: 'Show more ranked families' }).click();
+    await expect(ranking.locator('ol li')).toHaveCount(30);
+    await ranking.locator('ol li button').first().click();
+    await expect(page).toHaveURL(/evidence=morphology&morph=root&term=/);
+    await expect(
+      analytics.getByRole('region', { name: 'Selected QAC family distribution' }),
+    ).toContainText('Distribution across surahs');
+    expect(qacRequests).toHaveLength(1);
+
+    await page.reload();
+    await expect(analytics).toBeVisible();
+    await expect(page).toHaveURL(/term=/);
+  });
+
+  test('shows surah distribution with canonical occurrence navigation and separate lemma rankings', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    await page.goto('./?ref=1%3A1&evidence=morphology&morph=root&term=rHm');
+    const analytics = page.getByRole('region', { name: 'QAC vocabulary frequency analytics' });
+    const distribution = analytics.getByRole('region', {
+      name: 'Selected QAC family distribution',
+    });
+    await expect(
+      distribution.getByRole('button', { name: /Open .* root source/ }).first(),
+    ).toBeVisible();
+    await distribution
+      .getByRole('button', { name: /Open .* root source/ })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/morph=root&term=rHm&word=\d+/);
+    const bounds = await analytics.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds?.width ?? 0).toBeLessThanOrEqual(321);
+
+    await page.getByRole('combobox', { name: 'Morphology grouping' }).selectOption('lemma');
+    await expect(page).toHaveURL(/evidence=morphology/);
+    await expect(page).not.toHaveURL(/morph=root/);
+    await expect(analytics.getByRole('heading', { name: 'Most frequent lemmas' })).toBeVisible();
+    await expect(
+      analytics.getByRole('progressbar', {
+        name: /QAC word-position coverage by top 25 lemma families/,
+      }),
+    ).toBeVisible();
+  });
+});
+
 test.describe('Quran Phase 2D.1 independently annotated themes', () => {
   test('loads experimental theme annotations on demand, with integrity and no separate translation shipping', async ({
     page,

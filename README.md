@@ -194,3 +194,9 @@ In **Threads & Reader**, the search type selector distinguishes original-text **
 Results list the annotated QAC surface form, original corpus POS and one-based word position, but deliberately **do not highlight QAC positions in Tanzil text**: the separate editions have not been proven codepoint-aligned. Roots and lemmas are linguistic evidence, not theological or semantic equivalence. Search links preserve `qmode=root|lemma`, the normalized Arabic search language and other canonical filters. The optional QAC dataset loads only for QAC search or existing morphology research; after an activated service worker has fetched it once, the same hashed publication may be reused offline without increasing the install precache budget.
 
 See [Phase 3C.1 search contract](docs/QURAN_PHASE_3C1.md). Source attribution, published hashes, `noindex` and real-device release gates remain in place.
+
+## QAC vocabulary frequency analytics (Phase 3C.2)
+
+Open **Arabic morphology** evidence to explore ranked Quranic Arabic Corpus v0.4 roots and lemmas, see how widely each occurs across canonical surahs, and jump to the original annotated word positions. Potential vocabulary **coverage** shows the share of all 77,429 original QAC word positions represented by the top 10, 25, 50, 100 or 250 families. Overlapping families count the same position only once, and roots and lemmas remain separate evidence classes. This is **not** a measure of learned words, Arabic fluency, or semantic equivalence.
+
+The analysis is derived locally from the existing verified, optionally cached QAC index with no new dataset, account, telemetry or primary navigation tab. Rank and surah selections reuse morphology deep links. See [Phase 3C.2's counting and licensing contract](docs/QURAN_PHASE_3C2.md).

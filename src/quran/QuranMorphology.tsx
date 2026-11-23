@@ -3,6 +3,7 @@ import { buckwalterToArabic, type QacMorphologyIndex } from '../core/quran/qac-i
 import { QAC_OCCURRENCE_PAGE_SIZE, type QacGrouping } from '../core/quran/qac-types.ts';
 import { formatAyahId } from '../core/quran/ayah-ref.ts';
 import { CANONICAL_QURAN } from '../core/quran/quran-versification.ts';
+import { QuranMorphologyFrequency } from './QuranMorphologyFrequency.tsx';
 import styles from './QuranApp.module.css';
 
 interface Props {
@@ -124,6 +125,18 @@ export function QuranMorphology({
           {searchError}
         </p>
       )}
+      <QuranMorphologyFrequency
+        key={grouping}
+        index={index}
+        grouping={grouping}
+        term={term}
+        onSelect={(selected) => {
+          setSearchError(null);
+          setPagination({ key: '', page: 0 });
+          onSelect(selected, null);
+        }}
+        onOccurrence={onOccurrence}
+      />
       <div className={styles.qacColumns}>
         <section className={styles.qacSection} aria-label="Annotated words at selected ayah">
           <h3>
