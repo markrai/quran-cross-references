@@ -71,7 +71,7 @@ test.describe('Phase 3A.1 bilingual verse search', () => {
     await search.getByRole('combobox', { name: 'Search surah filter' }).selectOption('1');
     await search.getByRole('button', { name: 'Search verses' }).click();
     await expect(page).toHaveURL(/q=ALLAH&qlang=en&qsurah=1/);
-    await expect(search.getByText(/matching ayah/)).toBeVisible();
+    await expect(search.locator('p[role="status"]')).toBeVisible();
     await expect(search.locator('mark').first()).toContainText(/allah/i);
     await search.getByRole('button', { name: /Al-Fatiha.*1:1/ }).click();
     await expect(page.getByRole('heading', { name: /Al-Fatiha.*1:1/ })).toBeVisible();
@@ -90,7 +90,7 @@ test.describe('Phase 3A.1 bilingual verse search', () => {
     await expect(search.getByRole('combobox', { name: 'Arabic matching' })).toHaveValue(
       'unmarked',
     );
-    await expect(search.getByText(/matching ayah/)).toBeVisible();
+    await expect(search.locator('p[role="status"]')).toBeVisible();
     await expect(search.locator('mark').first()).toContainText('بِسْم');
     await search.getByRole('button', { name: /Al-Fatiha.*1:1/ }).click();
     await expect(page.getByRole('heading', { name: /Al-Fatiha.*1:1/ })).toBeVisible();
