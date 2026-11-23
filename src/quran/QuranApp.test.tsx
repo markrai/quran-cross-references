@@ -10,6 +10,11 @@ vi.mock('./model.ts', () => ({ loadQuranReaderData: vi.fn() }));
 vi.mock('./qac.ts', () => ({ loadQacMorphology: vi.fn() }));
 
 const qacIndex = {
+  wordCount: 77_429,
+  segmentCount: 128_219,
+  rootCount: 1,
+  lemmaCount: 1,
+  terms: () => ['rHm'],
   resolve: (grouping: string, query: string) =>
     grouping === 'root' && (query === 'rHm' || query === 'رحم') ? 'rHm' : null,
   occurrences: () => [
@@ -356,6 +361,38 @@ describe('Quran-first reader', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Retry QAC data' }));
     expect(await screen.findByText('QAC v0.4 · 2 annotated words')).toBeTruthy();
     expect(vi.mocked(loadQacMorphology)).toHaveBeenCalledTimes(2);
+  });
+
+  it('opens QAC frequency analytics from the existing morphology panel and shares selected roots', async () => {
+    window.history.replaceState(
+      null,
+      '',
+      '/?ref=1%3A1&evidence=morphology&morph=root&term=rHm',
+    );
+    render(<QuranApp />);
+    const analytics = await screen.findByRole('region', {
+      name: 'QAC vocabulary frequency analytics',
+    });
+    expect(analytics.textContent).toContain('Vocabulary frequency and coverage');
+    expect(analytics.textContent).toContain('77,429 QAC word');
+    expect(screen.getByRole('combobox', { name: 'Coverage family count' })).toHaveProperty(
+      'value',
+      '25',
+    );
+    expect(analytics.querySelector('progress')).not.toBeNull();
+    expect(screen.getByRole('region', { name: 'Selected QAC family distribution' }).textContent)
+      .toContain('2 annotated word');
+    fireEvent.change(screen.getByRole('combobox', { name: 'Coverage family count' }), {
+      target: { value: '10' },
+    });
+    expect(screen.getByRole('combobox', { name: 'Coverage family count' })).toHaveProperty(
+      'value',
+      '10',
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Explore root rHm rank 1/ }));
+    expect(window.location.search).toContain('morph=root');
+    expect(window.location.search).toContain('term=rHm');
+    expect(vi.mocked(loadQacMorphology)).toHaveBeenCalledTimes(1);
   });
 
   it('offers a retry if the dataset load fails', async () => {
