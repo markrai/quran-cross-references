@@ -57,6 +57,81 @@ describe('Quran offline release shell', () => {
     expect(source).not.toContain('bible-cross-references');
   });
 
+  it('reuses optional QAC corpus offline after network fetch without precaching it', async () => {
+    const scope = 'https://example.test/quran-cross-references/';
+    const stored = new Map<string, Response>();
+    const handlers = new Map<
+      string,
+      (event: {
+        request?: Request;
+        respondWith?: (promise: Promise<unknown>) => void;
+      }) => void
+    >();
+    let online = true;
+    const network = vi.fn(() =>
+      online
+        ? Promise.resolve(new Response('verified-qac-payload', { status: 200 }))
+        : Promise.reject(new Error('Offline')),
+    );
+    const cache = {
+      addAll: () => Promise.resolve(undefined),
+      match: (request: Request) => Promise.resolve(stored.get(request.url)?.clone()),
+      put: (request: Request, response: Response) => {
+        stored.set(request.url, response);
+        return Promise.resolve(undefined);
+      },
+    };
+    const self = {
+      registration: { scope },
+      addEventListener: (
+        name: string,
+        handler: (event: {
+          request?: Request;
+          respondWith?: (promise: Promise<unknown>) => void;
+        }) => void,
+      ) => {
+        handlers.set(name, handler);
+      },
+      skipWaiting: () => Promise.resolve(undefined),
+      clients: { claim: () => Promise.resolve(undefined) },
+    };
+    const caches = {
+      open: () => Promise.resolve(cache),
+      keys: () => Promise.resolve([]),
+      delete: () => Promise.resolve(true),
+    };
+    runInNewContext(offlineWorkerSource(['index.html'], 'revision-2'), {
+      self,
+      caches,
+      Request,
+      Response,
+      URL,
+      fetch: network,
+    });
+    const request = new Request(new URL('data/quran/morphology.json', scope));
+    const fetchHandler = handlers.get('fetch');
+    expect(fetchHandler).toBeDefined();
+    const fetchCorpus = () => {
+      let response: Promise<unknown> | null = null;
+      fetchHandler?.({
+        request,
+        respondWith(promise) {
+          response = promise;
+        },
+      });
+      if (response === null) throw new Error('No morphology fetch response');
+      return response as Promise<Response>;
+    };
+    const onlineResponse = await fetchCorpus();
+    expect(await onlineResponse.text()).toBe('verified-qac-payload');
+    expect(stored.has(request.url)).toBe(true);
+    online = false;
+    const offlineResponse = await fetchCorpus();
+    expect(await offlineResponse.text()).toBe('verified-qac-payload');
+    expect(network).toHaveBeenCalledTimes(2);
+    expect(pwaCacheFiles(['data/quran/morphology.json'])).toEqual([]);
+  });
+
   it('changes the cache key for a new release', () => {
     expect(offlineWorkerSource([], 'first')).not.toBe(offlineWorkerSource([], 'second'));
   });
