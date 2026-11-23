@@ -26,4 +26,10 @@ jobs:
           print('ELQV UNIQUE',len(set(keys)),'DUPLICATES',len(keys)-len(set(keys)),flush=True)
           print('ELQV EXAMPLES',[(r['Sourah Number'],r['Verse Number'],r['Label']) for r in rows[:6]],flush=True)
           print('ELQV MINMAX',min(s for s,a in keys),max(s for s,a in keys),min(a for s,a in keys),max(a for s,a in keys),flush=True)
+          by_key=collections.defaultdict(list)
+          for row in rows: by_key[(row['Sourah Number'],row['Verse Number'])].append(row['Label'])
+          duplicates=[(key,labels) for key,labels in by_key.items() if len(labels)>1]
+          print('ELQV REPEATED REFS',duplicates,flush=True)
+          print('ELQV AMBIGUOUS',sum(len(set(labels))>1 for _,labels in duplicates),flush=True)
+          print('ELQV UNIQUE BY EMOTION',dict(collections.Counter(label for labels in by_key.values() for label in set(labels))),flush=True)
           PY
