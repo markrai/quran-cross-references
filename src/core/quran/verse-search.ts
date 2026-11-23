@@ -49,7 +49,9 @@ function withoutArabicMarks(text: string): UnmarkedText {
     const end = offset + character.length;
     if (!/\p{M}/u.test(character) && character !== '\u0640') {
       value += character;
-      for (let i = 0; i < character.length; i += 1) {
+      starts.push(offset);
+      ends.push(end);
+      if (character.length === 2) {
         starts.push(offset);
         ends.push(end);
       }
