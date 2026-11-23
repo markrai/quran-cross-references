@@ -43,7 +43,10 @@ export function QuranEmotions({
 
   const topics = useMemo(() => themeIndex?.rankedTags() ?? [], [themeIndex]);
   const topic = selectedTheme === null ? null : (themeIndex?.find(selectedTheme) ?? null);
-  const topicMatches = selectedTheme === null ? null : new Set(themeIndex?.occurrences(selectedTheme) ?? []);
+  const topicMatches = useMemo(
+    () => (selectedTheme === null ? null : new Set(themeIndex?.occurrences(selectedTheme) ?? [])),
+    [selectedTheme, themeIndex],
+  );
   const selected = useMemo(() => {
     return index
       .occurrences(filter)
@@ -51,7 +54,7 @@ export function QuranEmotions({
         (!surahOnly || CANONICAL_QURAN.refAt(ayah).surah === focusSurah) &&
         (topicMatches === null || topicMatches.has(ayah)),
       );
-  }, [index, filter, surahOnly, focusSurah, selectedTheme, themeIndex]);
+  }, [index, filter, surahOnly, focusSurah, topicMatches]);
   const activeKey = filter + ':' + (selectedTheme ?? '') + ':' + (surahOnly ? String(focusSurah) : 'all');
   const pageCount = Math.max(1, Math.ceil(selected.length / ELQV_PAGE_SIZE));
   const visiblePage = pageKey === activeKey ? Math.min(page, pageCount - 1) : 0;

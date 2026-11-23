@@ -121,7 +121,8 @@ export function parseQuranLocation(url: URL): QuranLocation {
   return {
     reference,
     rangeEnd,
-    selectedLink: evidence === 'curated' ? parseSelectedLink(params.get('link')) : null,
+    selectedLink:
+      view !== 'emotions' && evidence === 'curated' ? parseSelectedLink(params.get('link')) : null,
     morphologyGrouping,
     selectedMorphTerm,
     selectedMorphWord,
@@ -145,7 +146,7 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
   const params = new URLSearchParams();
   params.set('ref', formatAyahId(location.reference));
   if (location.rangeEnd !== null) params.set('end', formatAyahId(location.rangeEnd));
-  if (location.evidence === 'curated' && location.selectedLink !== null) {
+  if (location.view !== 'emotions' && location.evidence === 'curated' && location.selectedLink !== null) {
     params.set('link', String(location.selectedLink));
   }
   if (location.evidence === 'morphology') {
