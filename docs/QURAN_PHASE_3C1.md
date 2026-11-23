@@ -20,7 +20,7 @@ The optional QAC corpus is fetched only on an active morphology query or existin
 
 ## Offline boundary
 
-Original-text search operates within the installed offline Quran shell. The larger optional QAC morphology artifact is **not precached at installation**. In an already-loaded reader session, verified morphology data remains available from memory even if the network goes away. Fresh offline sessions cannot assume optional morphology availability until separately cached support is introduced and validated. A missing offline QAC response must remain an explicit load failure, never a false zero-results message.
+Original-text search operates within the installed offline Quran shell. The larger optional QAC morphology artifact is **not precached at installation**. After a network fetch through an activated service worker, the optional response is stored in the release-scoped runtime cache, with a network-first strategy and cached fallback when offline. The app still checks the published SHA-256 and all QAC structural invariants before using any response, including cached responses. Once verified in an active session, the in-memory index also remains available without network. Fresh offline installs cannot run morphology search before their first successful optional fetch; that absence remains an explicit load failure, never a false zero-results message. A new release invalidates the old versioned runtime cache.
 
 ## Automated acceptance
 
