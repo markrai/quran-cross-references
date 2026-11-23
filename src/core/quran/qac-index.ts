@@ -273,6 +273,10 @@ export class QacMorphologyIndex {
     return registry.has(converted) ? converted : null;
   }
 
+  terms(grouping: QacGrouping): readonly string[] {
+    return [...(grouping === 'root' ? this.#roots : this.#lemmas).keys()];
+  }
+
   occurrences(grouping: QacGrouping, term: string): readonly QacOccurrence[] {
     return grouping === 'root' ? (this.#roots.get(term) ?? []) : (this.#lemmas.get(term) ?? []);
   }
