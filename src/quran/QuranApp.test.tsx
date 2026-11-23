@@ -16,6 +16,7 @@ const qacIndex = {
     { ayah: 0, word: 2, form: 'الرَّحْمَٰنِ', pos: 'ADJ' },
     { ayah: 0, word: 3, form: 'الرَّحِيمِ', pos: 'ADJ' },
   ],
+  wordsAt: () => [],
 } as unknown as QacMorphologyIndex;
 
 const data: QuranReaderData = {
@@ -311,7 +312,7 @@ describe('Quran-first reader', () => {
   it('keeps English literal search independent of the optional QAC dataset', async () => {
     window.history.replaceState(null, '', '/?ref=1%3A1&view=threads&q=Allah&qlang=en');
     render(<QuranApp />);
-    const verse = screen.getByRole('region', { name: 'Bilingual Quran verse search' });
+    const verse = await screen.findByRole('region', { name: 'Bilingual Quran verse search' });
     expect(await screen.findByText(/matching ayahs · English literal/)).toBeTruthy();
     expect(verse.querySelector('mark')).not.toBeNull();
     expect(vi.mocked(loadQacMorphology)).not.toHaveBeenCalled();
