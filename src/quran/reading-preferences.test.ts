@@ -36,14 +36,7 @@ describe('Phase 3B.1 reader preferences', () => {
   });
 
   it('rejects malformed versions and unsafe values without executing or applying them', () => {
-    for (const raw of [
-      'not-json',
-      'null',
-      '[]',
-      '"x"',
-      '{}',
-      '{"version":3,"readingMode":true}',
-    ]) {
+    for (const raw of ['not-json', 'null', '[]', '"x"', '{}', '{"version":3,"readingMode":true}']) {
       expect(parseReadingPreferences(raw)).toEqual(DEFAULT_READING_PREFERENCES);
     }
     expect(
@@ -58,9 +51,9 @@ describe('Phase 3B.1 reader preferences', () => {
         }),
       ),
     ).toEqual(DEFAULT_READING_PREFERENCES);
-    expect(
-      parseReadingPreferences('{"version":1,"language":"english","englishSize":160}'),
-    ).toEqual({ ...DEFAULT_READING_PREFERENCES, language: 'english', englishSize: 160 });
+    expect(parseReadingPreferences('{"version":1,"language":"english","englishSize":160}')).toEqual(
+      { ...DEFAULT_READING_PREFERENCES, language: 'english', englishSize: 160 },
+    );
   });
 
   it('fails safely if browser storage is unavailable', () => {
