@@ -72,7 +72,7 @@ test.describe('Phase 3A.1 bilingual verse search', () => {
     await search.getByRole('button', { name: 'Search verses' }).click();
     await expect(page).toHaveURL(/q=ALLAH&qlang=en&qsurah=1/);
     await expect(search.getByText(/matching ayah/)).toBeVisible();
-    await expect(search.getByRole('mark').first()).toContainText(/allah/i);
+    await expect(search.locator('mark').first()).toContainText(/allah/i);
     await search.getByRole('button', { name: /Al-Fatiha.*1:1/ }).click();
     await expect(page.getByRole('heading', { name: /Al-Fatiha.*1:1/ })).toBeVisible();
     await page.goBack();
