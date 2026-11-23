@@ -47,11 +47,19 @@ function sourceStatus<T>(load: AyahEvidenceLoad<T>, count: number, empty: string
   return count === 0 ? empty : String(count) + ' at this ayah';
 }
 
-function EvidenceError({ message, onRetry }: { readonly message: string; readonly onRetry: () => void }) {
+function EvidenceError({
+  message,
+  onRetry,
+}: {
+  readonly message: string;
+  readonly onRetry: () => void;
+}) {
   return (
     <div className={styles.ayahEvidenceFailure} role="alert">
       <p>Source verification failed: {message}</p>
-      <button type="button" onClick={onRetry}>Retry this source</button>
+      <button type="button" onClick={onRetry}>
+        Retry this source
+      </button>
     </div>
   );
 }
@@ -99,7 +107,8 @@ export function QuranAyahEvidence({
   const tags = themes.status === 'ready' ? themes.index.forAyah(ayahIndex) : [];
   const labels = emotions.status === 'ready' ? emotions.index.forAyah(ayahIndex) : [];
   const details = {
-    curated: curated.length > 0 ? String(curated.length) + ' distinct links' : 'No curated link here',
+    curated:
+      curated.length > 0 ? String(curated.length) + ' distinct links' : 'No curated link here',
     exact: sourceStatus(expressions, exactPhrases.length, 'No exact phrase here'),
     morphology: sourceStatus(morphology, words.length, 'No annotated words'),
     themes: sourceStatus(themes, tags.length, 'No thematic tags'),
@@ -117,7 +126,8 @@ export function QuranAyahEvidence({
     Number(morphology.status === 'ready' && words.length > 0) +
     Number(themes.status === 'ready' && tags.length > 0) +
     Number(emotions.status === 'ready' && labels.length > 0);
-  const showing = (source: QuranInspectorSource): boolean => section === 'all' || section === source;
+  const showing = (source: QuranInspectorSource): boolean =>
+    section === 'all' || section === source;
   const incomplete =
     expressions.status !== 'ready' ||
     morphology.status !== 'ready' ||
@@ -131,7 +141,9 @@ export function QuranAyahEvidence({
         className={styles.ayahEvidenceToggle}
         aria-expanded={section !== null}
         aria-controls="ayah-evidence-content"
-        onClick={() => { onSection(section === null ? 'curated' : null); }}
+        onClick={() => {
+          onSection(section === null ? 'curated' : null);
+        }}
       >
         <span>
           <strong>Evidence for this ayah</strong>
@@ -143,18 +155,24 @@ export function QuranAyahEvidence({
         <div id="ayah-evidence-content" className={styles.ayahEvidenceContent}>
           <p className={styles.ayahEvidenceCoverage} role="status">
             {present} of {checked} checked sources have evidence at{' '}
-            <strong>{formatAyahId(CANONICAL_QURAN.refAt(ayahIndex))}</strong>.
-            Unchecked sources are not counted as absent; these are source-coverage counts,
-            not agreement scores or theological rankings.
+            <strong>{formatAyahId(CANONICAL_QURAN.refAt(ayahIndex))}</strong>. Unchecked sources are
+            not counted as absent; these are source-coverage counts, not agreement scores or
+            theological rankings.
           </p>
-          <div className={styles.ayahEvidenceSourceGrid} role="group" aria-label="Choose an ayah evidence source">
+          <div
+            className={styles.ayahEvidenceSourceGrid}
+            role="group"
+            aria-label="Choose an ayah evidence source"
+          >
             {SOURCES.map((source) => (
               <button
                 key={source.id}
                 type="button"
                 aria-pressed={showing(source.id)}
                 className={styles.ayahEvidenceSourceButton}
-                onClick={() => { onSection(source.id); }}
+                onClick={() => {
+                  onSection(source.id);
+                }}
               >
                 <strong>{source.title}</strong>
                 <span>{source.kind}</span>
@@ -166,70 +184,118 @@ export function QuranAyahEvidence({
             type="button"
             className={styles.ayahEvidenceAll}
             aria-pressed={section === 'all'}
-            onClick={() => { onSection('all'); }}
+            onClick={() => {
+              onSection('all');
+            }}
           >
             Check all five sources
           </button>
 
           {showing('curated') && (
-            <section aria-label="Inspector curated passage evidence" className={styles.ayahEvidencePanel}>
+            <section
+              aria-label="Inspector curated passage evidence"
+              className={styles.ayahEvidencePanel}
+            >
               <h3>Curated similar passages</h3>
               <p>
                 {curated.length} distinct original source link IDs touch this ayah.{' '}
-                {outgoing.length} outgoing and {incoming.length} incoming link incidences.
-                These are source-defined passage connections, not inferred similarities.
+                {outgoing.length} outgoing and {incoming.length} incoming link incidences. These are
+                source-defined passage connections, not inferred similarities.
               </p>
               {curated.length === 0 ? (
                 <p>No curated links are recorded for this ayah in the pinned dataset.</p>
               ) : (
                 <ul className={styles.ayahEvidenceList}>
-                  {curated.slice(0, 8).map(({ link, outgoing: isOutgoing, incoming: isIncoming }) => (
-                    <li key={link.id}>
-                      <button type="button" onClick={() => { onCuratedLink(link.id); }}>
-                        <strong>Link #{link.id}</strong>
-                        <span>
-                          {formatIndexRange(index.versification, link.source.start, link.source.end)}
-                          {' → '}
-                          {formatIndexRange(index.versification, link.target.start, link.target.end)}
-                        </span>
-                        <small>
-                          {isOutgoing && isIncoming ? 'Outgoing and incoming' : isOutgoing ? 'Outgoing' : 'Incoming'}
-                          {' · Open original relationship'}
-                        </small>
-                      </button>
-                    </li>
-                  ))}
+                  {curated
+                    .slice(0, 8)
+                    .map(({ link, outgoing: isOutgoing, incoming: isIncoming }) => (
+                      <li key={link.id}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onCuratedLink(link.id);
+                          }}
+                        >
+                          <strong>Link #{link.id}</strong>
+                          <span>
+                            {formatIndexRange(
+                              index.versification,
+                              link.source.start,
+                              link.source.end,
+                            )}
+                            {' → '}
+                            {formatIndexRange(
+                              index.versification,
+                              link.target.start,
+                              link.target.end,
+                            )}
+                          </span>
+                          <small>
+                            {isOutgoing && isIncoming
+                              ? 'Outgoing and incoming'
+                              : isOutgoing
+                                ? 'Outgoing'
+                                : 'Incoming'}
+                            {' · Open original relationship'}
+                          </small>
+                        </button>
+                      </li>
+                    ))}
                 </ul>
               )}
-              {curated.length > 8 && <p>Showing 8 of {curated.length} links. Open Arcs for the original source index.</p>}
+              {curated.length > 8 && (
+                <p>Showing 8 of {curated.length} links. Open Arcs for the original source index.</p>
+              )}
             </section>
           )}
 
           {showing('exact') && (
-            <section aria-label="Inspector exact Arabic evidence" className={styles.ayahEvidencePanel}>
+            <section
+              aria-label="Inspector exact Arabic evidence"
+              className={styles.ayahEvidencePanel}
+            >
               <h3>Computed exact Arabic phrases</h3>
               {expressions.status === 'ready' ? (
                 <>
                   <p>
-                    {exactPhrases.length} distinct repeated 3–8-word sequences in this ayah.
-                    Literal matches preserve original Tanzil spelling and word order; they do
-                    not establish shared meaning or curated connections.
+                    {exactPhrases.length} distinct repeated 3–8-word sequences in this ayah. Literal
+                    matches preserve original Tanzil spelling and word order; they do not establish
+                    shared meaning or curated connections.
                   </p>
-                  {exactPhrases.length === 0 && <p>No exact repeated expressions recorded at this ayah.</p>}
+                  {exactPhrases.length === 0 && (
+                    <p>No exact repeated expressions recorded at this ayah.</p>
+                  )}
                   <ul className={styles.ayahEvidenceList}>
                     {exactPhrases.slice(0, 8).map((expression) => (
                       <li key={expression.id}>
-                        <button type="button" onClick={() => { onExactExpression(expression.id); }}>
-                          <strong lang="ar" dir="rtl">{expression.words.join(' ')}</strong>
-                          <small>{expression.occurrences.length} recorded spans · Inspect exact source locations</small>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onExactExpression(expression.id);
+                          }}
+                        >
+                          <strong lang="ar" dir="rtl">
+                            {expression.words.join(' ')}
+                          </strong>
+                          <small>
+                            {expression.occurrences.length} recorded spans · Inspect exact source
+                            locations
+                          </small>
                         </button>
                       </li>
                     ))}
                   </ul>
-                  {exactPhrases.length > 8 && <p>Showing 8 of {exactPhrases.length} distinct expressions.</p>}
+                  {exactPhrases.length > 8 && (
+                    <p>Showing 8 of {exactPhrases.length} distinct expressions.</p>
+                  )}
                 </>
               ) : expressions.status === 'error' ? (
-                <EvidenceError message={expressions.message} onRetry={() => { onRetry('exact'); }} />
+                <EvidenceError
+                  message={expressions.message}
+                  onRetry={() => {
+                    onRetry('exact');
+                  }}
+                />
               ) : (
                 <p role="status">Verifying optional exact Arabic expressions…</p>
               )}
@@ -237,14 +303,17 @@ export function QuranAyahEvidence({
           )}
 
           {showing('morphology') && (
-            <section aria-label="Inspector Arabic morphology evidence" className={styles.ayahEvidencePanel}>
+            <section
+              aria-label="Inspector Arabic morphology evidence"
+              className={styles.ayahEvidencePanel}
+            >
               <h3>QAC lemmas, roots and segments</h3>
               {morphology.status === 'ready' ? (
                 <>
                   <p>
-                    {words.length} source-word positions are annotated for this ayah.
-                    The historical QAC tokenization is not assumed to align word-for-word
-                    with the separately displayed Tanzil v1.1 text.
+                    {words.length} source-word positions are annotated for this ayah. The historical
+                    QAC tokenization is not assumed to align word-for-word with the separately
+                    displayed Tanzil v1.1 text.
                   </p>
                   <ul className={styles.ayahEvidenceList}>
                     {words.slice(0, 8).map((word, position) => (
@@ -252,21 +321,41 @@ export function QuranAyahEvidence({
                         <button
                           type="button"
                           onClick={() => {
-                            onMorphologyWord(position + 1, word.lemmas[0] ?? null, word.roots[0] ?? null);
+                            onMorphologyWord(
+                              position + 1,
+                              word.lemmas[0] ?? null,
+                              word.roots[0] ?? null,
+                            );
                           }}
                         >
-                          <strong>QAC word {position + 1} <span lang="ar" dir="rtl">{word.form}</span></strong>
+                          <strong>
+                            QAC word {position + 1}{' '}
+                            <span lang="ar" dir="rtl">
+                              {word.form}
+                            </span>
+                          </strong>
                           <small>
-                            Lemmas: {word.lemmas.join(', ') || 'none'} · Roots: {word.roots.join(', ') || 'none'} · Grammar: {word.pos.join(', ') || 'unclassified'}
+                            Lemmas: {word.lemmas.join(', ') || 'none'} · Roots:{' '}
+                            {word.roots.join(', ') || 'none'} · Grammar:{' '}
+                            {word.pos.join(', ') || 'unclassified'}
                           </small>
                         </button>
                       </li>
                     ))}
                   </ul>
-                  {words.length > 8 && <p>Showing 8 of {words.length} source positions. Open morphology for every word.</p>}
+                  {words.length > 8 && (
+                    <p>
+                      Showing 8 of {words.length} source positions. Open morphology for every word.
+                    </p>
+                  )}
                 </>
               ) : morphology.status === 'error' ? (
-                <EvidenceError message={morphology.message} onRetry={() => { onRetry('morphology'); }} />
+                <EvidenceError
+                  message={morphology.message}
+                  onRetry={() => {
+                    onRetry('morphology');
+                  }}
+                />
               ) : (
                 <p role="status">Verifying optional QAC linguistic annotations…</p>
               )}
@@ -274,21 +363,31 @@ export function QuranAyahEvidence({
           )}
 
           {showing('themes') && (
-            <section aria-label="Inspector QSAC thematic evidence" className={styles.ayahEvidencePanel}>
+            <section
+              aria-label="Inspector QSAC thematic evidence"
+              className={styles.ayahEvidencePanel}
+            >
               <h3>QSAC external thematic tags</h3>
               {themes.status === 'ready' ? (
                 <>
                   <p>
-                    {tags.length} distinct external labels at this ayah. The QSAC annotations
-                    were produced with LLM assistance and human review; they are exploratory,
-                    not tafsir, scholarly consensus, or verified cross-references.
+                    {tags.length} distinct external labels at this ayah. The QSAC annotations were
+                    produced with LLM assistance and human review; they are exploratory, not tafsir,
+                    scholarly consensus, or verified cross-references.
                   </p>
                   <ul className={styles.ayahEvidenceList}>
                     {tags.map((tag) => (
                       <li key={tag.name}>
-                        <button type="button" onClick={() => { onTheme(tag.name); }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onTheme(tag.name);
+                          }}
+                        >
                           <strong>{tag.name}</strong>
-                          <span>{tag.domain} · {tag.category}</span>
+                          <span>
+                            {tag.domain} · {tag.category}
+                          </span>
                           <small>{tag.description}</small>
                         </button>
                       </li>
@@ -296,7 +395,12 @@ export function QuranAyahEvidence({
                   </ul>
                 </>
               ) : themes.status === 'error' ? (
-                <EvidenceError message={themes.message} onRetry={() => { onRetry('themes'); }} />
+                <EvidenceError
+                  message={themes.message}
+                  onRetry={() => {
+                    onRetry('themes');
+                  }}
+                />
               ) : (
                 <p role="status">Verifying optional QSAC annotation source…</p>
               )}
@@ -304,26 +408,37 @@ export function QuranAyahEvidence({
           )}
 
           {showing('emotions') && (
-            <section aria-label="Inspector ELQV emotion evidence" className={styles.ayahEvidencePanel}>
+            <section
+              aria-label="Inspector ELQV emotion evidence"
+              className={styles.ayahEvidencePanel}
+            >
               <h3>ELQV research emotion annotations</h3>
               {emotions.status === 'ready' ? (
                 <>
                   {labels.length === 0 ? (
                     <p>
-                      Not covered by the ELQV sample. This ayah is not annotated in that study;
-                      it is <strong>not</strong> classified as neutral or emotionless.
+                      Not covered by the ELQV sample. This ayah is not annotated in that study; it
+                      is <strong>not</strong> classified as neutral or emotionless.
                     </p>
                   ) : (
                     <>
                       <p>
-                        {labels.length} source-defined emotion {labels.length === 1 ? 'label' : 'labels'}.
-                        {labels.length > 1 ? ' Multiple conflicting categories are preserved without voting.' : ''}
-                        {' '}ELQV is an independent selected sample, not Quran-wide interpretation.
+                        {labels.length} source-defined emotion{' '}
+                        {labels.length === 1 ? 'label' : 'labels'}.
+                        {labels.length > 1
+                          ? ' Multiple conflicting categories are preserved without voting.'
+                          : ''}{' '}
+                        ELQV is an independent selected sample, not Quran-wide interpretation.
                       </p>
                       <ul className={styles.ayahEvidenceList}>
                         {labels.map((label) => (
                           <li key={label}>
-                            <button type="button" onClick={() => { onEmotion(label); }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onEmotion(label);
+                              }}
+                            >
                               <strong>{label.charAt(0).toUpperCase() + label.slice(1)}</strong>
                               <small>Open original ELQV sample for this label</small>
                             </button>
@@ -332,12 +447,23 @@ export function QuranAyahEvidence({
                       </ul>
                     </>
                   )}
-                  <button type="button" className={styles.ayahEvidenceAll} onClick={() => { onEmotion('all'); }}>
+                  <button
+                    type="button"
+                    className={styles.ayahEvidenceAll}
+                    onClick={() => {
+                      onEmotion('all');
+                    }}
+                  >
                     Open full ELQV research sample
                   </button>
                 </>
               ) : emotions.status === 'error' ? (
-                <EvidenceError message={emotions.message} onRetry={() => { onRetry('emotions'); }} />
+                <EvidenceError
+                  message={emotions.message}
+                  onRetry={() => {
+                    onRetry('emotions');
+                  }}
+                />
               ) : (
                 <p role="status">Verifying optional ELQV research annotations…</p>
               )}
@@ -345,8 +471,8 @@ export function QuranAyahEvidence({
           )}
           {section === 'all' && incomplete && (
             <p className={styles.ayahEvidenceDisclaimer}>
-              Results remain incomplete while optional sources are loading or unavailable.
-              Missing values are never inferred or counted as negative evidence.
+              Results remain incomplete while optional sources are loading or unavailable. Missing
+              values are never inferred or counted as negative evidence.
             </p>
           )}
         </div>

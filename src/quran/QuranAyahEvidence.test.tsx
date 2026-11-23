@@ -27,11 +27,17 @@ const data: QuranReaderData = {
 
 const themes = {
   forAyah: () => [
-    { name: 'Divine Mercy', domain: 'Theology', category: 'Attributes', description: 'Source-defined annotation', count: 25 },
+    {
+      name: 'Divine Mercy',
+      domain: 'Theology',
+      category: 'Attributes',
+      description: 'Source-defined annotation',
+      count: 25,
+    },
   ],
 } as unknown as QuranThemeIndex;
 const emotions = {
-  forAyah: (ayah: number) => ayah === 0 ? [] : ['fear', 'joy'],
+  forAyah: (ayah: number) => (ayah === 0 ? [] : ['fear', 'joy']),
 } as unknown as QuranEmotionIndex;
 
 function props() {
@@ -90,10 +96,16 @@ describe('Unified per-ayah evidence inspector', () => {
         emotions={{ status: 'ready', index: emotions }}
       />,
     );
-    expect(screen.getByLabelText('Ayah evidence inspector').textContent).toContain('2 of 3 checked sources');
-    expect(screen.getByLabelText('Inspector QSAC thematic evidence').textContent).toContain('Divine Mercy');
-    const theme = within(screen.getByLabelText('Inspector QSAC thematic evidence'))
-      .getByRole('button', { name: /Divine Mercy/ });
+    expect(screen.getByLabelText('Ayah evidence inspector').textContent).toContain(
+      '2 of 3 checked sources',
+    );
+    expect(screen.getByLabelText('Inspector QSAC thematic evidence').textContent).toContain(
+      'Divine Mercy',
+    );
+    const theme = within(screen.getByLabelText('Inspector QSAC thematic evidence')).getByRole(
+      'button',
+      { name: /Divine Mercy/ },
+    );
     fireEvent.click(theme);
     expect(input.onTheme).toHaveBeenCalledWith('Divine Mercy');
     const emotionPanel = screen.getByLabelText('Inspector ELQV emotion evidence');

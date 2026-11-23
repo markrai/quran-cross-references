@@ -4,13 +4,13 @@
 
 The Quran reader previously exposed five independent evidence systems in separate parts of the application. This phase brings them together under **each selected ayah** without combining their relationship semantics or asserting agreement.
 
-| Evidence source | Original provenance | Inspector measure | Drilldown |
-| --- | --- | --- | --- |
-| Curated | Mutashabihat source relationship index (2,445 directed link IDs) | Distinct source IDs incident on the ayah, with incoming/outgoing incidences shown separately | Original source relationship in Arcs |
-| Exact | Deterministic repeated 3–8-word Tanzil Uthmani v1.1 sequences | Unique expressions covering the ayah | Exact phrase source spans |
-| Morphology | QAC v0.4 word/segment annotation | Historical QAC word positions at this canonical ayah | Original QAC word, lemma, root and grammar |
-| Themes | QSAC v1.0, LLM-assisted and human reviewed | Source-assigned topic tags at this ayah | Full QSAC topic explorer |
-| Emotions | ELQV independent 2025 research sample | Labels recorded at this ayah, if it was included in the 2,087-ayah sample | Original ELQV emotion explorer |
+| Evidence source | Original provenance                                              | Inspector measure                                                                            | Drilldown                                  |
+| --------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Curated         | Mutashabihat source relationship index (2,445 directed link IDs) | Distinct source IDs incident on the ayah, with incoming/outgoing incidences shown separately | Original source relationship in Arcs       |
+| Exact           | Deterministic repeated 3–8-word Tanzil Uthmani v1.1 sequences    | Unique expressions covering the ayah                                                         | Exact phrase source spans                  |
+| Morphology      | QAC v0.4 word/segment annotation                                 | Historical QAC word positions at this canonical ayah                                         | Original QAC word, lemma, root and grammar |
+| Themes          | QSAC v1.0, LLM-assisted and human reviewed                       | Source-assigned topic tags at this ayah                                                      | Full QSAC topic explorer                   |
+| Emotions        | ELQV independent 2025 research sample                            | Labels recorded at this ayah, if it was included in the 2,087-ayah sample                    | Original ELQV emotion explorer             |
 
 Original source notices and pinned hashes remain as in `data/quran/sources.json`. Phase 2E.1 does **not** introduce or copy another source corpus, text edition or generated semantic relationship. Existing curated link IDs and external ontology labels remain stable.
 

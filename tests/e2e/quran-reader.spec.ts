@@ -1048,7 +1048,6 @@ test.describe('Quran Phase 2D.2 specialist-reviewed emotion evidence', () => {
   });
 });
 
-
 test.describe('Quran Phase 2E.1 unified ayah evidence inspector', () => {
   test('keeps optional sources unloaded until chosen and restores the curated section through history', async ({
     page,
@@ -1094,9 +1093,12 @@ test.describe('Quran Phase 2E.1 unified ayah evidence inspector', () => {
     expect(requests).toHaveLength(1);
     expect(requests[0]).toContain('/themes.json');
     await expect(page.getByLabel('Choose an ayah evidence source')).toContainText('Not checked');
-    await page.getByLabel('Inspector QSAC thematic evidence').getByRole('button', {
-      name: /Divine Mercy/,
-    }).click();
+    await page
+      .getByLabel('Inspector QSAC thematic evidence')
+      .getByRole('button', {
+        name: /Divine Mercy/,
+      })
+      .click();
     await expect(page).toHaveURL(/view=themes&theme=Divine\+Mercy/);
     await expect(page.getByRole('heading', { name: 'Divine Mercy' })).toBeVisible();
     await page.goBack();
@@ -1110,7 +1112,9 @@ test.describe('Quran Phase 2E.1 unified ayah evidence inspector', () => {
   }) => {
     await page.goto('./?ref=26%3A8&view=threads&inspect=emotions');
     const panel = page.getByLabel('Inspector ELQV emotion evidence');
-    await expect(panel).toContainText('Multiple conflicting categories are preserved without voting');
+    await expect(panel).toContainText(
+      'Multiple conflicting categories are preserved without voting',
+    );
     await expect(panel.getByRole('button', { name: /Fear/ })).toBeVisible();
     await expect(panel.getByRole('button', { name: /Anger/ })).toBeVisible();
     await expect(panel.getByRole('button', { name: /Sadness/ })).toBeVisible();
@@ -1123,9 +1127,7 @@ test.describe('Quran Phase 2E.1 unified ayah evidence inspector', () => {
     await expect(page.getByLabel('Inspector ELQV emotion evidence')).toContainText(
       'Not covered by the ELQV sample',
     );
-    await expect(page.getByLabel('Ayah evidence inspector')).toContainText(
-      'Not covered by ELQV',
-    );
+    await expect(page.getByLabel('Ayah evidence inspector')).toContainText('Not covered by ELQV');
   });
 
   test('drills into QAC source words without aligning historical token positions to displayed Arabic', async ({
@@ -1139,7 +1141,9 @@ test.describe('Quran Phase 2E.1 unified ayah evidence inspector', () => {
     await expect(page).toHaveURL(/evidence=morphology/);
     await expect(page).toHaveURL(/word=3/);
     await expect(page).not.toHaveURL(/inspect=/);
-    await expect(page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' }),
+    ).toBeVisible();
   });
 
   test('checks all independently verified sources on explicit request and retains coverage as ayahs change', async ({
@@ -1147,7 +1151,9 @@ test.describe('Quran Phase 2E.1 unified ayah evidence inspector', () => {
   }) => {
     const requested = new Set<string>();
     page.on('request', (event) => {
-      const match = event.url().match(/\/data\/quran\/(expressions|morphology|themes|emotions)\.json$/);
+      const match = event
+        .url()
+        .match(/\/data\/quran\/(expressions|morphology|themes|emotions)\.json$/);
       if (match?.[1]) requested.add(match[1]);
     });
     await page.goto('./?ref=2%3A255&view=threads');
@@ -1159,8 +1165,12 @@ test.describe('Quran Phase 2E.1 unified ayah evidence inspector', () => {
     await expect(page.getByLabel('Inspector Arabic morphology evidence')).toBeVisible();
     await expect(page.getByLabel('Inspector QSAC thematic evidence')).toBeVisible();
     await expect(page.getByLabel('Inspector ELQV emotion evidence')).toBeVisible();
-    await expect(page.getByLabel('Choose an ayah evidence source')).not.toContainText('Checking source');
-    await expect(page.getByLabel('Choose an ayah evidence source')).not.toContainText('Verification failed');
+    await expect(page.getByLabel('Choose an ayah evidence source')).not.toContainText(
+      'Checking source',
+    );
+    await expect(page.getByLabel('Choose an ayah evidence source')).not.toContainText(
+      'Verification failed',
+    );
     await expect(page.getByLabel('Ayah evidence inspector')).toContainText('of 5 checked sources');
     expect([...requested].sort()).toEqual(['emotions', 'expressions', 'morphology', 'themes']);
     await page.getByRole('button', { name: 'Next ayah' }).click();

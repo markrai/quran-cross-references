@@ -187,8 +187,11 @@ export function QuranApp() {
     if (
       !data ||
       !reader ||
-      (location.evidence !== 'exact' && location.inspector !== 'exact' && location.inspector !== 'all')
-    ) return;
+      (location.evidence !== 'exact' &&
+        location.inspector !== 'exact' &&
+        location.inspector !== 'all')
+    )
+      return;
     if (expressionCache.current) {
       setExpressionState({ status: 'ready', index: expressionCache.current });
       return;
@@ -270,8 +273,11 @@ export function QuranApp() {
     if (
       !data ||
       !reader ||
-      (location.evidence !== 'morphology' && location.inspector !== 'morphology' && location.inspector !== 'all')
-    ) return;
+      (location.evidence !== 'morphology' &&
+        location.inspector !== 'morphology' &&
+        location.inspector !== 'all')
+    )
+      return;
     if (morphologyCache.current) {
       setMorphologyState({ status: 'ready', index: morphologyCache.current });
       return;
@@ -297,14 +303,16 @@ export function QuranApp() {
   }, [data, location.view, location.evidence, location.inspector, morphologyAttempt]);
 
   useEffect(() => {
-    const inspecting = (location.view === 'arcs' || location.view === 'threads') &&
+    const inspecting =
+      (location.view === 'arcs' || location.view === 'threads') &&
       (location.inspector === 'themes' || location.inspector === 'all');
     if (
       !data ||
       (location.view !== 'themes' &&
         !inspecting &&
         !(location.view === 'emotions' && (comparisonRequested || location.selectedTheme !== null)))
-    ) return;
+    )
+      return;
     if (themesCache.current) {
       setThemesState({ status: 'ready', index: themesCache.current });
       return;
@@ -327,10 +335,18 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.view, location.inspector, location.selectedTheme, comparisonRequested, themesAttempt]);
+  }, [
+    data,
+    location.view,
+    location.inspector,
+    location.selectedTheme,
+    comparisonRequested,
+    themesAttempt,
+  ]);
 
   useEffect(() => {
-    const inspecting = (location.view === 'arcs' || location.view === 'threads') &&
+    const inspecting =
+      (location.view === 'arcs' || location.view === 'threads') &&
       (location.inspector === 'emotions' || location.inspector === 'all');
     if (!data || (location.view !== 'emotions' && !inspecting)) return;
     if (emotionsCache.current) {
@@ -732,105 +748,106 @@ export function QuranApp() {
                   )}
                 </section>
               )}
-            {(location.view === 'arcs' || location.view === 'threads') && activeIndex !== undefined && (
-              <QuranAyahEvidence
-                data={data}
-                ayahIndex={activeIndex}
-                section={location.inspector}
-                expressions={expressionState}
-                morphology={morphologyState}
-                themes={themesState}
-                emotions={emotionsState}
-                onSection={(inspector) => {
-                  navigate({ ...location, inspector });
-                }}
-                onRetry={(source: Exclude<QuranInspectorSource, 'curated'>) => {
-                  if (source === 'exact') {
-                    setExpressionState({ status: 'loading' });
-                    setExpressionAttempt((value) => value + 1);
-                  } else if (source === 'morphology') {
-                    setMorphologyState({ status: 'loading' });
-                    setMorphologyAttempt((value) => value + 1);
-                  } else if (source === 'themes') {
-                    setThemesState({ status: 'loading' });
-                    setThemesAttempt((value) => value + 1);
-                  } else {
-                    setEmotionsState({ status: 'loading' });
-                    setEmotionsAttempt((value) => value + 1);
-                  }
-                }}
-                onCuratedLink={(selectedLink) => {
-                  navigate({
-                    ...location,
-                    view: 'arcs',
-                    evidence: 'curated',
-                    inspector: null,
-                    scope: 'all',
-                    rangeEnd: null,
-                    selectedLink,
-                    selectedExpression: null,
-                    selectedMorphTerm: null,
-                    selectedMorphWord: null,
-                  });
-                }}
-                onExactExpression={(selectedExpression) => {
-                  navigate({
-                    ...location,
-                    view: 'arcs',
-                    evidence: 'exact',
-                    inspector: null,
-                    rangeEnd: null,
-                    selectedLink: null,
-                    selectedExpression,
-                    selectedMorphTerm: null,
-                    selectedMorphWord: null,
-                  });
-                }}
-                onMorphologyWord={(selectedMorphWord, lemma, root) => {
-                  navigate({
-                    ...location,
-                    view: 'arcs',
-                    evidence: 'morphology',
-                    inspector: null,
-                    rangeEnd: null,
-                    selectedLink: null,
-                    selectedExpression: null,
-                    morphologyGrouping: lemma === null && root !== null ? 'root' : 'lemma',
-                    selectedMorphTerm: lemma ?? root,
-                    selectedMorphWord,
-                  });
-                }}
-                onTheme={(selectedTheme) => {
-                  navigate({
-                    ...location,
-                    view: 'themes',
-                    evidence: 'curated',
-                    inspector: null,
-                    rangeEnd: null,
-                    selectedLink: null,
-                    selectedExpression: null,
-                    selectedMorphTerm: null,
-                    selectedMorphWord: null,
-                    selectedTheme,
-                  });
-                }}
-                onEmotion={(selectedEmotion) => {
-                  navigate({
-                    ...location,
-                    view: 'emotions',
-                    evidence: 'curated',
-                    inspector: null,
-                    rangeEnd: null,
-                    selectedLink: null,
-                    selectedExpression: null,
-                    selectedMorphTerm: null,
-                    selectedMorphWord: null,
-                    selectedTheme: null,
-                    selectedEmotion,
-                  });
-                }}
-              />
-            )}
+            {(location.view === 'arcs' || location.view === 'threads') &&
+              activeIndex !== undefined && (
+                <QuranAyahEvidence
+                  data={data}
+                  ayahIndex={activeIndex}
+                  section={location.inspector}
+                  expressions={expressionState}
+                  morphology={morphologyState}
+                  themes={themesState}
+                  emotions={emotionsState}
+                  onSection={(inspector) => {
+                    navigate({ ...location, inspector });
+                  }}
+                  onRetry={(source: Exclude<QuranInspectorSource, 'curated'>) => {
+                    if (source === 'exact') {
+                      setExpressionState({ status: 'loading' });
+                      setExpressionAttempt((value) => value + 1);
+                    } else if (source === 'morphology') {
+                      setMorphologyState({ status: 'loading' });
+                      setMorphologyAttempt((value) => value + 1);
+                    } else if (source === 'themes') {
+                      setThemesState({ status: 'loading' });
+                      setThemesAttempt((value) => value + 1);
+                    } else {
+                      setEmotionsState({ status: 'loading' });
+                      setEmotionsAttempt((value) => value + 1);
+                    }
+                  }}
+                  onCuratedLink={(selectedLink) => {
+                    navigate({
+                      ...location,
+                      view: 'arcs',
+                      evidence: 'curated',
+                      inspector: null,
+                      scope: 'all',
+                      rangeEnd: null,
+                      selectedLink,
+                      selectedExpression: null,
+                      selectedMorphTerm: null,
+                      selectedMorphWord: null,
+                    });
+                  }}
+                  onExactExpression={(selectedExpression) => {
+                    navigate({
+                      ...location,
+                      view: 'arcs',
+                      evidence: 'exact',
+                      inspector: null,
+                      rangeEnd: null,
+                      selectedLink: null,
+                      selectedExpression,
+                      selectedMorphTerm: null,
+                      selectedMorphWord: null,
+                    });
+                  }}
+                  onMorphologyWord={(selectedMorphWord, lemma, root) => {
+                    navigate({
+                      ...location,
+                      view: 'arcs',
+                      evidence: 'morphology',
+                      inspector: null,
+                      rangeEnd: null,
+                      selectedLink: null,
+                      selectedExpression: null,
+                      morphologyGrouping: lemma === null && root !== null ? 'root' : 'lemma',
+                      selectedMorphTerm: lemma ?? root,
+                      selectedMorphWord,
+                    });
+                  }}
+                  onTheme={(selectedTheme) => {
+                    navigate({
+                      ...location,
+                      view: 'themes',
+                      evidence: 'curated',
+                      inspector: null,
+                      rangeEnd: null,
+                      selectedLink: null,
+                      selectedExpression: null,
+                      selectedMorphTerm: null,
+                      selectedMorphWord: null,
+                      selectedTheme,
+                    });
+                  }}
+                  onEmotion={(selectedEmotion) => {
+                    navigate({
+                      ...location,
+                      view: 'emotions',
+                      evidence: 'curated',
+                      inspector: null,
+                      rangeEnd: null,
+                      selectedLink: null,
+                      selectedExpression: null,
+                      selectedMorphTerm: null,
+                      selectedMorphWord: null,
+                      selectedTheme: null,
+                      selectedEmotion,
+                    });
+                  }}
+                />
+              )}
             {location.view === 'analytics' && (
               <>
                 {(analyticsState.status === 'loading' || analyticsState.status === 'idle') && (
