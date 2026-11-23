@@ -735,7 +735,7 @@ export function QuranApp() {
                     aria-label="Previous ayah"
                     disabled={activeIndex === undefined || activeIndex === 0}
                     onClick={() => {
-                      if (data && activeIndex !== undefined && activeIndex > 0) {
+                      if (activeIndex !== undefined && activeIndex > 0) {
                         focus(data.relationships.versification.refAt(activeIndex - 1));
                       }
                     }}
@@ -747,7 +747,7 @@ export function QuranApp() {
                     aria-label="Next ayah"
                     disabled={activeIndex === undefined || activeIndex === data.relationships.ayahCount - 1}
                     onClick={() => {
-                      if (data && activeIndex !== undefined && activeIndex < data.relationships.ayahCount - 1) {
+                      if (activeIndex !== undefined && activeIndex < data.relationships.ayahCount - 1) {
                         focus(data.relationships.versification.refAt(activeIndex + 1));
                       }
                     }}
