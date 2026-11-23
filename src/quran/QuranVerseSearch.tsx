@@ -26,7 +26,11 @@ function highlighted(text: string, spans: readonly VerseSearchSpan[]): ReactNode
   let offset = 0;
   for (const span of spans) {
     nodes.push(text.slice(offset, span.start));
-    nodes.push(<mark key={span.start} className={styles.verseSearchMark}>{text.slice(span.start, span.end)}</mark>);
+    nodes.push(
+      <mark key={span.start} className={styles.verseSearchMark}>
+        {text.slice(span.start, span.end)}
+      </mark>,
+    );
     offset = span.end;
   }
   nodes.push(text.slice(offset));
@@ -46,7 +50,6 @@ export function QuranVerseSearch({
   const [surah, setSurah] = useState<number | null>(search?.surah ?? null);
   const [page, setPage] = useState(0);
 
-
   const index = useMemo(() => createVerseSearchIndex(data.text), [data.text]);
   const hits = useMemo(() => (search ? searchQuranVerses(index, search) : []), [index, search]);
   const pages = Math.ceil(hits.length / VERSE_SEARCH_PAGE_SIZE);
@@ -57,12 +60,19 @@ export function QuranVerseSearch({
       <div className={styles.verseSearchIntro}>
         <div>
           <h2>Search Quran verses</h2>
-          <p>Search the verified Tanzil Arabic or Pickthall English text, then open any matching ayah.</p>
+          <p>
+            Search the verified Tanzil Arabic or Pickthall English text, then open any matching
+            ayah.
+          </p>
         </div>
         {search && (
-          <button type="button" className={styles.goButton} onClick={() => {
-            onSearch(null);
-          }}>
+          <button
+            type="button"
+            className={styles.goButton}
+            onClick={() => {
+              onSearch(null);
+            }}
+          >
             Clear search
           </button>
         )}
@@ -74,7 +84,12 @@ export function QuranVerseSearch({
           const trimmed = query.trim();
           onSearch(
             trimmed
-              ? { query: trimmed, language, mode: language === 'arabic' ? mode : 'literal', surah }
+              ? {
+                  query: trimmed,
+                  language,
+                  mode: language === 'arabic' ? mode : 'literal',
+                  surah,
+                }
               : null,
           );
         }}
@@ -143,21 +158,27 @@ export function QuranVerseSearch({
             ))}
           </select>
         </label>
-        <button type="submit" className={styles.goButton}>Search verses</button>
+        <button type="submit" className={styles.goButton}>
+          Search verses
+        </button>
       </form>
       <p className={styles.verseSearchNote}>
         Arabic matching never modifies the original text. Ignoring marks removes combining
-        vocalization signs and tatweel from comparison only; it does not equate different
-        forms of alif or perform root or semantic matching.
+        vocalization signs and tatweel from comparison only; it does not equate different forms of
+        alif or perform root or semantic matching.
       </p>
       {search && (
         <div className={styles.verseSearchResults}>
           <p role="status" className={styles.verseSearchCount}>
-            {hits.length} matching {hits.length === 1 ? 'ayah' : 'ayahs'} · {search.language === 'arabic' ? 'Arabic' : 'English'}
+            {hits.length} matching {hits.length === 1 ? 'ayah' : 'ayahs'} ·{' '}
+            {search.language === 'arabic' ? 'Arabic' : 'English'}
             {search.surah !== null ? ' · ' + getSurah(search.surah).name : ''}
           </p>
           {hits.length === 0 ? (
-            <p>No verses match this exact text query. Try another spelling or a different Arabic matching mode.</p>
+            <p>
+              No verses match this exact text query. Try another spelling or a different Arabic
+              matching mode.
+            </p>
           ) : (
             <>
               <ol className={styles.verseSearchList} start={page * VERSE_SEARCH_PAGE_SIZE + 1}>
@@ -173,7 +194,9 @@ export function QuranVerseSearch({
                           onNavigate(reference);
                         }}
                       >
-                        <strong>{getSurah(reference.surah).name} · {formatAyahId(reference)}</strong>
+                        <strong>
+                          {getSurah(reference.surah).name} · {formatAyahId(reference)}
+                        </strong>
                         <span lang="ar" dir="rtl" className={styles.verseSearchArabic}>
                           {search.language === 'arabic'
                             ? highlighted(data.text.arabic[hit.ayahIndex] ?? '', hit.spans)
@@ -191,13 +214,27 @@ export function QuranVerseSearch({
               </ol>
               {pages > 1 && (
                 <div className={styles.verseSearchPagination}>
-                  <button type="button" className={styles.goButton} disabled={page === 0} onClick={() => {
-                    setPage((n) => Math.max(0, n - 1));
-                  }}>Previous matches</button>
+                  <button
+                    type="button"
+                    className={styles.goButton}
+                    disabled={page === 0}
+                    onClick={() => {
+                      setPage((n) => Math.max(0, n - 1));
+                    }}
+                  >
+                    Previous matches
+                  </button>
                   <span>Page {page + 1} of {pages}</span>
-                  <button type="button" className={styles.goButton} disabled={page >= pages - 1} onClick={() => {
-                    setPage((n) => Math.min(pages - 1, n + 1));
-                  }}>Next matches</button>
+                  <button
+                    type="button"
+                    className={styles.goButton}
+                    disabled={page >= pages - 1}
+                    onClick={() => {
+                      setPage((n) => Math.min(pages - 1, n + 1));
+                    }}
+                  >
+                    Next matches
+                  </button>
                 </div>
               )}
             </>
