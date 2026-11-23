@@ -2155,3 +2155,295 @@
     min-height: 5.5rem;
   }
 }
+
+.themeLanguageExplorer {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.themeLanguageBack {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 2.7rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.55rem;
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.themeLanguageBack:hover,
+.themeLanguageBack:focus-visible {
+  border-color: var(--color-accent);
+}
+
+.themeLanguageExplorer > .analyticsPanel {
+  padding: 1.15rem;
+}
+
+.themeLanguageControls {
+  display: grid;
+  grid-template-columns: minmax(13rem, 1.5fr) repeat(3, minmax(9rem, 1fr));
+  align-items: end;
+  gap: 0.7rem;
+}
+
+.themeLanguageControls .field,
+.themeLanguageControls select,
+.themeLanguageControls input {
+  min-width: 0;
+  width: 100%;
+  max-width: none;
+}
+
+.themeLanguageDenominator,
+.themeLanguageNotice {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.themeLanguageColumns {
+  display: grid;
+  grid-template-columns: minmax(17rem, 0.78fr) minmax(0, 1.22fr);
+  align-items: start;
+  gap: 1rem;
+}
+
+.themeLanguageColumns > .analyticsPanel,
+.themeLanguageDetails > .analyticsPanel {
+  min-width: 0;
+  padding: 1rem;
+}
+
+.themeLanguageDetails {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.themeLanguageFeatureList {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.themeLanguageFeature {
+  width: 100%;
+  min-height: 4.2rem;
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+  padding: 0.8rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  border-radius: 0.55rem;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.themeLanguageFeature[aria-pressed='true'],
+.themeLanguageFeature:hover,
+.themeLanguageFeature:focus-visible {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.themeLanguageFeature small {
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.themeLanguageFeatureHeading {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.themeLanguageFeatureHeading > strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.themeLanguageArabic,
+.themeLanguagePhrase {
+  font-family: 'Amiri', 'Noto Naskh Arabic', 'Traditional Arabic', 'Scheherazade New', serif;
+  line-height: 1.45;
+  font-size: 1.4rem;
+  overflow-wrap: anywhere;
+}
+
+.themeLanguagePhrase {
+  font-size: 1.18rem;
+}
+
+.themeLanguageRateGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 1rem 0;
+}
+
+.themeLanguageRateGrid > div {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.7rem;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+  min-width: 0;
+}
+
+.themeLanguageRateGrid strong {
+  font-size: clamp(1.05rem, 2vw, 1.45rem);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.themeLanguageRateGrid span {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.themeLanguageSurahs {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.themeLanguageSurahs button {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(6rem, 1fr) minmax(7rem, auto);
+  gap: 0.2rem 0.75rem;
+  text-align: left;
+  align-items: center;
+  padding: 0.65rem;
+  min-height: 2.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.45rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+}
+
+.themeLanguageSurahs button[aria-pressed='true'],
+.themeLanguageSurahs button:hover {
+  border-color: var(--color-accent);
+}
+
+.themeLanguageSurahs button > span {
+  font-size: 0.73rem;
+  color: var(--color-text-muted);
+}
+
+.themeLanguageSurahs .themeLanguageBars {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 0.15rem;
+  background: var(--color-surface);
+  border-radius: 0.25rem;
+}
+
+.themeLanguageBars > span {
+  display: block;
+  height: 0.34rem;
+  max-width: 100%;
+  border-radius: 0.25rem;
+  background: var(--color-accent);
+}
+
+.themeLanguageBars > span + span {
+  background: var(--color-text-muted);
+  opacity: 0.65;
+}
+
+.themeLanguageSurahs .themeLanguageMore {
+  display: block;
+  text-align: center;
+  background: transparent;
+  font-size: 0.84rem;
+}
+
+.themeLanguageSampleControls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 0.9rem 0;
+}
+
+.themeLanguageSampleControls .field,
+.themeLanguageSampleControls select {
+  min-width: 0;
+  width: 100%;
+  max-width: none;
+}
+
+.themeLanguageVerses {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.8rem 0;
+}
+
+.themeLanguageVerses > button {
+  display: grid;
+  gap: 0.5rem;
+  min-height: 3.5rem;
+  padding: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.55rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.themeLanguageVerses button:hover,
+.themeLanguageVerses button:focus-visible {
+  border-color: var(--color-accent);
+}
+
+.themeLanguageVerses button > span {
+  font-family: 'Amiri', 'Noto Naskh Arabic', 'Traditional Arabic', 'Scheherazade New', serif;
+  font-size: 1.25rem;
+  line-height: 1.9;
+  text-align: right;
+}
+
+.themeLanguageVerses button > small {
+  font-family: var(--font-serif);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 75rem) {
+  .themeLanguageControls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 62rem) {
+  .themeLanguageColumns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 38rem) {
+  .themeLanguageControls,
+  .themeLanguageSampleControls,
+  .themeLanguageRateGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .themeLanguageSurahs button {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
