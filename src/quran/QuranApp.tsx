@@ -493,7 +493,13 @@ export function QuranApp() {
         )}
       </header>
 
-      <main id="quran-main" className={styles.main} style={readingStyle} ref={mainRef} tabIndex={-1}>
+      <main
+        id="quran-main"
+        className={styles.main}
+        style={readingStyle}
+        ref={mainRef}
+        tabIndex={-1}
+      >
         <div className={styles.toolbar}>
           {!readingMode && (
             <div className={styles.viewTabs} role="group" aria-label="Visualization">

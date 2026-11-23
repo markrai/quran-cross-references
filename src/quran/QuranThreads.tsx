@@ -132,7 +132,9 @@ export function QuranThreads({
               </span>
             )}
           </h2>
-          <p>{surah.ayahCount} ayahs · {readerOnly ? 'Focused reading' : 'Explore verse connections'}</p>
+          <p>
+            {surah.ayahCount} ayahs · {readerOnly ? 'Focused reading' : 'Explore verse connections'}
+          </p>
           <p id="quran-verse-keyboard-help" className={styles.keyboardHelp}>
             Keyboard: Tab to the selected ayah, then Up/Down to move through verses. Home/End move
             to the first/last ayah of the current surah.
@@ -141,7 +143,7 @@ export function QuranThreads({
         <ol
           className={styles.ayahList}
           start={1}
-          aria-label={surah.name + " ayahs"}
+          aria-label={surah.name + ' ayahs'}
           aria-describedby="quran-verse-keyboard-help"
         >
           {Array.from({ length: surah.ayahCount }, (_, offset) => {

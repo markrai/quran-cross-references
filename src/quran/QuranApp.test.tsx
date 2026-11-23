@@ -208,7 +208,9 @@ describe('Quran-first reader', () => {
   it('uses a single tab stop and arrow-key focus across canonical surah boundaries', async () => {
     window.history.replaceState(null, '', '/?ref=1%3A7&view=threads');
     render(<QuranApp />);
-    const reader = await screen.findByRole('region', { name: 'Quran text and relationship threads' });
+    const reader = await screen.findByRole('region', {
+      name: 'Quran text and relationship threads',
+    });
     const selected = () => findSelectedVerse(reader);
     expect(reader.querySelectorAll('ol button[tabindex="0"]')).toHaveLength(1);
     expect(reader.querySelectorAll('ol button[tabindex="-1"]')).toHaveLength(6);
@@ -238,7 +240,9 @@ describe('Quran-first reader', () => {
   it('does not capture modified keys or form keyboard actions', async () => {
     window.history.replaceState(null, '', '/?ref=2%3A1&view=threads');
     render(<QuranApp />);
-    const reader = await screen.findByRole('region', { name: 'Quran text and relationship threads' });
+    const reader = await screen.findByRole('region', {
+      name: 'Quran text and relationship threads',
+    });
     const selected = findSelectedVerse(reader);
     const original = window.location.search;
     fireEvent.keyDown(selected, { key: 'ArrowDown', ctrlKey: true });
@@ -254,9 +258,7 @@ describe('Quran-first reader', () => {
     selected.focus();
     fireEvent.keyDown(selected, { key: 'ArrowUp' });
     expect(window.location.search).toContain('ref=1%3A7');
-    expect(document.activeElement).toBe(
-      reader.querySelector('ol button[aria-current="true"]'),
-    );
+    expect(document.activeElement).toBe(reader.querySelector('ol button[aria-current="true"]'));
   });
 
   it('provides surah navigation in reading mode with reachable selected-ayah focus', async () => {
@@ -266,14 +268,16 @@ describe('Quran-first reader', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Enter reading mode' }));
     const nav = screen.getByRole('navigation', { name: 'Surah navigation' });
     expect(nav.querySelectorAll('button')).toHaveLength(3);
-    expect(screen.getByRole('button', { name: 'Previous surah' }).hasAttribute('disabled')).toBe(true);
+    expect(screen.getByRole('button', { name: 'Previous surah' }).hasAttribute('disabled')).toBe(
+      true,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Next surah' }));
     expect(window.location.search).toContain('ref=2%3A1');
     fireEvent.click(screen.getByRole('button', { name: 'Focus selected ayah' }));
     expect(document.activeElement).toBe(
-      screen.getByRole('region', { name: 'Distraction-free Quran reader' }).querySelector(
-        'ol button[aria-current="true"]',
-      ),
+      screen
+        .getByRole('region', { name: 'Distraction-free Quran reader' })
+        .querySelector('ol button[aria-current="true"]'),
     );
     fireEvent.click(screen.getByRole('button', { name: 'Previous surah' }));
     expect(window.location.search).toContain('ref=1%3A1');
