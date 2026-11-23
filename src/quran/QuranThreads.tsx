@@ -85,7 +85,10 @@ export function QuranThreads({
               {surah.arabicName}
             </span>
           </h2>
-          <p>{surah.ayahCount} ayahs · Select any ayah to explore its connections</p>
+          <p>
+            {surah.ayahCount} ayahs ·{' '}
+            {readerOnly ? 'Select an ayah to continue reading' : 'Select any ayah to explore its connections'}
+          </p>
         </div>
         <ol className={styles.ayahList} start={1}>
           {Array.from({ length: surah.ayahCount }, (_, offset) => {
