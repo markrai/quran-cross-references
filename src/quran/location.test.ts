@@ -27,6 +27,9 @@ describe('Quran-first canonical route', () => {
       selectedTheme: null,
       selectedEmotion: 'all',
       inspector: null,
+      themeAnalysis: 'browse',
+      patternKind: 'root',
+      selectedPattern: null,
       morphologyGrouping: 'lemma',
       selectedMorphTerm: null,
       selectedMorphWord: null,
@@ -111,6 +114,61 @@ describe('Quran-first canonical route', () => {
       parseQuranLocation(new URL('https://example.test/?evidence=morphology&term=%20'))
         .selectedMorphTerm,
     ).toBeNull();
+  });
+
+  it('round-trips bounded theme-language source and feature links independently of other views', () => {
+    const root = {
+      ...DEFAULT_QURAN_LOCATION,
+      view: 'themes' as const,
+      selectedTheme: 'Divine Mercy',
+      themeAnalysis: 'language' as const,
+      patternKind: 'root' as const,
+      selectedPattern: 'rHm',
+      reference: { surah: 2, ayah: 255 },
+    };
+    const url = quranLocationUrl(root, '/quran-cross-references/');
+    expect(url).toContain('theme=Divine+Mercy&analysis=language&feature=rHm');
+    expect(parseQuranLocation(new URL(url, 'https://example.test'))).toEqual(root);
+
+    const expression = 'exact:v1:' + 'a'.repeat(64);
+    const exact = {
+      ...root,
+      patternKind: 'exact' as const,
+      selectedPattern: expression,
+    };
+    const exactUrl = quranLocationUrl(exact, '/site/');
+    expect(exactUrl).toContain('pattern=exact&feature=exact%3Av1%3A');
+    expect(parseQuranLocation(new URL(exactUrl, 'https://example.test'))).toEqual(exact);
+
+    const lemma = { ...root, patternKind: 'lemma' as const, selectedPattern: 'raHm' };
+    expect(parseQuranLocation(new URL(quranLocationUrl(lemma, '/site/'), 'https://example.test')))
+      .toEqual(lemma);
+  });
+
+  it('does not leak linguistics into other research tabs or accept untrusted malformed features', () => {
+    const invalid = [
+      'https://example.test/?view=threads&theme=Divine+Mercy&analysis=language&feature=rHm',
+      'https://example.test/?view=emotions&theme=Divine+Mercy&analysis=language&pattern=exact',
+      'https://example.test/?view=themes&theme=Divine+Mercy&analysis=unknown&feature=rHm',
+    ];
+    for (const url of invalid) {
+      const result = parseQuranLocation(new URL(url));
+      expect(result.themeAnalysis).toBe('browse');
+      expect(result.patternKind).toBe('root');
+      expect(result.selectedPattern).toBeNull();
+      expect(quranLocationUrl(result, '/site/')).not.toContain('analysis=');
+    }
+    for (const bad of ['%20', 'rHm%0A', 'a'.repeat(129), 'exact:v1:bad']) {
+      const result = parseQuranLocation(
+        new URL('https://example.test/?view=themes&analysis=language&pattern=exact&feature=' + bad),
+      );
+      expect(result.selectedPattern).toBeNull();
+    }
+    const bogus = parseQuranLocation(
+      new URL('https://example.test/?view=themes&analysis=language&pattern=unknown&feature=rHm'),
+    );
+    expect(bogus.patternKind).toBe('root');
+    expect(bogus.selectedPattern).toBe('rHm');
   });
 
   it('round-trips independent thematic annotations without mixing them into curated or exact evidence', () => {
