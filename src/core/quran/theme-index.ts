@@ -122,7 +122,9 @@ export class QuranThemeIndex {
       (dataset['duplicateAssignmentCount'] as number) < 0 ||
       dataset['sourceAssignmentCount'] !== total + (dataset['duplicateAssignmentCount'] as number)
     ) {
-      invalid('Raw source totals must distinguish duplicate annotations from unique verse memberships.');
+      invalid(
+        'Raw source totals must distinguish duplicate annotations from unique verse memberships.',
+      );
     }
     for (const [id, raw] of tags.entries()) {
       const tag = object(raw, 'Tag');
