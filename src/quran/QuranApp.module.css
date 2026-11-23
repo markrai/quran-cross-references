@@ -1706,3 +1706,132 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+
+.themesDashboard {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.themesCredit {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+}
+
+.themesCredit a {
+  width: fit-content;
+}
+
+.themesColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr);
+  gap: 1.1rem;
+  align-items: start;
+}
+
+.themesDetails {
+  min-width: 0;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.themesFilters {
+  display: grid;
+  gap: 0.8rem;
+  padding: 0.8rem 1.15rem;
+}
+
+.themesFilters .field select,
+.themesFilters .field input {
+  max-width: none;
+  width: 100%;
+  min-width: 0;
+}
+
+.themesCatalog,
+.themesOccurrences {
+  display: grid;
+  gap: 0.35rem;
+  max-height: 38rem;
+  padding: 0.4rem 0.85rem;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.themesCatalog button,
+.themesOccurrences button {
+  display: grid;
+  gap: 0.3rem;
+  min-height: 50px;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.themesCatalog button:hover,
+.themesCatalog button[aria-pressed='true'],
+.themesOccurrences button:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.themesCatalog button strong,
+.themesOccurrences button strong {
+  line-height: 1.4;
+}
+
+.themesCatalog button span,
+.themesOccurrences button span {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.themesCatalog button small,
+.themesOccurrences button small {
+  color: var(--color-accent);
+  font-size: 0.76rem;
+}
+
+.themesDistribution {
+  display: grid;
+  gap: 0.8rem;
+  padding: 0.9rem 1.1rem 1.2rem;
+}
+
+.themesDistributionRow {
+  display: grid;
+  grid-template-columns: minmax(7.2rem, 12rem) minmax(0, 1fr) 3rem;
+  gap: 0.65rem;
+  align-items: center;
+  font-size: 0.78rem;
+}
+
+.themesDistributionRow > span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.themesDistributionRow strong {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 65rem) {
+  .themesColumns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 37rem) {
+  .themesDistributionRow {
+    grid-template-columns: minmax(5.5rem, 8rem) minmax(0, 1fr) 2rem;
+    gap: 0.4rem;
+  }
+}
