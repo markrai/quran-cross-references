@@ -175,9 +175,9 @@ describe('Quran-first reader', () => {
     const reader = screen.getByRole('region', { name: 'Quran text and relationship threads' });
     expect(reader.querySelector('[lang="ar"]')).toBeNull();
     expect(reader.querySelector('[lang="en"]')).not.toBeNull();
-    expect(document.getElementById('quran-main')?.style.getPropertyValue('--reading-arabic-size')).toBe(
-      '2.45rem',
-    );
+    expect(
+      document.getElementById('quran-main')?.style.getPropertyValue('--reading-arabic-size'),
+    ).toBe('2.45rem');
     expect(window.location.search).toBe('?ref=2%3A1&view=threads');
     rendered.unmount();
     render(<QuranApp />);
