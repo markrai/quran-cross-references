@@ -315,10 +315,7 @@ describe('Quran-first reader', () => {
     expect(await screen.findByText(/matching ayahs · English literal/)).toBeTruthy();
     expect(verse.querySelector('mark')).not.toBeNull();
     expect(vi.mocked(loadQacMorphology)).not.toHaveBeenCalled();
-    expect(screen.getByRole('combobox', { name: 'Search type' })).toHaveProperty(
-      'value',
-      'text',
-    );
+    expect(screen.getByRole('combobox', { name: 'Search type' })).toHaveProperty('value', 'text');
   });
 
   it('lazily verifies QAC for root search, preserves original Quran text and shows word positions', async () => {
@@ -329,10 +326,7 @@ describe('Quran-first reader', () => {
     );
     render(<QuranApp />);
     expect(await screen.findByText('QAC v0.4 · 2 annotated words')).toBeTruthy();
-    expect(screen.getByRole('combobox', { name: 'Search type' })).toHaveProperty(
-      'value',
-      'root',
-    );
+    expect(screen.getByRole('combobox', { name: 'Search type' })).toHaveProperty('value', 'root');
     expect(screen.getByText('Word 3 · ADJ')).toBeTruthy();
     expect(screen.getByText('Word 4 · ADJ')).toBeTruthy();
     const search = screen.getByRole('region', { name: 'Bilingual Quran verse search' });
@@ -355,8 +349,9 @@ describe('Quran-first reader', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Search verses' }));
     expect(window.location.search).toContain('qmode=root');
-    expect(await screen.findByText(/Unable to verify Quranic Arabic Corpus: pinned mismatch/))
-      .toBeTruthy();
+    expect(
+      await screen.findByText(/Unable to verify Quranic Arabic Corpus: pinned mismatch/),
+    ).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Retry QAC data' }));
     expect(await screen.findByText('QAC v0.4 · 2 annotated words')).toBeTruthy();
     expect(vi.mocked(loadQacMorphology)).toHaveBeenCalledTimes(2);

@@ -190,7 +190,9 @@ export function parseQuranLocation(url: URL): QuranLocation {
           query: rawVerseQuery,
           language: rawVerseMode !== null || rawVerseLanguage === 'ar' ? 'arabic' : 'english',
           mode:
-            rawVerseMode === null && rawVerseLanguage === 'ar' && params.get('qmatch') === 'unmarked'
+            rawVerseMode === null &&
+            rawVerseLanguage === 'ar' &&
+            params.get('qmatch') === 'unmarked'
               ? 'unmarked'
               : 'literal',
           surah: validVerseSurah,

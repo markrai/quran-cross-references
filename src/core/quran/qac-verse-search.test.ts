@@ -51,9 +51,7 @@ describe('Phase 3C.1 Quranic Arabic Corpus verse discovery', () => {
   it('filters canonical surah ranges without using QAC word count as an ayah index', () => {
     const surah1 = searchQacVerses(index, 'root', 'rHm', 1);
     expect(surah1.hits.map((hit) => hit.ayahIndex)).toEqual([0, 5]);
-    expect(searchQacVerses(index, 'root', 'rHm', 2).hits.map((hit) => hit.ayahIndex)).toEqual([
-      7,
-    ]);
+    expect(searchQacVerses(index, 'root', 'rHm', 2).hits.map((hit) => hit.ayahIndex)).toEqual([7]);
     expect(searchQacVerses(index, 'root', 'rHm', 114).hits).toEqual([]);
   });
 

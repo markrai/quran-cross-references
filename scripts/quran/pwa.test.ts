@@ -62,10 +62,7 @@ describe('Quran offline release shell', () => {
     const stored = new Map<string, Response>();
     const handlers = new Map<
       string,
-      (event: {
-        request?: Request;
-        respondWith?: (promise: Promise<unknown>) => void;
-      }) => void
+      (event: { request?: Request; respondWith?: (promise: Promise<unknown>) => void }) => void
     >();
     let online = true;
     const network = vi.fn(() =>

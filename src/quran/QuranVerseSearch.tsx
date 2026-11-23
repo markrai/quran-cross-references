@@ -64,9 +64,7 @@ export function QuranVerseSearch({
   const [query, setQuery] = useState(search?.query ?? '');
   const [language, setLanguage] = useState(search?.language ?? 'english');
   const [mode, setMode] = useState(search?.mode ?? 'literal');
-  const [searchType, setSearchType] = useState<'text' | QacGrouping>(
-    search?.morphology ?? 'text',
-  );
+  const [searchType, setSearchType] = useState<'text' | QacGrouping>(search?.morphology ?? 'text');
   const [surah, setSurah] = useState<number | null>(search?.surah ?? null);
   const [page, setPage] = useState(0);
 
@@ -248,15 +246,16 @@ export function QuranVerseSearch({
           )}
           {!morphologyPending && hits.length === 0 ? (
             <p>
-              No annotated or literal verses match this query. Try a different spelling,
-              Buckwalter transliteration, or another search type.
+              No annotated or literal verses match this query. Try a different spelling, Buckwalter
+              transliteration, or another search type.
             </p>
           ) : !morphologyPending ? (
             <>
               <ol className={styles.verseSearchList} start={page * VERSE_SEARCH_PAGE_SIZE + 1}>
                 {visible.map((hit, i) => {
                   const reference = CANONICAL_QURAN.refAt(hit.ayahIndex);
-                  const annotations = qacResult?.hits[page * VERSE_SEARCH_PAGE_SIZE + i]?.annotations ?? [];
+                  const annotations =
+                    qacResult?.hits[page * VERSE_SEARCH_PAGE_SIZE + i]?.annotations ?? [];
                   return (
                     <li key={hit.ayahIndex}>
                       <button
@@ -290,8 +289,12 @@ export function QuranVerseSearch({
                           <ul>
                             {annotations.map((occurrence) => (
                               <li key={occurrence.word}>
-                                <span lang="ar" dir="rtl">{occurrence.form}</span>
-                                <span>Word {occurrence.word + 1} · {occurrence.pos}</span>
+                                <span lang="ar" dir="rtl">
+                                  {occurrence.form}
+                                </span>
+                                <span>
+                                  Word {occurrence.word + 1} · {occurrence.pos}
+                                </span>
                               </li>
                             ))}
                           </ul>

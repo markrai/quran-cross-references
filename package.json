@@ -16,7 +16,7 @@
     "typecoverage": "node scripts/type-coverage.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --write docs/QURAN_PHASE_3C1.md src/core/quran/qac-verse-search.test.ts src/core/quran/qac-verse-search.ts src/quran/location.ts src/quran/location.test.ts src/quran/QuranApp.test.tsx src/quran/QuranVerseSearch.tsx tests/e2e/quran-reader.spec.ts scripts/quran/pwa.test.ts scripts/quran/pwa.ts && git diff -- docs/QURAN_PHASE_3C1.md src/core/quran/qac-verse-search.test.ts src/core/quran/qac-verse-search.ts src/quran/location.ts src/quran/location.test.ts src/quran/QuranApp.test.tsx src/quran/QuranVerseSearch.tsx tests/e2e/quran-reader.spec.ts scripts/quran/pwa.test.ts scripts/quran/pwa.ts && exit 1",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

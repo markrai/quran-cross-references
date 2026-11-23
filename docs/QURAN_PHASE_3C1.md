@@ -8,7 +8,7 @@ Literal Arabic and Pickthall English searches retain the Phase 3A.1 exact-text a
 
 The resulting corpus words are grouped by their zero-based canonical ayah index and sorted by numeric ayah and QAC word position. UI labels convert the QAC word position to **one-based** but do not use it to compute Tanzil character offsets. Original `lang="ar" dir="rtl"` Tanzil and `lang="en" dir="ltr"` Pickthall verses stay byte-identical. Search results label QAC v0.4 and show the annotated word form and part of speech, with an explicit link to the existing QAC inspector.
 
-Root-family hits and lemma-family hits are **linguistic annotations**, not curated cross-references, full-text substring matches, reliable word-to-word Tanzil codepoint alignments, or interpretations of meaning. Result counts count *distinct ayahs* while a verse may contain multiple annotated QAC words.
+Root-family hits and lemma-family hits are **linguistic annotations**, not curated cross-references, full-text substring matches, reliable word-to-word Tanzil codepoint alignments, or interpretations of meaning. Result counts count _distinct ayahs_ while a verse may contain multiple annotated QAC words.
 
 ## URLs and failure behavior
 
