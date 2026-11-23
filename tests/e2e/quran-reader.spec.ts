@@ -1063,12 +1063,14 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
     await expect(page).toHaveURL(/evidence=morphology&morph=root&term=rHm/);
   });
 
-  test('does not precache the large QAC sidecar with the offline reader', async ({ page }) => {
-    await page.goto('./?ref=2%3A255&evidence=morphology');
-    await expect(
-      page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' }),
-    ).toBeVisible();
-    const cached = await page.evaluate(async () => {
+  test('keeps QAC out of install precache and caches it only after morphology use', async ({ page }) => {
+    await page.goto('./?ref=2%3A255');
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    await page.reload();
+    await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated');
+    const checkCache = async () => page.evaluate(async () => {
       const registration = await navigator.serviceWorker.ready;
       const names = await caches.keys();
       const name = names.find((candidate) => candidate.startsWith('quran-cross-references-shell-'));
@@ -1080,7 +1082,12 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
       const text = await cache.match(new URL('data/quran/text.json', registration.scope));
       return { morphology: morphology !== undefined, text: text !== undefined };
     });
-    expect(cached).toEqual({ morphology: false, text: true });
+    expect(await checkCache()).toEqual({ morphology: false, text: true });
+    await page.getByRole('combobox', { name: 'Evidence type' }).selectOption('morphology');
+    await expect(
+      page.getByRole('heading', { name: 'Arabic lemmas, roots, and grammar' }),
+    ).toBeVisible();
+    expect(await checkCache()).toEqual({ morphology: true, text: true });
   });
 });
 
