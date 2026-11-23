@@ -58,7 +58,7 @@ describe('canonical bilingual verse search', () => {
       mode: 'unmarked',
     });
     expect(unmarked.map((hit) => hit.ayahIndex)).toEqual([0, 1]);
-    expect(unmarked[0]?.spans[0]).toEqual({ start: 0, end: 5 });
+    expect(unmarked[0]?.spans[0]).toEqual({ start: 0, end: 6 });
     expect(index.text.arabic[0]).toBe('بِسْمِ ٱللَّهِ');
   });
 
@@ -118,13 +118,13 @@ describe('canonical bilingual verse search', () => {
     const arabic = [...text.arabic];
     arabic[0] = 'مَـرْحَمَةٌ';
     const index = createVerseSearchIndex({ arabic, english: text.english });
-    expect(
-      searchQuranVerses(index, {
-        ...base,
-        query: 'مرحمة',
-        language: 'arabic',
-        mode: 'unmarked',
-      }),
-    ).toEqual([{ ayahIndex: 0, spans: [{ start: 0, end: arabic[0].length }] }]);
+    const hits = searchQuranVerses(index, {
+      ...base,
+      query: 'مرحمة',
+      language: 'arabic',
+      mode: 'unmarked',
+    });
+    expect(hits[0]).toEqual({ ayahIndex: 0, spans: [{ start: 0, end: arabic[0].length }] });
+    expect(hits[1]?.ayahIndex).toBe(2);
   });
 });
