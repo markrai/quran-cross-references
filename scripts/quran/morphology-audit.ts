@@ -44,10 +44,16 @@ function features(input: string, feature: string): string | null {
   return result;
 }
 
-export function parseQacWords(raw: string): { readonly words: readonly QacWord[]; readonly segmentCount: number; readonly stemCount: number } {
-  if (!raw.includes('Copyright (C) 2011 Kais Dukes') ||
-      !raw.includes('GNU General Public License') ||
-      !raw.includes('CHANGING IT IS NOT ALLOWED')) {
+export function parseQacWords(raw: string): {
+  readonly words: readonly QacWord[];
+  readonly segmentCount: number;
+  readonly stemCount: number;
+} {
+  if (
+    !raw.includes('Copyright (C) 2011 Kais Dukes') ||
+    !raw.includes('GNU General Public License') ||
+    !raw.includes('CHANGING IT IS NOT ALLOWED')
+  ) {
     throw new Error('Missing Quranic Arabic Corpus license or immutable-source notice.');
   }
   const words: QacWord[] = [];
@@ -55,7 +61,14 @@ export function parseQacWords(raw: string): { readonly words: readonly QacWord[]
   let stemCount = 0;
   let previousAyah = -1;
   let previousPosition = 0;
-  let current: { ayah: number; position: number; segments: number; stems: number; lemmas: Set<string>; roots: Set<string> } | null = null;
+  let current: {
+    ayah: number;
+    position: number;
+    segments: number;
+    stems: number;
+    lemmas: Set<string>;
+    roots: Set<string>;
+  } | null = null;
   const finish = () => {
     if (current === null) return;
     if (current.stems === 0) throw new Error('QAC word lacks a stem.');
@@ -84,10 +97,12 @@ export function parseQacWords(raw: string): { readonly words: readonly QacWord[]
     }
     if (current === null || current.ayah !== ayah || current.position !== position) {
       finish();
-      if (ayah < previousAyah ||
-          (ayah === previousAyah && position !== previousPosition + 1) ||
-          (ayah !== previousAyah && position !== 1) ||
-          segment !== 1) {
+      if (
+        ayah < previousAyah ||
+        (ayah === previousAyah && position !== previousPosition + 1) ||
+        (ayah !== previousAyah && position !== 1) ||
+        segment !== 1
+      ) {
         throw new Error('QAC word sequence is not ordered and contiguous.');
       }
       current = { ayah, position, segments: 0, stems: 0, lemmas: new Set(), roots: new Set() };
@@ -114,7 +129,8 @@ export function parseQacWords(raw: string): { readonly words: readonly QacWord[]
 }
 
 export function auditQac(bytes: Buffer, arabic: readonly string[]): QacAudit {
-  if (arabic.length !== CANONICAL_QURAN.ayahCount) throw new Error('Missing canonical Tanzil ayahs.');
+  if (arabic.length !== CANONICAL_QURAN.ayahCount)
+    throw new Error('Missing canonical Tanzil ayahs.');
   if (bytes.length !== QAC_RAW_BYTES) throw new Error('Incorrect upstream QAC byte length.');
   const blobHeader = Buffer.from('blob ' + String(bytes.length) + '\0', 'ascii');
   const blob = createHash('sha1').update(blobHeader).update(bytes).digest('hex');

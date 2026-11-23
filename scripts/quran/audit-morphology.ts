@@ -9,7 +9,8 @@ try {
 } catch {
   throw new Error(
     'Morphology audit needs an independently obtained, unmodified QAC v0.4 file at data/raw/' +
-    QAC_FILENAME + '. This command neither downloads nor publishes third-party annotation.',
+      QAC_FILENAME +
+      '. This command neither downloads nor publishes third-party annotation.',
   );
 }
 const registry = JSON.parse(readFileSync('data/quran/sources.json', 'utf8')) as {
@@ -18,7 +19,9 @@ const registry = JSON.parse(readFileSync('data/quran/sources.json', 'utf8')) as 
 function pinned(id: string, file: string): string {
   const item = registry.sources.find((source) => source.id === id);
   if (!item) throw new Error('Missing source pin: ' + id);
-  return verifyPinnedQuranSource(readFileSync('data/raw/' + file), item.sha256, id).toString('utf8');
+  return verifyPinnedQuranSource(readFileSync('data/raw/' + file), item.sha256, id).toString(
+    'utf8',
+  );
 }
 const original = importQuranText(
   pinned('tanzil-uthmani', 'quran-uthmani-1.1.txt'),

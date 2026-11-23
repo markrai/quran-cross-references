@@ -54,16 +54,23 @@ describe('QAC morphology audit intake', () => {
     expect(() => parseQacWords(fixture)).toThrow('license');
     expect(() => parseQacWords(notice + '\n(115:1:1:1)\ta\tN\tSTEM')).toThrow('outside');
     expect(() => parseQacWords(notice + '\n(1:1:1:2)\ta\tN\tSTEM')).toThrow('ordered');
-    expect(() => parseQacWords(notice + '\n(1:1:1:1)\ta\tN\tSTEM\n(1:1:1:3)\tb\tP\tPREFIX')).toThrow('consecutive');
+    expect(() =>
+      parseQacWords(notice + '\n(1:1:1:1)\ta\tN\tSTEM\n(1:1:1:3)\tb\tP\tPREFIX'),
+    ).toThrow('consecutive');
     expect(() => parseQacWords(notice + '\n(1:1:1:1)\ta\tP\tPREFIX')).toThrow('lacks');
     expect(() => parseQacWords(notice + '\n(1:1:1:1)\ta\tN')).toThrow('four-column');
-    expect(() => parseQacWords(notice + '\n(1:1:1:1)\ta\tN\tSTEM\n(1:1:3:1)\tb\tN\tSTEM')).toThrow('contiguous');
+    expect(() => parseQacWords(notice + '\n(1:1:1:1)\ta\tN\tSTEM\n(1:1:3:1)\tb\tN\tSTEM')).toThrow(
+      'contiguous',
+    );
   });
 
   it('rejects substitute or incomplete licensed corpus bytes before any alignment claims', () => {
     expect(() => auditQac(Buffer.from(notice + '\n' + fixture), [])).toThrow('Canonical');
     expect(() =>
-      auditQac(Buffer.from(notice + '\n' + fixture), Array.from({ length: 6236 }, () => 'بِسْمِ')),
+      auditQac(
+        Buffer.from(notice + '\n' + fixture),
+        Array.from({ length: 6236 }, () => 'بِسْمِ'),
+      ),
     ).toThrow('byte length');
   });
 });
