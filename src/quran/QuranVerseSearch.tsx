@@ -302,7 +302,7 @@ export function QuranVerseSearch({
                               onClick={() => {
                                 const first = annotations[0];
                                 const grouping = search.morphology;
-                                const term = qacResult?.term;
+                                const term = qacResult.term;
                                 if (first && grouping && term) {
                                   onInspectMorphology(reference, grouping, term, first.word + 1);
                                 }
