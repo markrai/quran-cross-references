@@ -1246,7 +1246,8 @@ test.describe('Quran Phase 2E.2 linguistic pattern discovery', () => {
     );
     const details = page.getByLabel('Selected linguistic pattern');
     await details.getByRole('button', { name: 'Open original exact phrase evidence' }).click();
-    await expect(page).toHaveURL(/view=arcs/);
+    await expect(page).not.toHaveURL(/view=themes/);
+    await expect(page.getByRole('button', { name: 'Arcs', exact: true })).toHaveAttribute('aria-pressed', 'true');
     await expect(page).toHaveURL(/evidence=exact/);
     await expect(page).toHaveURL(/expression=exact%3Av1%3A/);
     await page.goBack();
