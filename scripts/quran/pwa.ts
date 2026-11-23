@@ -67,7 +67,8 @@ export function pwaCacheFiles(files: readonly string[]): string[] {
         file.startsWith('assets/') ||
         (file.startsWith('data/quran/') &&
           file !== 'data/quran/expressions.json' &&
-          file !== 'data/quran/morphology.json') ||
+          file !== 'data/quran/morphology.json' &&
+          file !== 'data/quran/themes.json') ||
         file.startsWith('icons/') ||
         file === 'social-preview.png',
     )

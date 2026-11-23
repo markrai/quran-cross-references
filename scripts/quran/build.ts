@@ -13,6 +13,7 @@ import {
 import { importMutashabihat, importQuranText } from './datasets.ts';
 import { buildQuranAnalytics } from './analytics.ts';
 import { importQacMorphology } from './qac.ts';
+import { importQsacThemes } from './qsac.ts';
 import { buildQuranTopology } from '../../src/quran/topology-model.ts';
 import { verifyPinnedQuranSource } from './pinned-source.ts';
 
@@ -118,6 +119,14 @@ writeDataset('topology.json', buildQuranTopology(relationshipIndex, curatedPin.s
 const qacPin = pins.find((pin) => pin.id === 'qac-morphology-v04');
 if (!qacPin) throw new Error('Missing pinned QAC v0.4 morphology.');
 writeDataset('morphology.json', importQacMorphology(readPinned(qacPin.id), qacPin, tanzilNotice));
+const themeSource = pins.find((pin) => pin.id === 'qsac-verse-tags-v1');
+const ontologySource = pins.find((pin) => pin.id === 'qsac-ontology-v1');
+if (!themeSource || !ontologySource) throw new Error('Missing pinned QSAC source.');
+writeDataset('themes.json', importQsacThemes(
+  readPinned(themeSource.id),
+  readPinned(ontologySource.id),
+  { annotations: themeSource.sha256, ontology: ontologySource.sha256 },
+));
 writeDataset('manifest.json', {
   format: 'quran-foundation-manifest',
   schemaVersion: 1,
