@@ -202,6 +202,7 @@ export function QuranApp() {
       : undefined;
 
   useEffect(() => {
+    if (readingMode) return;
     const reader = location.view === 'arcs' || location.view === 'threads';
     const themeAnalysis =
       location.view === 'themes' &&
@@ -246,6 +247,7 @@ export function QuranApp() {
     location.themeAnalysis,
     location.patternKind,
     expressionAttempt,
+    readingMode,
   ]);
 
   useEffect(() => {
@@ -301,6 +303,7 @@ export function QuranApp() {
   }, [data, location.view, topologyAttempt]);
 
   useEffect(() => {
+    if (readingMode) return;
     const reader = location.view === 'arcs' || location.view === 'threads';
     const themeAnalysis =
       location.view === 'themes' &&
@@ -345,9 +348,11 @@ export function QuranApp() {
     location.themeAnalysis,
     location.patternKind,
     morphologyAttempt,
+    readingMode,
   ]);
 
   useEffect(() => {
+    if (readingMode) return;
     const inspecting =
       (location.view === 'arcs' || location.view === 'threads') &&
       (location.inspector === 'themes' || location.inspector === 'all');
@@ -387,9 +392,11 @@ export function QuranApp() {
     location.selectedTheme,
     comparisonRequested,
     themesAttempt,
+    readingMode,
   ]);
 
   useEffect(() => {
+    if (readingMode) return;
     const inspecting =
       (location.view === 'arcs' || location.view === 'threads') &&
       (location.inspector === 'emotions' || location.inspector === 'all');
@@ -416,7 +423,7 @@ export function QuranApp() {
     return () => {
       controller.abort();
     };
-  }, [data, location.view, location.inspector, emotionsAttempt]);
+  }, [data, location.view, location.inspector, emotionsAttempt, readingMode]);
 
   const expressionIndex = expressionState.status === 'ready' ? expressionState.index : null;
   const candidate =
@@ -718,6 +725,37 @@ export function QuranApp() {
                 preferences={readingPreferences}
                 onChange={setReadingPreferences}
               />
+            )}
+            {readingMode && (
+              <div className={styles.readingHeading}>
+                <h1>{activeSurah.name} · {formatAyahId(location.reference)}</h1>
+                <div className={styles.stepper}>
+                  <button
+                    type="button"
+                    aria-label="Previous ayah"
+                    disabled={activeIndex === undefined || activeIndex === 0}
+                    onClick={() => {
+                      if (data && activeIndex !== undefined && activeIndex > 0) {
+                        focus(data.relationships.versification.refAt(activeIndex - 1));
+                      }
+                    }}
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Next ayah"
+                    disabled={activeIndex === undefined || activeIndex === data.relationships.ayahCount - 1}
+                    onClick={() => {
+                      if (data && activeIndex !== undefined && activeIndex < data.relationships.ayahCount - 1) {
+                        focus(data.relationships.versification.refAt(activeIndex + 1));
+                      }
+                    }}
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
             )}
             {location.view === 'threads' && !readingMode && (
               <QuranVerseSearch
