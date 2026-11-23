@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { formatAyahId, type AyahRef } from '../core/quran/ayah-ref.ts';
 import { formatIndexRange, parseReference } from '../core/quran/reference.ts';
 import { passesQuranRelationshipFilter } from '../core/quran/relationship-filter.ts';
@@ -25,6 +25,12 @@ import { loadQacMorphology } from './qac.ts';
 import type { QacMorphologyIndex } from '../core/quran/qac-index.ts';
 import { QuranThreads } from './QuranThreads.tsx';
 import { QuranVerseSearch } from './QuranVerseSearch.tsx';
+import { QuranReadingControls } from './QuranReadingControls.tsx';
+import {
+  readReadingPreferences,
+  saveReadingPreferences,
+  readingTextStyles,
+} from './reading-preferences.ts';
 import { QuranAyahEvidence } from './QuranAyahEvidence.tsx';
 import type { QuranInspectorSource } from './location.ts';
 import {
@@ -116,6 +122,7 @@ export function QuranApp() {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const [offline, setOffline] = useState(() => !navigator.onLine);
+  const [readingPreferences, setReadingPreferences] = useState(readReadingPreferences);
   const [expressionState, setExpressionState] = useState<ExpressionLoadState>({ status: 'idle' });
   const [expressionAttempt, setExpressionAttempt] = useState(0);
   const expressionCache = useRef<QuranExpressionIndex | null>(null);
@@ -135,6 +142,10 @@ export function QuranApp() {
   const [emotionsState, setEmotionsState] = useState<EmotionLoadState>({ status: 'idle' });
   const [emotionsAttempt, setEmotionsAttempt] = useState(0);
   const emotionsCache = useRef<QuranEmotionIndex | null>(null);
+
+  useEffect(() => {
+    saveReadingPreferences(readingPreferences);
+  }, [readingPreferences]);
 
   useEffect(() => {
     const update = () => {
@@ -184,6 +195,11 @@ export function QuranApp() {
     focus({ surah, ayah: 1 });
   };
   const data = loadState.status === 'ready' ? loadState.data : null;
+  const readingMode = location.view === 'threads' && readingPreferences.readingMode;
+  const readingStyle =
+    location.view === 'threads'
+      ? (readingTextStyles(readingPreferences) as CSSProperties)
+      : undefined;
 
   useEffect(() => {
     const reader = location.view === 'arcs' || location.view === 'threads';
@@ -462,8 +478,9 @@ export function QuranApp() {
         )}
       </header>
 
-      <main id="quran-main" className={styles.main}>
+      <main id="quran-main" className={styles.main} style={readingStyle}>
         <div className={styles.toolbar}>
+          {!readingMode && (
           <div className={styles.viewTabs} role="group" aria-label="Visualization">
             {(['arcs', 'threads', 'analytics', 'network', 'themes', 'emotions'] as const).map(
               (view) => (
@@ -506,8 +523,10 @@ export function QuranApp() {
               ),
             )}
           </div>
+          )}
           <div className={styles.toolbarFields}>
-            {location.view !== 'analytics' &&
+            {!readingMode &&
+              location.view !== 'analytics' &&
               location.view !== 'network' &&
               location.view !== 'themes' &&
               location.view !== 'emotions' && (
@@ -617,7 +636,8 @@ export function QuranApp() {
                 </select>
               </label>
             )}
-            {location.view !== 'analytics' &&
+            {!readingMode &&
+              location.view !== 'analytics' &&
               location.view !== 'network' &&
               location.view !== 'themes' &&
               location.view !== 'emotions' &&
@@ -640,7 +660,7 @@ export function QuranApp() {
                   </select>
                 </label>
               )}
-            {location.view === 'threads' && location.evidence === 'curated' && (
+            {!readingMode && location.view === 'threads' && location.evidence === 'curated' && (
               <label className={styles.field}>
                 <span>Direction</span>
                 <select
@@ -694,6 +714,12 @@ export function QuranApp() {
         {data && (
           <>
             {location.view === 'threads' && (
+              <QuranReadingControls
+                preferences={readingPreferences}
+                onChange={setReadingPreferences}
+              />
+            )}
+            {location.view === 'threads' && !readingMode && (
               <QuranVerseSearch
                 key={location.verseSearch ? JSON.stringify(location.verseSearch) : 'empty'}
                 data={data}
@@ -705,7 +731,8 @@ export function QuranApp() {
                 onNavigate={focus}
               />
             )}
-            {location.view !== 'analytics' &&
+            {!readingMode &&
+              location.view !== 'analytics' &&
               location.view !== 'network' &&
               location.view !== 'themes' &&
               location.view !== 'emotions' && (
@@ -781,17 +808,22 @@ export function QuranApp() {
                   )}
                   {activeIndex !== undefined && (
                     <>
-                      <p className={styles.focusArabic} lang="ar" dir="rtl">
-                        {data.text.arabic[activeIndex]}
-                      </p>
-                      <p className={styles.focusEnglish} lang="en" dir="ltr">
-                        {data.text.english[activeIndex]}
-                      </p>
+                      {(location.view !== 'threads' || readingPreferences.language !== 'english') && (
+                        <p className={styles.focusArabic} lang="ar" dir="rtl">
+                          {data.text.arabic[activeIndex]}
+                        </p>
+                      )}
+                      {(location.view !== 'threads' || readingPreferences.language !== 'arabic') && (
+                        <p className={styles.focusEnglish} lang="en" dir="ltr">
+                          {data.text.english[activeIndex]}
+                        </p>
+                      )}
                     </>
                   )}
                 </section>
               )}
-            {(location.view === 'arcs' || location.view === 'threads') &&
+            {!readingMode &&
+              (location.view === 'arcs' || location.view === 'threads') &&
               activeIndex !== undefined && (
                 <QuranAyahEvidence
                   data={data}
@@ -1247,7 +1279,8 @@ export function QuranApp() {
                 )}
               </>
             )}
-            {location.view !== 'analytics' &&
+            {!readingMode &&
+              location.view !== 'analytics' &&
               location.view !== 'network' &&
               location.view !== 'themes' &&
               location.view !== 'emotions' &&
@@ -1311,7 +1344,8 @@ export function QuranApp() {
                   )}
                 </>
               )}
-            {location.view !== 'analytics' &&
+            {!readingMode &&
+              location.view !== 'analytics' &&
               location.view !== 'network' &&
               location.view !== 'themes' &&
               location.view !== 'emotions' &&
@@ -1355,7 +1389,17 @@ export function QuranApp() {
               location.view !== 'network' &&
               location.view !== 'themes' &&
               location.view !== 'emotions' &&
-              (location.evidence === 'morphology' ? (
+              (readingMode ? (
+                <QuranThreads
+                  data={data}
+                  reference={location.reference}
+                  scope={location.scope}
+                  direction={location.direction}
+                  onNavigate={focus}
+                  readerOnly
+                  displayLanguage={readingPreferences.language}
+                />
+              ) : location.evidence === 'morphology' ? (
                 location.view === 'threads' ? (
                   <QuranThreads
                     data={data}
@@ -1364,6 +1408,7 @@ export function QuranApp() {
                     direction={location.direction}
                     onNavigate={focus}
                     showCurated={false}
+                    displayLanguage={readingPreferences.language}
                   />
                 ) : null
               ) : location.evidence === 'exact' ? (
@@ -1384,6 +1429,7 @@ export function QuranApp() {
                     direction={location.direction}
                     onNavigate={focus}
                     showCurated={false}
+                    displayLanguage={readingPreferences.language}
                   />
                 )
               ) : location.view === 'arcs' ? (
@@ -1460,6 +1506,7 @@ export function QuranApp() {
                   scope={location.scope}
                   direction={location.direction}
                   onNavigate={focus}
+                  displayLanguage={readingPreferences.language}
                 />
               ))}
           </>
