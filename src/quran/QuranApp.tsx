@@ -24,6 +24,7 @@ import type { QuranThemeIndex } from '../core/quran/theme-index.ts';
 import { loadQacMorphology } from './qac.ts';
 import type { QacMorphologyIndex } from '../core/quran/qac-index.ts';
 import { QuranThreads } from './QuranThreads.tsx';
+import { QuranVerseSearch } from './QuranVerseSearch.tsx';
 import { QuranAyahEvidence } from './QuranAyahEvidence.tsx';
 import type { QuranInspectorSource } from './location.ts';
 import {
@@ -692,6 +693,15 @@ export function QuranApp() {
         )}
         {data && (
           <>
+            {location.view === 'threads' && (
+              <QuranVerseSearch
+                data={data}
+                search={location.verseSearch}
+                selectedAyah={activeIndex ?? null}
+                onSearch={(verseSearch) => navigate({ ...location, verseSearch })}
+                onNavigate={focus}
+              />
+            )}
             {location.view !== 'analytics' &&
               location.view !== 'network' &&
               location.view !== 'themes' &&
