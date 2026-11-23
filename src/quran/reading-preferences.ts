@@ -54,9 +54,7 @@ export function parseReadingPreferences(raw: string | null): ReadingPreferences 
           ? spacing
           : DEFAULT_READING_PREFERENCES.spacing,
       readingMode:
-        typeof readingMode === 'boolean'
-          ? readingMode
-          : DEFAULT_READING_PREFERENCES.readingMode,
+        typeof readingMode === 'boolean' ? readingMode : DEFAULT_READING_PREFERENCES.readingMode,
     };
   } catch {
     return DEFAULT_READING_PREFERENCES;
