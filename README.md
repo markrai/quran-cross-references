@@ -135,6 +135,20 @@ The inspector is collapsed initially. Opening a category loads only that source'
 
 Share an exact reader state such as `?ref=26%3A8&view=threads&inspect=emotions` or `?ref=2%3A255&view=threads&inspect=all`. Browser back and forward retain the selected source; switching ayahs recalculates coverage without refetching already verified datasets. This phase introduces **no new corpus**, no new pairwise graph edges, no login infrastructure, and no extra PWA installation data. See [Phase 2E.1](docs/QURAN_PHASE_2E1.md).
 
+## QSAC theme-to-language research (Phase 2E.2)
+
+The existing **Themes** tab now offers **Analyze Arabic patterns within this topic** for each experimental QSAC tag. The explorer compares the **fraction of canonical ayahs carrying both a QSAC topic label and a particular linguistic feature** against the fraction of **all other ayahs not carrying that QSAC label**. Results are read-only, computed locally, and sourced exclusively from the existing integrity-verified datasets:
+
+- **QAC roots / lemmas:** original v0.4 linguistic annotations, grouped independently. Word positions are not overlaid onto the separately displayed Tanzil text.
+- **Exact Arabic expressions:** exact diacritic- and order-preserving 3–8-word Tanzil v1.1 repetitions; repeated spans *within the same ayah* count only once.
+- **QSAC topics:** 338 independently published LLM-assisted, human-reviewed exploratory annotation labels. A verse without a given tag is **untagged in this dataset**, not necessarily absent of that subject.
+
+Each feature displays tagged and untagged **ayah-presence counts, both denominators, percentage rates and a signed percentage-point difference**. Eligible features are sorted descriptively by their difference, with conservative visibility filters but **no statistical-significance or semantic-similarity claims**. You can switch between positive and negative differences, filter source features, explore per-surah numerator/denominator counts, inspect paginated bilingual source ayahs, or open the original morphological or exact-phrase evidence.
+
+The optional QAC or exact-expression data loads only for the chosen source, using existing pinned manifest checks. The Themes explorer itself does not request either dataset until analysis is opened. Re-entering an already verified source reuses the session index. The full state can be linked, for example, using `?view=themes&theme=Divine+Mercy&analysis=language&pattern=root&feature=rHm`. No new data publication, offline precaching, user accounts, generated relationships or network service is introduced.
+
+Interpretation caveat: **co-occurrence is not causation, proof of meaning, annotation consensus, or scholarly tafsir**. Many QSAC labels are sparse, and ayah lengths and surah distributions differ. A small feature count, even with a large percentage difference, may be unstable. See [Phase 2E.2 design and acceptance](docs/QURAN_PHASE_2E2.md).
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).
