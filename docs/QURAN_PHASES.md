@@ -251,6 +251,17 @@ See [Phase 2C.2](QURAN_PHASE_2C2.md).
 
 See [Phase 2B.4](QURAN_PHASE_2B4.md).
 
+### Phase 2D.1: Independent experimental thematic annotations
+
+- Import QSAC v1.0 at an immutable revision with SHA-256 pinned source CSV and ontology, identifying it explicitly as LLM-assisted and human-reviewed third-party annotations.
+- Validate canonical 6,236 ayah positions, 18 domains, 70 categories, 338 tags, 1–5 assignments per ayah and dataset integrity. Do not ship upstream Arabic or Saheeh International translation columns.
+- Publish a separate deterministic and checksum-pinned `themes.json` sidecar, with source attribution and ontology hierarchy; keep it out of the default offline PWA installation cache.
+- Add an independent Themes tab with topic search, domain/category filtering, paginated 24-ayah results, surah distributions, shareable topic links and drill-through to the bilingual Quran reader.
+- Never recast experimental topic membership as curated cross-references, theological consensus or a similarity-weighted graph.
+- Retain all current Quran data products and release gates, with Linux/Windows reproducibility and desktop/phone acceptance tests.
+
+See [Phase 2D.1](QURAN_PHASE_2D1.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

@@ -2,7 +2,7 @@ import { formatAyahId, type AyahRef } from '../core/quran/ayah-ref.ts';
 import { parseReference } from '../core/quran/reference.ts';
 import type { QuranRelationshipScope } from '../core/quran/relationship-filter.ts';
 
-export type QuranView = 'arcs' | 'threads' | 'analytics' | 'network';
+export type QuranView = 'arcs' | 'threads' | 'analytics' | 'network' | 'themes';
 export type QuranNetworkMode = 'surah' | 'ayah';
 export type QuranDirection = 'outgoing' | 'incoming' | 'both';
 export type QuranEvidenceMode = 'curated' | 'exact' | 'morphology';
@@ -17,6 +17,7 @@ export interface QuranLocation {
   readonly selectedLink: number | null;
   readonly evidence: QuranEvidenceMode;
   readonly selectedExpression: string | null;
+  readonly selectedTheme: string | null;
   readonly morphologyGrouping: QuranMorphGrouping;
   readonly selectedMorphTerm: string | null;
   readonly selectedMorphWord: number | null;
@@ -33,6 +34,7 @@ export const DEFAULT_QURAN_LOCATION: QuranLocation = {
   selectedLink: null,
   evidence: 'curated',
   selectedExpression: null,
+  selectedTheme: null,
   morphologyGrouping: 'lemma',
   selectedMorphTerm: null,
   selectedMorphWord: null,
@@ -61,12 +63,17 @@ export function parseQuranLocation(url: URL): QuranLocation {
       : null;
   const rawView = params.get('view');
   const view: QuranView =
-    rawView === 'threads' || rawView === 'analytics' || rawView === 'network' ? rawView : 'arcs';
+    rawView === 'threads' ||
+    rawView === 'analytics' ||
+    rawView === 'network' ||
+    rawView === 'themes'
+      ? rawView
+      : 'arcs';
   const direction = params.get('direction');
   const scope = params.get('scope');
   const requestedEvidence = params.get('evidence');
   const evidence: QuranEvidenceMode =
-    view === 'network'
+    view === 'network' || view === 'themes'
       ? 'curated'
       : requestedEvidence === 'exact' || requestedEvidence === 'morphology'
         ? requestedEvidence
@@ -91,6 +98,16 @@ export function parseQuranLocation(url: URL): QuranLocation {
       ? Number(rawWord)
       : null;
   const expression = params.get('expression');
+  const rawTheme = params.get('theme');
+  const selectedTheme =
+    view === 'themes' &&
+    rawTheme !== null &&
+    rawTheme.length > 0 &&
+    rawTheme.length <= 80 &&
+    rawTheme.trim() === rawTheme &&
+    !Array.from(rawTheme).some((character) => character.charCodeAt(0) < 32)
+      ? rawTheme
+      : null;
   return {
     reference,
     rangeEnd,
@@ -99,6 +116,7 @@ export function parseQuranLocation(url: URL): QuranLocation {
     selectedMorphTerm,
     selectedMorphWord,
     evidence,
+    selectedTheme,
     selectedExpression:
       evidence === 'exact' && expression !== null && /^exact:v1:[a-f0-9]{64}$/.test(expression)
         ? expression
@@ -130,6 +148,9 @@ export function quranLocationUrl(location: QuranLocation, base: string): string 
     if (location.selectedExpression !== null) params.set('expression', location.selectedExpression);
   }
   if (location.view !== 'arcs') params.set('view', location.view);
+  if (location.view === 'themes' && location.selectedTheme !== null) {
+    params.set('theme', location.selectedTheme);
+  }
   if (location.view === 'network' && location.networkMode === 'ayah') {
     params.set('network', 'ayah');
     if (location.networkDepth === 2) params.set('depth', '2');

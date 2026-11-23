@@ -837,3 +837,92 @@ test.describe('Quran Phase 2B.4 original QAC morphology', () => {
     expect(cached).toEqual({ morphology: false, text: true });
   });
 });
+
+test.describe('Quran Phase 2D.1 independently annotated themes', () => {
+  test('loads experimental theme annotations on demand, with integrity and no separate translation shipping', async ({
+    page,
+    request,
+  }) => {
+    const requests: string[] = [];
+    page.on('request', (event) => {
+      if (event.url().endsWith('/data/quran/themes.json')) requests.push(event.url());
+    });
+    await page.goto('./?ref=1%3A1');
+    await expect(page.getByRole('heading', { name: /Al-Fatihah.*1:1/ })).toBeVisible();
+    expect(requests).toEqual([]);
+    await page.getByRole('button', { name: 'Themes', exact: true }).click();
+    await expect(page).toHaveURL(/view=themes/);
+    await expect(
+      page.getByRole('heading', { name: 'Thematic exploration across the Quran' }),
+    ).toBeVisible();
+    expect(requests).toHaveLength(1);
+    const response = await request.get('data/quran/themes.json');
+    expect(response.ok()).toBe(true);
+    const report = (await response.json()) as {
+      format: string;
+      origin: string;
+      tags: unknown[];
+      ayahs: number[][];
+      annotationCount: number;
+    };
+    expect(report.format).toBe('quran-external-themes');
+    expect(report.origin).toBe('external-llm-assisted-annotation');
+    expect(report.tags).toHaveLength(338);
+    expect(report.ayahs).toHaveLength(6236);
+    expect(report.annotationCount).toBeGreaterThan(14000);
+    expect(Object.keys(report)).not.toContain('eng');
+    expect(Object.keys(report)).not.toContain('arabic');
+  });
+
+  test('filters thematic concepts and opens the original cited ayah with back navigation', async ({
+    page,
+  }) => {
+    await page.goto('./?ref=1%3A1&view=themes');
+    await expect(
+      page.getByRole('heading', { name: 'Thematic exploration across the Quran' }),
+    ).toBeVisible();
+    await page.getByRole('searchbox', { name: 'Search Quran topics' }).fill('Divine Mercy');
+    await page
+      .getByRole('button', { name: /Divine Mercy/ })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/view=themes&theme=Divine\+Mercy/);
+    await expect(page.getByRole('heading', { name: 'Divine Mercy' })).toBeVisible();
+    await expect(page.getByLabel('Theme distribution by surah')).toBeVisible();
+    await page.getByRole('combobox', { name: 'Theme verse scope' }).selectOption('surah');
+    await expect(page.getByLabel('Theme tagged Quran verses')).toBeVisible();
+    await page.getByRole('combobox', { name: 'Theme verse scope' }).selectOption('all');
+    await expect(page.getByRole('button', { name: 'Next labeled verses' })).toBeEnabled();
+    await page.getByRole('button', { name: 'Next labeled verses' }).click();
+    await expect(page.getByText(/2 \/ \d+/).last()).toBeVisible();
+    await page
+      .getByRole('button', { name: /Read tagged Quran ayah/ })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/view=threads/);
+    await expect(page.getByRole('heading', { name: /Threads from/ })).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/view=themes&theme=Divine\+Mercy/);
+    await expect(page.getByRole('heading', { name: 'Divine Mercy' })).toBeVisible();
+  });
+
+  test('does not add optional experimental themes to the offline reader installation cache', async ({
+    page,
+  }) => {
+    await page.goto('./?view=themes');
+    await expect(
+      page.getByRole('heading', { name: 'Thematic exploration across the Quran' }),
+    ).toBeVisible();
+    const cached = await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready;
+      const names = await caches.keys();
+      const name = names.find((candidate) => candidate.startsWith('quran-cross-references-shell-'));
+      if (!name) return { themes: false, text: false };
+      const cache = await caches.open(name);
+      const themes = await cache.match(new URL('data/quran/themes.json', registration.scope));
+      const text = await cache.match(new URL('data/quran/text.json', registration.scope));
+      return { themes: themes !== undefined, text: text !== undefined };
+    });
+    expect(cached).toEqual({ themes: false, text: true });
+  });
+});

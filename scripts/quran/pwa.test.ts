@@ -16,6 +16,8 @@ describe('Quran offline release shell', () => {
       'data/quran/manifest.json',
       'data/quran/expressions.json',
       'data/quran/morphology.json',
+      'data/quran/themes.json',
+      'data/quran/themes.json',
       'manifest.webmanifest',
       'icons/icon-192.png',
       'icons/icon-512.png',

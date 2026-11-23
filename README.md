@@ -103,6 +103,14 @@ This segment-level evidence is different from curated similar passages and compu
 
 See [Phase 2B.4: QAC morphology](docs/QURAN_PHASE_2B4.md).
 
+## Experimental thematic source expansion (Phase 2D.1)
+
+The **Themes** tab explores 338 topical annotations grouped into 18 domains and 70 categories from the independent QSAC v1.0 corpus. Filter topics, inspect per-surah distributions, and open each assigned ayah in the existing bilingual reader. Share any selected topic using `?view=themes&theme=Divine+Mercy`.
+
+**Evidence disclaimer:** QSAC labels were created with LLM assistance and human review. They are exploratory external annotations, **not** original curated similar-passage links, a scholarly consensus, tafsir, or new machine-inferred Quran graph edges. Every visible assignment links back to the original ayah so you can review it.
+
+The source CSV and ontology are fetched at pinned immutable revisions and SHA-256 checked during builds. Only original QSAC topic labels, ontology metadata, and canonical assignment IDs are published as `data/quran/themes.json`; **Saheeh International translation and the separate Arabic text columns are never republished**. QSAC v1.0 annotations and ontology © Ahmad Bilal, CC BY 4.0; see [Phase 2D.1](docs/QURAN_PHASE_2D1.md). The optional theme file is loaded when selected, not included in the PWA installation cache.
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).

@@ -24,6 +24,7 @@ describe('Quran-first canonical route', () => {
       selectedLink: null,
       evidence: 'curated',
       selectedExpression: null,
+      selectedTheme: null,
       morphologyGrouping: 'lemma',
       selectedMorphTerm: null,
       selectedMorphWord: null,
@@ -68,6 +69,25 @@ describe('Quran-first canonical route', () => {
       parseQuranLocation(new URL('https://example.test/?evidence=morphology&term=%20'))
         .selectedMorphTerm,
     ).toBeNull();
+  });
+
+  it('round-trips independent thematic annotations without mixing them into curated or exact evidence', () => {
+    const location = {
+      ...DEFAULT_QURAN_LOCATION,
+      view: 'themes' as const,
+      selectedTheme: 'Divine Mercy',
+      reference: { surah: 55, ayah: 13 },
+    };
+    const href = quranLocationUrl(location, '/quran-cross-references/');
+    expect(href).toContain('view=themes&theme=Divine+Mercy');
+    expect(parseQuranLocation(new URL(href, 'https://example.test'))).toEqual(location);
+    expect(
+      parseQuranLocation(new URL('https://example.test/?view=arcs&theme=Divine+Mercy')),
+    ).toEqual(DEFAULT_QURAN_LOCATION);
+    expect(parseQuranLocation(new URL('https://example.test/?view=themes&theme=%20'))).toEqual({
+      ...DEFAULT_QURAN_LOCATION,
+      view: 'themes',
+    });
   });
 
   it('round-trips analytics URLs while preserving their selected ayah', () => {
