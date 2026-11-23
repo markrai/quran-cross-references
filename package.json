@@ -29,6 +29,7 @@
     "pwa:build": "node scripts/quran/build-pwa.ts",
     "bench:graph": "node scripts/quran/bench-graph.ts",
     "data:expressions": "node scripts/quran/build-expressions.ts",
+    "data:morphology:audit": "node scripts/quran/audit-morphology.ts",
     "bench:expressions": "npm run data:expressions"
   },
   "dependencies": {

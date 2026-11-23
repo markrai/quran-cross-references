@@ -240,6 +240,16 @@ See [Phase 2C.1](QURAN_PHASE_2C1.md).
 
 See [Phase 2C.2](QURAN_PHASE_2C2.md).
 
+### Phase 2B.4A: Morphology source intake (research-only)
+
+- Evaluate the Quranic Arabic Corpus v0.4 (Kais Dukes, GNU GPL) and QuranMorph (SinaLab, CC BY 4.0) as distinct morphology annotation sources.
+- Provide a pinned, offline QAC v0.4 reader that rejects changed upstream bytes, missing license notice, noncanonical references, noncontiguous word/segment numbering and absent stem annotations.
+- Report lemma/root completeness, ambiguous multi-stem words and per-ayah word-count disagreements with our preserved Tanzil Uthmani text.
+- **Do not** publish, relicense or silently align GPL-derived morphology; the main app, offline precache and existing evidence types remain unchanged.
+- Next: verify licensing and implement deterministic surface-form alignment before exposing a separately classified lemma/root view.
+
+See [Phase 2B.4 intake and acceptance](QURAN_PHASE_2B4.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

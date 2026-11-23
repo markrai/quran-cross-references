@@ -95,6 +95,12 @@ The graph is descriptive: connectivity is not a measure of religious significanc
 
 The deterministic `data/quran/topology.json` report is SHA-256 pinned in the Quran manifest and verified against the loaded curated source relationships in the browser before rendering. Its compact footprint is included in the offline PWA; the full `expressions.json` remains on demand. The `view=network&network=ayah&depth=2` route is shareable. See [Phase 2C.2](docs/QURAN_PHASE_2C2.md).
 
+## Morphology source audit (Phase 2B.4A)
+
+An experimental **Quranic Arabic Corpus v0.4 morphology audit** is available for researchers as `npm run data:morphology:audit`. It requires an independently obtained, unmodified `data/raw/quranic-corpus-morphology-0.4.txt`. The project verifies the upstream Git blob identity and audits verse/word/segment positions, lemma/root coverage, ambiguous multi-stem words and count-level alignment with pinned Tanzil Uthmani.
+
+**This phase does not ship or display morphology annotations.** The Quranic Arabic Corpus is distributed under GNU GPL terms and a verbatim-source notice. The project's application is MIT licensed. The licensing treatment for derived datasets, and word-by-word alignment between the Corpus and our different Tanzil whitespace tokenization, require explicit validation before public release. Equal word counts alone are not proof of aligned Arabic text, so the audit never declares them aligned. See [Phase 2B.4 source intake](docs/QURAN_PHASE_2B4.md).
+
 ## Data provenance
 
 The exact source URLs, attribution, rights notes, retrieval dates and SHA-256 pins live in [data/quran/sources.json](data/quran/sources.json).
