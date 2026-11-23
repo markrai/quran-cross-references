@@ -86,7 +86,8 @@ export function QuranThemeLanguage({
   const [sample, setSample] = useState<'theme' | 'outside'>('theme');
   const [showAllSurahs, setShowAllSurahs] = useState(false);
   const sortedThemes = useMemo(() => themes.rankedTags(), [themes]);
-  const selected = (selectedTheme === null ? null : themes.find(selectedTheme)) ?? sortedThemes[0] ?? null;
+  const selected =
+    (selectedTheme === null ? null : themes.find(selectedTheme)) ?? sortedThemes[0] ?? null;
   const source = kind === 'exact' ? expressions : morphology;
   const report = useMemo(() => {
     if (!selected) return null;
