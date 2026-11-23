@@ -112,15 +112,17 @@ describe('Quran offline release shell', () => {
     const fetchHandler = handlers.get('fetch');
     expect(fetchHandler).toBeDefined();
     const fetchCorpus = () => {
-      let response: Promise<unknown> | null = null;
+      let response: Promise<unknown> = Promise.resolve(undefined);
       fetchHandler?.({
         request,
         respondWith(promise) {
           response = promise;
         },
       });
-      if (response === null) throw new Error('No morphology fetch response');
-      return response as Promise<Response>;
+      return response.then((value) => {
+        if (!(value instanceof Response)) throw new Error('No morphology fetch response');
+        return value;
+      });
     };
     const onlineResponse = await fetchCorpus();
     expect(await onlineResponse.text()).toBe('verified-qac-payload');
