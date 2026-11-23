@@ -39,6 +39,26 @@
       "retrievedAt": "2026-11-22",
       "license": "GNU General Public License and verbatim-copy conditions in unmodified source header",
       "attribution": "Quranic Arabic Corpus © 2011 Kais Dukes, https://corpus.quran.com; Quran text copyright © Tanzil Project, https://tanzil.net. The original source file is downloaded verbatim and its copyright header is preserved."
+    },
+    {
+      "id": "qsac-verse-tags-v1",
+      "description": "QSAC v1.0 LLM-assisted and human-reviewed verse thematic annotations, dataset fields imported only from tags",
+      "url": "https://raw.githubusercontent.com/dev-ahmadbilal/quran-semantic-annotation-corpus/cb3852b127bfdda6668c5eec9e5c1d9cdcde3810/data/qsac-dataset.csv",
+      "fileName": "qsac-dataset.csv",
+      "sha256": "e242e15533eea643a5181006501d56fb95b8674362e7b18ea16c08793471b7a2",
+      "retrievedAt": "2026-11-22",
+      "license": "CC BY 4.0 for QSAC annotations; Saheeh International translation and Arabic text columns excluded from derived publication",
+      "attribution": "QSAC: Quran Semantic Annotation Corpus (2026), Ahmad Bilal, https://github.com/dev-ahmadbilal/quran-semantic-annotation-corpus; LLM-assisted annotation, human reviewed."
+    },
+    {
+      "id": "qsac-ontology-v1",
+      "description": "QSAC v1.0 ontology, 18 domains, 70 categories, 338 thematic labels",
+      "url": "https://raw.githubusercontent.com/dev-ahmadbilal/quran-semantic-annotation-corpus/cb3852b127bfdda6668c5eec9e5c1d9cdcde3810/data/qsac-ontology.json",
+      "fileName": "qsac-ontology.json",
+      "sha256": "95637f6ee8be5d7eb234820a2149805eae51e43d5526343290cca51fec2a7524",
+      "retrievedAt": "2026-11-22",
+      "license": "Creative Commons Attribution 4.0 International",
+      "attribution": "QSAC ontology © 2026 Ahmad Bilal, https://github.com/dev-ahmadbilal/quran-semantic-annotation-corpus"
     }
   ]
 }
