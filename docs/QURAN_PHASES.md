@@ -304,6 +304,10 @@ Search existing, verified Uthmani Arabic and Pickthall English text across all 6
 
 Preserve current research and shareable ayah navigation while allowing text-only reading with local language, relative text-size and line-height controls. Keep research evidence classified and recoverable when reading mode exits, and bring linked ayahs into view without altering source text. See [Phase 3B.1](QURAN_PHASE_3B1.md).
 
+### Phase 3B.2: Reading navigation and accessibility
+
+Introduce roving keyboard focus in the bilingual Quran reader, canonical Up/Down and surah Home/End shortcuts, accessible selected-ayah status, surah-level navigation and improved mobile touch targets. Preserve URLs, explicit Arabic/English direction, the verified source texts and the separate release acceptance gates. See [Phase 3B.2](QURAN_PHASE_3B2.md).
+
 ### CI and Windows source integrity
 
 The Quran source importer verifies the original SHA-256 pins. A pre-existing Windows

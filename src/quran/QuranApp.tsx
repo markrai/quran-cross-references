@@ -123,6 +123,8 @@ export function QuranApp() {
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const [offline, setOffline] = useState(() => !navigator.onLine);
   const [readingPreferences, setReadingPreferences] = useState(readReadingPreferences);
+  const mainRef = useRef<HTMLElement>(null);
+  const previousView = useRef(location.view);
   const [expressionState, setExpressionState] = useState<ExpressionLoadState>({ status: 'idle' });
   const [expressionAttempt, setExpressionAttempt] = useState(0);
   const expressionCache = useRef<QuranExpressionIndex | null>(null);
@@ -146,6 +148,12 @@ export function QuranApp() {
   useEffect(() => {
     saveReadingPreferences(readingPreferences);
   }, [readingPreferences]);
+
+  useEffect(() => {
+    if (previousView.current === location.view) return;
+    previousView.current = location.view;
+    mainRef.current?.focus({ preventScroll: true });
+  }, [location.view]);
 
   useEffect(() => {
     const update = () => {
@@ -485,7 +493,13 @@ export function QuranApp() {
         )}
       </header>
 
-      <main id="quran-main" className={styles.main} style={readingStyle}>
+      <main
+        id="quran-main"
+        className={styles.main}
+        style={readingStyle}
+        ref={mainRef}
+        tabIndex={-1}
+      >
         <div className={styles.toolbar}>
           {!readingMode && (
             <div className={styles.viewTabs} role="group" aria-label="Visualization">

@@ -32,6 +32,12 @@ beforeEach(() => {
   vi.mocked(loadQuranReaderData).mockResolvedValue(data);
 });
 
+function findSelectedVerse(reader: Element): HTMLButtonElement {
+  const selected = reader.querySelector<HTMLButtonElement>('ol button[aria-current="true"]');
+  if (selected === null) throw new Error('Selected ayah button not found');
+  return selected;
+}
+
 describe('Quran-first reader', () => {
   it('renders verified Arabic and English text with an isolated Quran header', async () => {
     render(<QuranApp />);
@@ -197,6 +203,95 @@ describe('Quran-first reader', () => {
     const arabic = screen.getByRole('region', { name: 'Quran text and relationship threads' });
     expect(arabic.querySelector('ol')?.querySelector('[lang="en"]')).toBeNull();
     expect(arabic.querySelector('[lang="ar"][dir="rtl"]')).not.toBeNull();
+  });
+
+  it('uses a single tab stop and arrow-key focus across canonical surah boundaries', async () => {
+    window.history.replaceState(null, '', '/?ref=1%3A7&view=threads');
+    render(<QuranApp />);
+    const reader = await screen.findByRole('region', {
+      name: 'Quran text and relationship threads',
+    });
+    const selected = () => findSelectedVerse(reader);
+    expect(reader.querySelectorAll('ol button[tabindex="0"]')).toHaveLength(1);
+    expect(reader.querySelectorAll('ol button[tabindex="-1"]')).toHaveLength(6);
+    expect(reader.querySelector('#quran-verse-keyboard-help')?.textContent).toContain('Up/Down');
+
+    selected().focus();
+    fireEvent.keyDown(selected(), { key: 'ArrowDown' });
+    expect(window.location.search).toContain('ref=2%3A1');
+    expect(reader.querySelectorAll('ol button[tabindex="0"]')).toHaveLength(1);
+    expect(document.activeElement).toBe(selected());
+    expect(screen.getByText('Selected Al-Baqarah 2:1 of 286 ayahs')).toBeTruthy();
+
+    fireEvent.keyDown(selected(), { key: 'End' });
+    expect(window.location.search).toContain('ref=2%3A286');
+    expect(document.activeElement).toBe(selected());
+
+    fireEvent.keyDown(selected(), { key: 'ArrowDown' });
+    expect(window.location.search).toContain('ref=3%3A1');
+    expect(document.activeElement).toBe(selected());
+
+    fireEvent.keyDown(selected(), { key: 'ArrowUp' });
+    expect(window.location.search).toContain('ref=2%3A286');
+    fireEvent.keyDown(selected(), { key: 'Home' });
+    expect(window.location.search).toContain('ref=2%3A1');
+  });
+
+  it('does not capture modified keys or form keyboard actions', async () => {
+    window.history.replaceState(null, '', '/?ref=2%3A1&view=threads');
+    render(<QuranApp />);
+    const reader = await screen.findByRole('region', {
+      name: 'Quran text and relationship threads',
+    });
+    const selected = findSelectedVerse(reader);
+    const original = window.location.search;
+    fireEvent.keyDown(selected, { key: 'ArrowDown', ctrlKey: true });
+    fireEvent.keyDown(selected, { key: 'ArrowUp', shiftKey: true });
+    expect(window.location.search).toBe(original);
+
+    const refInput = screen.getByRole('searchbox', { name: 'Ayah reference' });
+    refInput.focus();
+    fireEvent.keyDown(refInput, { key: 'ArrowDown' });
+    fireEvent.keyDown(refInput, { key: 'End' });
+    expect(window.location.search).toBe(original);
+
+    selected.focus();
+    fireEvent.keyDown(selected, { key: 'ArrowUp' });
+    expect(window.location.search).toContain('ref=1%3A7');
+    expect(document.activeElement).toBe(reader.querySelector('ol button[aria-current="true"]'));
+  });
+
+  it('provides surah navigation in reading mode with reachable selected-ayah focus', async () => {
+    window.history.replaceState(null, '', '/?ref=1%3A1&view=threads');
+    render(<QuranApp />);
+    await screen.findByRole('region', { name: 'Quran text and relationship threads' });
+    fireEvent.click(screen.getByRole('button', { name: 'Enter reading mode' }));
+    const nav = screen.getByRole('navigation', { name: 'Surah navigation' });
+    expect(nav.querySelectorAll('button')).toHaveLength(3);
+    expect(screen.getByRole('button', { name: 'Previous surah' }).hasAttribute('disabled')).toBe(
+      true,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Next surah' }));
+    expect(window.location.search).toContain('ref=2%3A1');
+    fireEvent.click(screen.getByRole('button', { name: 'Focus selected ayah' }));
+    expect(document.activeElement).toBe(
+      screen
+        .getByRole('region', { name: 'Distraction-free Quran reader' })
+        .querySelector('ol button[aria-current="true"]'),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Previous surah' }));
+    expect(window.location.search).toContain('ref=1%3A1');
+  });
+
+  it('moves keyboard focus to the main landmark after a primary view transition', async () => {
+    render(<QuranApp />);
+    await screen.findByRole('heading', { name: /Al-Baqarah.*2:1/ });
+    const main = document.getElementById('quran-main');
+    fireEvent.click(screen.getByRole('button', { name: 'Threads & Reader' }));
+    await screen.findByRole('region', { name: 'Quran text and relationship threads' });
+    expect(document.activeElement).toBe(main);
+    fireEvent.click(screen.getByRole('button', { name: 'Arcs' }));
+    expect(document.activeElement).toBe(main);
   });
 
   it('offers a retry if the dataset load fails', async () => {

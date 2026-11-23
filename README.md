@@ -178,3 +178,11 @@ In **Threads & Reader**, **Enter reading mode** now presents the full surah with
 **Reading settings** offer Arabic only, English only or bilingual; independently sized Arabic and English text (90% to 160%); and compact, comfortable or spacious line height. The selected ayah is scrolled into view in the full-surah reader on deep links and navigation. All options remain in versioned local browser storage, not in share links or remote services.
 
 These controls use the existing Quran text and browser fonts, with no new dataset or backend. See [Phase 3B.1 design and verification](docs/QURAN_PHASE_3B1.md). Original source attribution, `noindex`, offline cache and real-device release gates remain unchanged.
+
+## Reading navigation and accessibility (Phase 3B.2)
+
+The full-surah reader now has **one keyboard tab stop on the selected ayah** instead of requiring a Tab press for each verse. With a verse focused, **Up/Down** moves to the preceding/following canonical ayah (crossing surah boundaries), and **Home/End** jumps to the first/last ayah within the current surah. The active ayah receives focus on keyboard navigation; direct links and search navigation scroll to it without stealing focus. A polite screen-reader status announces the current reference and surah.
+
+Focused reading adds **Previous surah**, **Next surah**, and **Focus selected ayah** actions with 44px touch targets. Switching research views moves focus to the main content landmark; browser history, source evidence, language, and local display preferences are preserved.
+
+See [Phase 3B.2 navigation and accessibility acceptance](docs/QURAN_PHASE_3B2.md). Real-device VoiceOver/TalkBack/NVDA and 200% text-scaling checks remain manual release gates.
